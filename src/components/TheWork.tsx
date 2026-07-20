@@ -13,9 +13,9 @@ export default function TheWork() {
         <p className="text-xs tracking-[0.25em] text-gray-500 uppercase mb-4">
           The work, in its forms
         </p>
-        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.6rem] font-semibold leading-tight max-w-3xl">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.6rem] font-semibold leading-tight max-w-5xl">
           Films, series, journalism, and education
-          <br />
+          <br className="hidden sm:block" />
           that name power and refuse erasure.
         </h2>
       </div>
