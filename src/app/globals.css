@@ -225,9 +225,9 @@
   will-change: width, height, opacity, transform;
 }
 
-/* Carousel initial load — enters after typing finishes */
+/* Carousel initial load — enters after the 3rd line finishes typing */
 .carousel-animate {
-  animation: carouselSlideIn 1.1s cubic-bezier(0.16, 1, 0.3, 1) 3.8s forwards;
+  animation: carouselSlideIn 1.1s cubic-bezier(0.16, 1, 0.3, 1) 1.6s forwards;
   opacity: 0;
 }
 
@@ -235,6 +235,16 @@
 .welcome-animate {
   opacity: 0;
   animation: fadeInUp 0.7s ease-out 4.6s forwards;
+}
+
+/* Fix browser autofill ruining the dark theme on inputs */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active{
+    -webkit-box-shadow: 0 0 0 30px #161616 inset !important;
+    -webkit-text-fill-color: white !important;
+    transition: background-color 5000s ease-in-out 0s;
 }
 
 .welcome-line-animate {

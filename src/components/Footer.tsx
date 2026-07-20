@@ -12,8 +12,9 @@ const FOOTER_LINKS = {
     { label: "The Classroom", href: "/film/the-classroom" },
   ],
   Studio: [
-    { label: "All work", href: "/films" },
-    { label: "Salt and Light", href: "/film/salt-and-light" },
+    { label: "Docuseries", href: "/studio" },
+    { label: "Podcasts & Videocasts", href: "/studio" },
+    { label: "Production Capacity", href: "/studio" },
   ],
   Academy: [
     { label: "All programs", href: "/academy" },

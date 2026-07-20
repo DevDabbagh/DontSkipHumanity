@@ -1,4 +1,4 @@
-import type { Film, AcademyProgram, Article, DSHEvent } from "./types";
+import type { Film, AcademyProgram, Article, DSHEvent, StudioProject } from "./types";
 
 /* ═══════════════════════════════════════
    Mock data — swap with API calls later
@@ -323,6 +323,75 @@ export const MOCK_PROGRAMS: AcademyProgram[] = [
     createdAt: "2026-06-01T10:00:00Z",
     updatedAt: "2026-07-05T09:00:00Z",
   },
+];
+
+export const MOCK_STUDIO: StudioProject[] = [
+  {
+    id: "studio-1",
+    title: "YALLA",
+    slug: "yalla-podcast",
+    format: "podcast",
+    oneLineDescription: "An interview series with Palestinian cultural workers, activists, and journalists.",
+    synopsisShort: "An interview series with Palestinian cultural workers, activists, and journalists. We explore the intersection of art, resistance, and survival.",
+    synopsisLong: "YALLA goes deep into the minds of those who are shaping the Palestinian narrative today. Through long-form interviews, we unpack the realities of creating art under occupation, the burden of representation, and the enduring power of cultural resistance.",
+    episodes: [
+      { title: "Episode 1: The Archive as Resistance", description: "A conversation on preserving memory when history is under attack.", duration: "45:00" },
+      { title: "Episode 2: Filming the Unimaginable", description: "Journalists discuss the ethics and toll of documenting violence.", duration: "52:10" }
+    ],
+    credits: {
+      production: "Don't Skip Humanity",
+      coProduction: "Casa Palestina",
+      hosts: ["Tiago Zorro", "Bisan Owda"],
+      partners: ["Casa Palestina"],
+      year: "2026",
+      language: "Arabic, English"
+    },
+    status: "ongoing",
+    editorialContext: "This series creates space for unmediated Palestinian voices, bypassing the traditional media filters to offer direct, profound insights into cultural resistance.",
+    listenLinks: [
+      { platform: "Spotify", url: "#" },
+      { platform: "Apple Podcasts", url: "#" }
+    ],
+    relatedFilmIds: ["film-001"],
+    relatedArticleIds: [],
+    relatedCampaignIds: [],
+    thumbnailUrl: "/images/journalism.jpg",
+    coverUrl: "/images/slider1.jpg",
+    createdAt: "2026-06-01T10:00:00Z",
+    updatedAt: "2026-06-15T14:30:00Z",
+  },
+  {
+    id: "studio-2",
+    title: "Saber Não Ocupa Espaço",
+    slug: "saber-nao-ocupa",
+    format: "videocast",
+    oneLineDescription: "Conversations that challenge the dominant frame and stay with a subject over time.",
+    synopsisShort: "A videocast diving into structural change, solidarity, and decolonial methods with frontline organizers.",
+    synopsisLong: "Moving beyond soundbites, this series pairs deep research with on-the-ground experience to map out how movements actually build power and sustain care.",
+    episodes: [
+      { title: "Part 1: The Architecture of Care", description: "How movements structure support internally." }
+    ],
+    credits: {
+      production: "Don't Skip Humanity",
+      coProduction: "",
+      hosts: ["Catarina Marques Rodrigues"],
+      partners: [],
+      year: "2026",
+      language: "Portuguese"
+    },
+    status: "ongoing",
+    editorialContext: "A space for rigorous political education that treats the audience as active participants rather than passive consumers.",
+    listenLinks: [
+      { platform: "YouTube", url: "#" }
+    ],
+    relatedFilmIds: [],
+    relatedArticleIds: [],
+    relatedCampaignIds: [],
+    thumbnailUrl: "/images/political-education.jpg",
+    coverUrl: "/images/studio.jpg",
+    createdAt: "2026-05-01T10:00:00Z",
+    updatedAt: "2026-05-15T14:30:00Z",
+  }
 ];
 
 export const MOCK_ARTICLES: Article[] = [

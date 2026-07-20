@@ -59,6 +59,40 @@ export interface Film {
   updatedAt: string;
 }
 
+/* ─── Studio ──────────────────────────────────────────────────── */
+
+export type StudioFormat = "docuseries" | "videocast" | "podcast" | "series" | "other";
+export type StudioStatus = "ongoing" | "complete" | "upcoming";
+
+export interface StudioProject {
+  id: string;
+  title: string;
+  slug: string;
+  format: StudioFormat;
+  oneLineDescription: string;
+  synopsisShort: string;
+  synopsisLong: string;
+  episodes: { title: string; description: string; duration?: string }[];
+  credits: {
+    production: string;
+    coProduction: string;
+    hosts: string[];
+    partners: string[];
+    year: string;
+    language: string;
+  };
+  status: StudioStatus;
+  editorialContext: string;
+  listenLinks: { platform: string; url: string }[];
+  relatedFilmIds: string[];
+  relatedArticleIds: string[];
+  relatedCampaignIds: string[];
+  thumbnailUrl: string;
+  coverUrl: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 /* ─── Academy ─────────────────────────────────────────────────── */
 
 export type AcademyType = "course" | "workshop" | "toolkit" | "resource" | "mentorship";
