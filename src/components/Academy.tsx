@@ -30,11 +30,21 @@ export default function Academy() {
   const sectionRef = useReveal();
 
   return (
-    <section id="academy" className="py-16 sm:py-20 lg:py-24" ref={sectionRef}>
-      <div className="px-5 sm:px-8 max-w-[1400px] mx-auto">
-        <div className="flex flex-col lg:flex-row gap-10 lg:gap-0">
-          {/* Left content — clean dark background */}
-          <div className="reveal-left lg:w-[45%] lg:pr-16">
+    <section id="academy" className="relative py-16 sm:py-20 lg:py-24" ref={sectionRef}>
+      {/* Full-section background image */}
+      <div className="absolute inset-0 overflow-hidden">
+        <img
+          src="/images/political-education.jpg"
+          alt=""
+          className="w-full h-full object-cover opacity-20"
+        />
+        <div className="absolute inset-0 bg-[#0D0D0D]/60" />
+      </div>
+
+      <div className="relative px-5 sm:px-8 max-w-[1400px] mx-auto">
+        <div className="flex flex-col md:flex-row gap-8 md:gap-12">
+          {/* Left — header + description */}
+          <div className="reveal-left md:w-1/2">
             <p className="text-xs tracking-[0.25em] text-gray-500 uppercase mb-4">
               Academy
             </p>
@@ -52,71 +62,31 @@ export default function Academy() {
             </p>
 
             <p className="text-[#1ABC9C] text-sm mt-4">Free by principle</p>
-
-            {/* Numbered items */}
-            <div className="mt-10 space-y-8">
-              {ACADEMY_ITEMS.map((item, i) => (
-                <div key={item.num} className={`reveal stagger-${i + 1}`}>
-                  <span className="text-xs text-[#1ABC9C] font-mono">{item.num}</span>
-                  <h4 className="text-white font-medium mt-1">{item.title}</h4>
-                  <p className="text-sm text-gray-500 mt-1">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Buttons */}
-            <div className="reveal stagger-5 flex items-center gap-4 mt-10">
-              <Link href="/academy" className="text-sm border border-white/15 rounded-full px-5 py-2 text-white hover:bg-white/5 transition-colors">
-                Enter the Academy +
-              </Link>
-              <Link href="/course/community-screening-toolkit" className="text-sm text-gray-400 hover:text-white transition-colors flex items-center gap-1">
-                Browse resources
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H7M17 7v10" />
-                </svg>
-              </Link>
-            </div>
           </div>
 
-          {/* Right — background image + 3 overlapping cards */}
-          <div className="reveal-right lg:w-[55%] relative min-h-[400px] sm:min-h-[500px] lg:min-h-[700px]">
-            {/* Background image — right column only, visible */}
-            <div className="absolute inset-0 rounded-lg overflow-hidden">
-              <img
-                src="/images/political-education.jpg"
-                alt=""
-                className="w-full h-full object-cover opacity-[0.35]"
-              />
-              <div className="absolute inset-0 bg-[#0D0D0D]/40" />
-            </div>
-
-            {/* Card 1 — top right, portrait */}
-            <div className="reveal-scale stagger-1 absolute top-6 right-4 sm:right-8 w-[180px] sm:w-[220px] lg:w-[250px] aspect-[3/4] rounded-lg overflow-hidden shadow-[0_8px_40px_rgba(0,0,0,0.5)] border border-white/10 z-[3]">
-              <img
-                src="/images/journalism.jpg"
-                alt="Speaker at event"
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            {/* Card 2 — middle, shifted left, landscape */}
-            <div className="reveal-scale stagger-2 absolute top-[32%] left-4 sm:left-8 w-[170px] sm:w-[200px] lg:w-[220px] aspect-[4/3] rounded-lg overflow-hidden shadow-[0_8px_40px_rgba(0,0,0,0.5)] border border-white/10 z-[2]">
-              <img
-                src="/images/studio.jpg"
-                alt="Workshop collaboration"
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            {/* Card 3 — bottom right, portrait */}
-            <div className="reveal-scale stagger-3 absolute bottom-4 right-[10%] w-[170px] sm:w-[210px] lg:w-[230px] aspect-[3/4] rounded-lg overflow-hidden shadow-[0_8px_40px_rgba(0,0,0,0.5)] border border-white/10 z-[3]">
-              <img
-                src="/images/infocus.jpg"
-                alt="Catarina Marques Rodrigues"
-                className="w-full h-full object-cover"
-              />
-            </div>
+          {/* Right — numbered items with dark card backgrounds */}
+          <div className="reveal-right md:w-1/2 space-y-4 md:pt-8">
+            {ACADEMY_ITEMS.map((item, i) => (
+              <div key={item.num} className={`reveal stagger-${i + 1} rounded-xl bg-[#1A1A1A]/80 backdrop-blur-sm border border-white/5 p-5`}>
+                <span className="text-xs text-[#1ABC9C] font-mono">{item.num}</span>
+                <h4 className="text-white font-medium mt-1">{item.title}</h4>
+                <p className="text-sm text-gray-500 mt-1">{item.desc}</p>
+              </div>
+            ))}
           </div>
+        </div>
+
+        {/* Buttons */}
+        <div className="reveal stagger-5 flex items-center gap-4 mt-10">
+          <Link href="/academy" className="text-sm border border-white/15 rounded-full px-5 py-2 text-white hover:bg-white/5 transition-colors">
+            Enter the Academy +
+          </Link>
+          <Link href="/course/community-screening-toolkit" className="text-sm text-gray-400 hover:text-white transition-colors flex items-center gap-1">
+            Browse resources
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H7M17 7v10" />
+            </svg>
+          </Link>
         </div>
       </div>
     </section>
