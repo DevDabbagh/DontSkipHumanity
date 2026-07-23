@@ -77,28 +77,41 @@ export default function Academy() {
           </div>
         </div>
 
-        {/* Right images — stacked collage */}
-        <div className="reveal-right lg:w-1/2 relative min-h-[300px] sm:min-h-[400px] lg:min-h-[600px]">
-          {/* Background image */}
+        {/* Right images — 3-card stacked collage matching design */}
+        <div className="reveal-right lg:w-1/2 relative min-h-[400px] sm:min-h-[500px] lg:min-h-[700px]">
+          {/* Background image — visible behind cards */}
           <div className="absolute inset-0 rounded-lg overflow-hidden">
             <img
               src="/images/political-education.jpg"
               alt="Classroom setting"
-              className="w-full h-full object-cover opacity-30"
+              className="w-full h-full object-cover opacity-60"
             />
+            <div className="absolute inset-0 bg-[#0D0D0D]/30" />
           </div>
-          {/* Overlapping cards */}
-          <div className="reveal-scale stagger-2 absolute top-16 right-4 w-[300px] h-[200px] rounded-lg overflow-hidden shadow-2xl border border-white/5">
+
+          {/* Card 1 — top right, portrait, largest */}
+          <div className="reveal-scale stagger-1 absolute top-8 right-0 w-[220px] sm:w-[260px] lg:w-[280px] aspect-[3/4] rounded-lg overflow-hidden shadow-2xl border border-white/10">
             <img
               src="/images/journalism.jpg"
+              alt="Speaker at event"
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          {/* Card 2 — middle, shifted left, landscape */}
+          <div className="reveal-scale stagger-2 absolute top-[35%] right-[25%] w-[200px] sm:w-[240px] lg:w-[260px] aspect-[4/3] rounded-lg overflow-hidden shadow-2xl border border-white/10">
+            <img
+              src="/images/studio.jpg"
               alt="Workshop collaboration"
               className="w-full h-full object-cover"
             />
           </div>
-          <div className="reveal-scale stagger-3 absolute bottom-20 right-16 w-[300px] h-[200px] rounded-lg overflow-hidden shadow-2xl border border-white/5">
+
+          {/* Card 3 — bottom right, portrait */}
+          <div className="reveal-scale stagger-3 absolute bottom-8 right-[10%] w-[200px] sm:w-[230px] lg:w-[250px] aspect-[3/4] rounded-lg overflow-hidden shadow-2xl border border-white/10">
             <img
               src="/images/infocus.jpg"
-              alt="Speaker at event"
+              alt="Catarina Marques Rodrigues"
               className="w-full h-full object-cover"
             />
           </div>
