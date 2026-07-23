@@ -1,4 +1,4 @@
-import { MOCK_STUDIO } from "@/lib/mock-data";
+import { getStudioProjects } from "@/lib/api";
 import StudioListing from "./StudioListing";
 
 export const metadata = {
@@ -6,6 +6,7 @@ export const metadata = {
   description: "Docuseries, videocasts, podcasts, and series — and the production and co-production capacity behind them.",
 };
 
-export default function StudioPage() {
-  return <StudioListing projects={MOCK_STUDIO} />;
+export default async function StudioPage() {
+  const projects = await getStudioProjects();
+  return <StudioListing projects={projects} />;
 }

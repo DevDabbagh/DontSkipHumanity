@@ -84,7 +84,7 @@ export default function Hero() {
         clearTimeout(blinkTimer);
       };
     }
-    
+
     // Wait 500ms before starting to type the third line
     const speed = typedChars === initialChars ? 500 : Math.random() * 20 + 15;
     const timer = setTimeout(() => setTypedChars((c) => c + 1), speed);
@@ -107,7 +107,7 @@ export default function Hero() {
     // Wait for the entrance animation to finish before starting the timer,
     // and set the interval to 10 seconds (10000ms)
     if (carouselState !== 'full-visible') return;
-    
+
     const timer = setInterval(next, 10000);
     return () => clearInterval(timer);
   }, [next, carouselState]);
@@ -168,7 +168,7 @@ export default function Hero() {
         <div className="carousel-animate relative overflow-hidden py-4 lg:py-8">
           {/* Spotlight/Glow effect behind the active card to create a strong focus */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] sm:w-[600px] md:w-[800px] h-[400px] sm:h-[600px] md:h-[800px] bg-[radial-gradient(circle,rgba(255,255,255,0.08)_0%,transparent_70%)] pointer-events-none z-0" />
-        
+
         <div className="carousel-track relative w-full h-[300px] sm:h-[340px] md:h-[400px] lg:h-[440px] z-10">
           {visibleItems.map(({ item, index, offset }) => {
             const isActive = offset === 0;
@@ -289,7 +289,7 @@ export default function Hero() {
             );
           })}
         </div>
-        
+
         {/* Edge Shadows (Fade) to blend into the background seamlessly */}
         <div className="absolute top-0 bottom-0 left-0 w-[20%] lg:w-[25%] bg-gradient-to-r from-[#0D0D0D] via-[#0D0D0D]/90 to-transparent pointer-events-none z-50" />
         <div className="absolute top-0 bottom-0 right-0 w-[20%] lg:w-[25%] bg-gradient-to-l from-[#0D0D0D] via-[#0D0D0D]/90 to-transparent pointer-events-none z-50" />

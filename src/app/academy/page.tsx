@@ -1,4 +1,4 @@
-import { MOCK_PROGRAMS } from "@/lib/mock-data";
+import { getPrograms } from "@/lib/api";
 import AcademyListing from "./AcademyListing";
 
 export const metadata = {
@@ -6,7 +6,7 @@ export const metadata = {
   description: "Courses, workshops, toolkits, and fellowships — education rooted in justice, craft, and collective liberation.",
 };
 
-export default function AcademyPage() {
-  const programs = MOCK_PROGRAMS.filter((p) => p.status === "published");
+export default async function AcademyPage() {
+  const programs = await getPrograms();
   return <AcademyListing programs={programs} />;
 }

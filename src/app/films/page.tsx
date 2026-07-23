@@ -1,4 +1,4 @@
-import { MOCK_FILMS } from "@/lib/mock-data";
+import { getFilms } from "@/lib/api";
 import FilmsListing from "./FilmsListing";
 
 export const metadata = {
@@ -6,7 +6,7 @@ export const metadata = {
   description: "Documentary and fiction that stay close — to siege, displacement, and the daily labour of remaining human.",
 };
 
-export default function FilmsPage() {
-  const films = MOCK_FILMS.filter((f) => f.status === "published");
+export default async function FilmsPage() {
+  const films = await getFilms();
   return <FilmsListing films={films} />;
 }

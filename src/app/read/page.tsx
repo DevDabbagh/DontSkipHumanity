@@ -1,4 +1,4 @@
-import { MOCK_ARTICLES } from "@/lib/mock-data";
+import { getArticles } from "@/lib/api";
 import ReadListing from "./ReadListing";
 
 export const metadata = {
@@ -6,7 +6,7 @@ export const metadata = {
   description: "Journalism, essays, opinion, and field notes — work that names what power tries to hide.",
 };
 
-export default function ReadPage() {
-  const articles = MOCK_ARTICLES.filter((a) => a.status === "published");
+export default async function ReadPage() {
+  const articles = await getArticles();
   return <ReadListing articles={articles} />;
 }

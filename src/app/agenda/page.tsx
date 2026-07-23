@@ -1,4 +1,4 @@
-import { MOCK_EVENTS } from "@/lib/mock-data";
+import { getEvents } from "@/lib/api";
 import AgendaListing from "./AgendaListing";
 
 export const metadata = {
@@ -6,6 +6,7 @@ export const metadata = {
   description: "Screenings, workshops, and public programming — where the work meets the world.",
 };
 
-export default function AgendaPage() {
-  return <AgendaListing events={MOCK_EVENTS} />;
+export default async function AgendaPage() {
+  const events = await getEvents();
+  return <AgendaListing events={events} />;
 }

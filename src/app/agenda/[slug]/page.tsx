@@ -1,14 +1,10 @@
 import { notFound } from "next/navigation";
-import { getEventBySlug, MOCK_EVENTS } from "@/lib/mock-data";
+import { getEventBySlug, getEvents } from "@/lib/api";
 import EventContent from "./EventContent";
-
-export function generateStaticParams() {
-  return MOCK_EVENTS.map((e) => ({ slug: e.slug }));
-}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const event = getEventBySlug(slug);
+  const event = await getEventBySlug(slug);
   if (!event) return { title: "Event Not Found — DSH" };
   return {
     title: `${event.title} — Don't Skip Humanity`,
@@ -18,10 +14,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function EventPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const event = getEventBySlug(slug);
+  const event = await getEventBySlug(slug);
   if (!event) notFound();
 
-  const relatedEvents = MOCK_EVENTS
+  const allEvents = await getEvents();
+  const relatedEvents = allEvents
     .filter((e) => e.slug !== event.slug)
     .slice(0, 3);
 

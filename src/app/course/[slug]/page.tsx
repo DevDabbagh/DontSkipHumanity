@@ -1,14 +1,10 @@
 import { notFound } from "next/navigation";
-import { getProgramBySlug, MOCK_PROGRAMS } from "@/lib/mock-data";
+import { getProgramBySlug, getPrograms } from "@/lib/api";
 import CourseContent from "./CourseContent";
-
-export function generateStaticParams() {
-  return MOCK_PROGRAMS.filter((p) => p.status === "published").map((p) => ({ slug: p.slug }));
-}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const program = getProgramBySlug(slug);
+  const program = await getProgramBySlug(slug);
   if (!program) return { title: "Course Not Found — DSH" };
   return {
     title: `${program.title} — DSH Academy`,
@@ -18,11 +14,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function CoursePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const program = getProgramBySlug(slug);
+  const program = await getProgramBySlug(slug);
   if (!program) notFound();
 
-  const relatedPrograms = MOCK_PROGRAMS
-    .filter((p) => p.slug !== program.slug && p.status === "published")
+  const allPrograms = await getPrograms();
+  const relatedPrograms = allPrograms
+    .filter((p) => p.slug !== program.slug)
     .slice(0, 3);
 
   return <CourseContent program={program} relatedPrograms={relatedPrograms} />;
