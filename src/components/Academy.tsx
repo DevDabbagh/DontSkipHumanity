@@ -79,7 +79,7 @@ export default function Academy() {
           </div>
 
           {/* Right — background image only, no overlay cards */}
-          <div className="reveal-right lg:w-[55%] relative min-h-[400px] sm:min-h-[500px] lg:min-h-[700px]">
+          <div className="reveal-right lg:w-[55%] relative min-h-[300px] sm:min-h-[400px] lg:min-h-[500px]">
             <div className="absolute inset-0 rounded-lg overflow-hidden">
               <img
                 src="/images/political-education.jpg"
