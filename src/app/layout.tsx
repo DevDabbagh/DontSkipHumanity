@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import CustomCursor from "@/components/CustomCursor";
+import SupportBanner from "@/components/SupportBanner";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -22,8 +24,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} antialiased`}>
       <body className="min-h-screen bg-[#0D0D0D] text-white font-[var(--font-inter)]">
-        <CustomCursor />
-        {children}
+        <AuthProvider>
+          <CustomCursor />
+          {children}
+          <SupportBanner />
+        </AuthProvider>
       </body>
     </html>
   );
