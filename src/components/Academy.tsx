@@ -30,7 +30,7 @@ export default function Academy() {
   const sectionRef = useReveal();
 
   return (
-    <section id="academy" className="py-16 sm:py-20 lg:py-24" ref={sectionRef}>
+    <section id="academy" className="py-12 sm:py-16 lg:py-20" ref={sectionRef}>
       <div className="px-5 sm:px-8 max-w-[1400px] mx-auto">
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-0">
           {/* Left — text + numbered items on clean dark background */}
@@ -54,7 +54,7 @@ export default function Academy() {
             <p className="text-[#1ABC9C] text-sm mt-4">Free by principle</p>
 
             {/* Numbered items — plain text, no cards */}
-            <div className="mt-10 space-y-8">
+            <div className="mt-8 space-y-5">
               {ACADEMY_ITEMS.map((item, i) => (
                 <div key={item.num} className={`reveal stagger-${i + 1}`}>
                   <span className="text-xs text-[#1ABC9C] font-mono">{item.num}</span>
@@ -65,7 +65,7 @@ export default function Academy() {
             </div>
 
             {/* Buttons */}
-            <div className="reveal stagger-5 flex items-center gap-4 mt-10">
+            <div className="reveal stagger-5 flex items-center gap-4 mt-8">
               <Link href="/academy" className="text-sm border border-white/15 rounded-full px-5 py-2 text-white hover:bg-white/5 transition-colors">
                 Enter the Academy +
               </Link>
