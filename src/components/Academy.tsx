@@ -78,9 +78,8 @@ export default function Academy() {
             </div>
           </div>
 
-          {/* Right — background image with one overlapping photo card */}
+          {/* Right — background image only, no overlay cards */}
           <div className="reveal-right lg:w-[55%] relative min-h-[400px] sm:min-h-[500px] lg:min-h-[700px]">
-            {/* Background image — right column only */}
             <div className="absolute inset-0 rounded-lg overflow-hidden">
               <img
                 src="/images/political-education.jpg"
@@ -88,15 +87,6 @@ export default function Academy() {
                 className="w-full h-full object-cover opacity-[0.35]"
               />
               <div className="absolute inset-0 bg-[#0D0D0D]/40" />
-            </div>
-
-            {/* Single photo card overlay — centered */}
-            <div className="reveal-scale stagger-2 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[220px] sm:w-[280px] lg:w-[320px] aspect-[3/4] rounded-lg overflow-hidden shadow-[0_8px_40px_rgba(0,0,0,0.5)] border border-white/10">
-              <img
-                src="/images/journalism.jpg"
-                alt="Academy workshop"
-                className="w-full h-full object-cover"
-              />
             </div>
           </div>
         </div>
