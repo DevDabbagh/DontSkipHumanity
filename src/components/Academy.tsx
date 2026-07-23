@@ -30,21 +30,11 @@ export default function Academy() {
   const sectionRef = useReveal();
 
   return (
-    <section id="academy" className="relative py-16 sm:py-20 lg:py-24" ref={sectionRef}>
-      {/* Full-section background image */}
-      <div className="absolute inset-0 overflow-hidden">
-        <img
-          src="/images/political-education.jpg"
-          alt=""
-          className="w-full h-full object-cover opacity-20"
-        />
-        <div className="absolute inset-0 bg-[#0D0D0D]/60" />
-      </div>
-
-      <div className="relative px-5 sm:px-8 max-w-[1400px] mx-auto">
-        <div className="flex flex-col lg:flex-row gap-10 lg:gap-20">
-          {/* Left content */}
-          <div className="reveal-left lg:w-1/2">
+    <section id="academy" className="py-16 sm:py-20 lg:py-24" ref={sectionRef}>
+      <div className="px-5 sm:px-8 max-w-[1400px] mx-auto">
+        <div className="flex flex-col lg:flex-row gap-10 lg:gap-0">
+          {/* Left content — clean dark background */}
+          <div className="reveal-left lg:w-[45%] lg:pr-16">
             <p className="text-xs tracking-[0.25em] text-gray-500 uppercase mb-4">
               Academy
             </p>
@@ -88,10 +78,20 @@ export default function Academy() {
             </div>
           </div>
 
-          {/* Right images — 3-card stacked collage */}
-          <div className="reveal-right lg:w-1/2 relative min-h-[400px] sm:min-h-[500px] lg:min-h-[700px]">
+          {/* Right — background image + 3 overlapping cards */}
+          <div className="reveal-right lg:w-[55%] relative min-h-[400px] sm:min-h-[500px] lg:min-h-[700px]">
+            {/* Background image — right column only, visible */}
+            <div className="absolute inset-0 rounded-lg overflow-hidden">
+              <img
+                src="/images/political-education.jpg"
+                alt=""
+                className="w-full h-full object-cover opacity-[0.35]"
+              />
+              <div className="absolute inset-0 bg-[#0D0D0D]/40" />
+            </div>
+
             {/* Card 1 — top right, portrait */}
-            <div className="reveal-scale stagger-1 absolute top-4 right-0 w-[180px] sm:w-[210px] lg:w-[230px] aspect-[3/4] rounded-lg overflow-hidden shadow-2xl border border-white/10 z-[3]">
+            <div className="reveal-scale stagger-1 absolute top-6 right-4 sm:right-8 w-[180px] sm:w-[220px] lg:w-[250px] aspect-[3/4] rounded-lg overflow-hidden shadow-[0_8px_40px_rgba(0,0,0,0.5)] border border-white/10 z-[3]">
               <img
                 src="/images/journalism.jpg"
                 alt="Speaker at event"
@@ -99,8 +99,8 @@ export default function Academy() {
               />
             </div>
 
-            {/* Card 2 — middle left, landscape */}
-            <div className="reveal-scale stagger-2 absolute top-[30%] left-[5%] w-[180px] sm:w-[210px] lg:w-[230px] aspect-[4/3] rounded-lg overflow-hidden shadow-2xl border border-white/10 z-[2]">
+            {/* Card 2 — middle, shifted left, landscape */}
+            <div className="reveal-scale stagger-2 absolute top-[32%] left-4 sm:left-8 w-[170px] sm:w-[200px] lg:w-[220px] aspect-[4/3] rounded-lg overflow-hidden shadow-[0_8px_40px_rgba(0,0,0,0.5)] border border-white/10 z-[2]">
               <img
                 src="/images/studio.jpg"
                 alt="Workshop collaboration"
@@ -109,7 +109,7 @@ export default function Academy() {
             </div>
 
             {/* Card 3 — bottom right, portrait */}
-            <div className="reveal-scale stagger-3 absolute bottom-0 right-[5%] w-[180px] sm:w-[210px] lg:w-[240px] aspect-[3/4] rounded-lg overflow-hidden shadow-2xl border border-white/10 z-[3]">
+            <div className="reveal-scale stagger-3 absolute bottom-4 right-[10%] w-[170px] sm:w-[210px] lg:w-[230px] aspect-[3/4] rounded-lg overflow-hidden shadow-[0_8px_40px_rgba(0,0,0,0.5)] border border-white/10 z-[3]">
               <img
                 src="/images/infocus.jpg"
                 alt="Catarina Marques Rodrigues"
