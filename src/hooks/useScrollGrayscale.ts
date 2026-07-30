@@ -22,13 +22,18 @@ export function useScrollGrayscale<T extends HTMLElement = HTMLDivElement>() {
       const rect = el.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
 
-      // Progress 0 → element's top is at the bottom of the viewport.
-      // Progress 1 → element's top has reached ~35% up from the top of the viewport.
-      const start = vh;
-      const end = vh * 0.35;
+      // Progress 0 → element's top is still in the lower part of the viewport
+      // (clearly below the reading line, stays fully black & white).
+      // Progress 1 → element's top has scrolled up near the top of the viewport
+      // (fully colored). The band between is wide on purpose so the fade is
+      // slow and obvious while scrolling, not a quick, barely-visible tint shift.
+      const start = vh * 0.85;
+      const end = vh * 0.15;
       const raw = (start - rect.top) / (start - end);
       const clamped = Math.min(1, Math.max(0, raw));
-      setColorAmount(clamped);
+      // Ease so it holds near full grayscale a little longer before ramping to color.
+      const eased = clamped * clamped * (3 - 2 * clamped); // smoothstep
+      setColorAmount(eased);
     };
 
     const onScroll = () => {
