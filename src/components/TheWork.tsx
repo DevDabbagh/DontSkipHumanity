@@ -9,7 +9,7 @@ export default function TheWork() {
   return (
     <section id="films" className="py-16 sm:py-20 lg:py-24 px-5 sm:px-8 max-w-[1400px] mx-auto" ref={sectionRef}>
       {/* Section header */}
-      <div className="reveal mb-12 sm:mb-16 lg:mb-20">
+      <div className="reveal mb-16 sm:mb-20 lg:mb-24">
         <p className="text-xs tracking-[0.25em] text-gray-500 uppercase mb-4">
           The work, in its forms
         </p>
@@ -21,9 +21,9 @@ export default function TheWork() {
       </div>
 
       {/* Films — image left, text right */}
-      <div className="flex flex-col md:flex-row gap-8 md:gap-16 items-start mb-16 sm:mb-20 lg:mb-28">
+      <div className="flex flex-col md:flex-row gap-8 md:gap-14 items-start mb-20 sm:mb-24 lg:mb-28">
         <div className="reveal-left stagger-1 md:w-1/2">
-          <div className="relative aspect-[4/3] rounded-lg overflow-hidden">
+          <div className="relative aspect-[9/2] rounded-lg overflow-hidden">
             <img
               src="/images/slider1.jpg"
               alt="Elderly hands clasped together"
@@ -31,14 +31,14 @@ export default function TheWork() {
             />
           </div>
         </div>
-        <div className="reveal-right stagger-2 md:w-1/2 md:pt-8">
-          <h3 className="text-2xl md:text-3xl font-semibold flex items-center gap-2">
+        <div className="reveal-right stagger-2 md:w-1/2">
+          <h3 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
             Films
             <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 010 1.972l-11.54 6.347a1.125 1.125 0 01-1.667-.986V5.653z" />
             </svg>
           </h3>
-          <p className="text-gray-400 mt-4 leading-relaxed max-w-lg">
+          <p className="text-sm text-gray-400 mt-4 leading-relaxed max-w-lg">
             Documentary and fiction that stay close — to siege, displacement,
             and the daily labour of remaining human — and refuse the distance
             through which violence is made acceptable. Festivals, screenings,
@@ -51,9 +51,9 @@ export default function TheWork() {
       </div>
 
       {/* Studio — text left, image right */}
-      <div id="studio" className="flex flex-col md:flex-row-reverse gap-8 md:gap-16 items-start">
+      <div id="studio" className="flex flex-col md:flex-row-reverse gap-8 md:gap-14 items-start">
         <div className="reveal-right stagger-1 md:w-1/2">
-          <div className="relative aspect-[4/3] rounded-lg overflow-hidden">
+          <div className="relative aspect-[9/2] rounded-lg overflow-hidden">
             <img
               src="/images/studio.jpg"
               alt="Studio portrait"
@@ -61,12 +61,12 @@ export default function TheWork() {
             />
           </div>
         </div>
-        <div className="reveal-left stagger-2 md:w-1/2 md:pt-8">
-          <h3 className="text-2xl md:text-3xl font-semibold flex items-center gap-2">
+        <div className="reveal-left stagger-2 md:w-1/2">
+          <h3 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
             Studio
             <span className="text-gray-500 text-lg">🎙</span>
           </h3>
-          <p className="text-gray-400 mt-4 leading-relaxed max-w-lg">
+          <p className="text-sm text-gray-400 mt-4 leading-relaxed max-w-lg">
             Docuseries, videocasts, podcasts, and series — and the production
             and co-production capacity behind them. Bold, independent media
             that strengthens movements, made with the same politics and care.

@@ -10,8 +10,8 @@
   --color-dsh-text: #FFFFFF;
   --color-dsh-text-primary: #F0F0F0;
   --color-dsh-muted: #999999;
-  --color-dsh-nav: #999999;
-  --color-dsh-nav-hover: #F0F0F0;
+  --color-dsh-nav: #F0F0F0;
+  --color-dsh-nav-hover: #FFFFFF;
   --font-sans: var(--font-inter);
 }
 
