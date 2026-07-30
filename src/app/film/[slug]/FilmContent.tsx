@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useReveal } from "@/hooks/useReveal";
-import InternalNav from "@/components/InternalNav";
+import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import type { Film } from "@/lib/types";
 
@@ -21,7 +21,7 @@ export default function FilmContent({ film, relatedFilms }: { film: Film; relate
 
   return (
     <main className="min-h-screen bg-[#0D0D0D] text-white">
-      <InternalNav section={film.title} backLabel="Films" backHref="/films" />
+      <Navbar />
 
       {/* Cinematic hero banner */}
       <section className="relative pt-14">

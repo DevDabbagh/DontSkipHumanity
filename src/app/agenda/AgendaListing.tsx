@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useReveal } from "@/hooks/useReveal";
-import InternalNav from "@/components/InternalNav";
+import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import type { DSHEvent } from "@/lib/types";
 
@@ -32,7 +32,7 @@ export default function AgendaListing({ events }: { events: DSHEvent[] }) {
 
   return (
     <main className="min-h-screen bg-[#0D0D0D] text-white">
-      <InternalNav section="Agenda" />
+      <Navbar />
 
       <section className="pt-14">
         <div className="max-w-[1400px] mx-auto px-5 sm:px-8 pt-16 sm:pt-20 pb-10">

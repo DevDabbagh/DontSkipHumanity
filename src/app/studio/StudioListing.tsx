@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useReveal } from "@/hooks/useReveal";
-import InternalNav from "@/components/InternalNav";
+import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import type { StudioProject } from "@/lib/types";
 
@@ -25,7 +25,7 @@ export default function StudioListing({ projects }: { projects: StudioProject[] 
 
   return (
     <main className="min-h-screen bg-[#0D0D0D] text-white">
-      <InternalNav section="Studio" />
+      <Navbar />
 
       {/* Hero */}
       <section className="pt-14">

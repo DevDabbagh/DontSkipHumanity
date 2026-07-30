@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useReveal } from "@/hooks/useReveal";
-import InternalNav from "@/components/InternalNav";
+import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import type { Film } from "@/lib/types";
 
@@ -22,7 +22,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
 
   return (
     <main className="min-h-screen bg-[#0D0D0D] text-white">
-      <InternalNav section="Films" />
+      <Navbar />
 
       {/* Hero */}
       <section className="pt-14">

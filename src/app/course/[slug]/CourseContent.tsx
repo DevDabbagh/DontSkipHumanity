@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useReveal } from "@/hooks/useReveal";
-import InternalNav from "@/components/InternalNav";
+import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import type { AcademyProgram } from "@/lib/types";
 
@@ -34,7 +34,7 @@ export default function CourseContent({
 
   return (
     <main className="min-h-screen bg-[#0D0D0D] text-white">
-      <InternalNav section={program.title} backLabel="Academy" backHref="/academy" />
+      <Navbar />
 
       {/* Hero */}
       <section className="relative pt-14">

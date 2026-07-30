@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useReveal } from "@/hooks/useReveal";
-import InternalNav from "@/components/InternalNav";
+import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import type { DSHEvent } from "@/lib/types";
 
@@ -53,7 +53,7 @@ export default function EventContent({
 
   return (
     <main className="min-h-screen bg-[#0D0D0D] text-white">
-      <InternalNav section={event.title} backLabel="Agenda" backHref="/agenda" />
+      <Navbar />
 
       {/* Hero */}
       <section className="relative pt-14">

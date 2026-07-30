@@ -322,7 +322,18 @@ export default function Hero() {
       {/* Welcome text — delayed entrance */}
       <div className={`welcome-animate text-center mt-10 sm:mt-14 transition-all duration-1000 ${carouselState === 'full-visible' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
         <p className="text-xs sm:text-sm text-gray-500 tracking-wide">Welcome to our world!</p>
-        <div className="welcome-line-animate w-px bg-gray-600 mx-auto mt-3 h-[40px]" />
+
+        {/* Scroll indicator — animated mouse with travelling wheel dot + bouncing chevron */}
+        <div className="scroll-indicator flex flex-col items-center mt-4">
+          <div className="scroll-indicator-mouse">
+            <span className="scroll-indicator-dot" />
+          </div>
+          <div className="scroll-indicator-chevron">
+            <svg width="12" height="7" viewBox="0 0 12 7" fill="none">
+              <path d="M1 1l5 4.5L11 1" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+        </div>
       </div>
     </section>
   );
