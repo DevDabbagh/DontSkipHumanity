@@ -1,26 +1,25 @@
 "use client";
 
 import { useReveal } from "@/hooks/useReveal";
+import ScrollColorImage from "./ScrollColorImage";
 
 export default function InFocus() {
   const sectionRef = useReveal();
 
   return (
-    <section className="py-16 sm:py-20 lg:py-24 px-5 sm:px-8 max-w-[1400px] mx-auto" ref={sectionRef}>
-      <div className="flex flex-col md:flex-row gap-8 md:gap-16 items-start">
-        {/* Image */}
-        <div className="reveal-left md:w-5/12">
-          <div className="relative aspect-[3/4] max-w-[400px] rounded-lg overflow-hidden">
-            <img
-              src="/images/infocus.jpg"
-              alt="Catarina Marques Rodrigues"
-              className="w-full h-full object-cover"
-            />
-          </div>
+    <section className="py-16 sm:py-20 lg:py-24" ref={sectionRef}>
+      <div className="flex flex-col md:flex-row items-center">
+        {/* Image — bleeds full-width to the left edge on desktop */}
+        <div className="reveal-left w-full md:w-5/12 px-5 sm:px-8 md:px-0">
+          <ScrollColorImage
+            src="/images/infocus.jpg"
+            alt="Catarina Marques Rodrigues"
+            className="aspect-[3/4] max-w-[400px] md:aspect-auto md:max-w-none md:h-[520px]"
+          />
         </div>
 
         {/* Content */}
-        <div className="reveal-right md:w-7/12 md:pt-4">
+        <div className="reveal-right w-full md:w-7/12 px-5 sm:px-8 md:pl-14 md:pr-[max(2rem,calc((100vw-1400px)/2+2rem))] md:pt-4 mt-8 md:mt-0">
           <p className="text-xs tracking-[0.25em] text-gray-500 uppercase mb-3">
             In Focus
           </p>

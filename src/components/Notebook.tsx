@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useReveal } from "@/hooks/useReveal";
+import ScrollColorImage from "./ScrollColorImage";
 
 const ARTICLES = [
   {
@@ -40,21 +41,19 @@ export default function Notebook() {
   const sectionRef = useReveal();
 
   return (
-    <section id="read" className="py-16 sm:py-20 lg:py-24 px-5 sm:px-8 max-w-[1400px] mx-auto" ref={sectionRef}>
-      {/* Featured article */}
-      <div className="flex flex-col md:flex-row gap-8 md:gap-10 mb-12 sm:mb-20">
-        <div className="reveal-left md:w-5/12">
+    <section id="read" className="py-16 sm:py-20 lg:py-24" ref={sectionRef}>
+      {/* Featured article — image bleeds full-width to the left edge on desktop */}
+      <div className="flex flex-col md:flex-row items-center mb-12 sm:mb-20">
+        <div className="reveal-left w-full md:w-5/12 px-5 sm:px-8 md:px-0 group">
           <Link href={`/read/${ARTICLES[0].slug}`} className="block">
-            <div className="relative aspect-[3/4] max-w-[360px] rounded-lg overflow-hidden group">
-              <img
-                src="/images/note.jpg"
-                alt="Featured article"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-              />
-            </div>
+            <ScrollColorImage
+              src="/images/note.jpg"
+              alt="Featured article"
+              className="aspect-[3/4] max-w-[360px] md:aspect-auto md:max-w-none md:h-[480px] group-hover:scale-105 transition-transform duration-700"
+            />
           </Link>
         </div>
-        <div className="reveal-right md:w-7/12 md:pt-4">
+        <div className="reveal-right w-full md:w-7/12 px-5 sm:px-8 md:pl-14 md:pr-[max(2rem,calc((100vw-1400px)/2+2rem))] md:pt-4 mt-8 md:mt-0">
           <div className="flex items-center justify-between mb-4">
             <p className="text-xs tracking-[0.25em] text-gray-500 uppercase">
               Notebook
@@ -98,7 +97,7 @@ export default function Notebook() {
       </div>
 
       {/* Article cards */}
-      <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-5">
+      <div className="max-w-[1400px] mx-auto px-5 sm:px-8 grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-5">
         {ARTICLES.map((article, i) => (
           <Link
             key={article.slug}
