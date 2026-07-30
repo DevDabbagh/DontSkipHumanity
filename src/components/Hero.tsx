@@ -139,7 +139,7 @@ export default function Hero() {
   return (
     <section className="pt-24 sm:pt-28 lg:pt-36 xl:pt-[170px] pb-8 sm:pb-12">
       {/* Hero text — typewriter effect */}
-      <div className="max-w-[1200px] mx-auto px-5 sm:px-8 text-center mb-6 sm:mb-8 lg:mb-10">
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-8 text-center mb-6 sm:mb-8 lg:mb-10 xl:mb-[70px]">
         <div className="mb-1 sm:mb-2">
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] xl:text-[50px] font-semibold tracking-tight text-white/90 leading-[1.3] xl:leading-[1.04]">
             {(() => {
@@ -175,11 +175,11 @@ export default function Hero() {
 
       {/* Carousel — matching Figma design exactly */}
       <div className="relative group">
-        <div className="carousel-animate relative overflow-hidden py-4 lg:py-8">
+        <div className="carousel-animate relative overflow-hidden py-4 lg:py-8 xl:pt-0 xl:pb-8">
           {/* Spotlight/Glow effect behind the active card to create a strong focus */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] sm:w-[600px] md:w-[800px] h-[400px] sm:h-[600px] md:h-[800px] bg-[radial-gradient(circle,rgba(255,255,255,0.08)_0%,transparent_70%)] pointer-events-none z-0" />
 
-        <div className="carousel-track relative w-full h-[300px] sm:h-[340px] md:h-[400px] lg:h-[440px] z-10">
+        <div className="carousel-track relative w-full h-[300px] sm:h-[340px] md:h-[400px] lg:h-[440px] xl:h-[480px] z-10">
           {visibleItems.map(({ item, index, offset }) => {
             const isActive = offset === 0;
             const isNear = Math.abs(offset) === 1;

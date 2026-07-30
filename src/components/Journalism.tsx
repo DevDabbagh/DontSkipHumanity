@@ -6,11 +6,11 @@ export default function Journalism() {
   const sectionRef = useReveal();
 
   return (
-    <section className="py-16 sm:py-20 lg:py-24 px-5 sm:px-8 max-w-[1400px] mx-auto space-y-16 sm:space-y-20 lg:space-y-28" ref={sectionRef}>
+    <section className="py-16 sm:py-20 lg:py-24 px-5 sm:px-8 max-w-[1400px] mx-auto space-y-20 sm:space-y-24 lg:space-y-28" ref={sectionRef}>
       {/* Journalism — image left, text right */}
-      <div className="flex flex-col md:flex-row gap-8 md:gap-16 items-start">
+      <div className="flex flex-col md:flex-row gap-8 md:gap-14 items-start">
         <div className="reveal-left stagger-1 md:w-1/2">
-          <div className="relative aspect-[4/3] rounded-lg overflow-hidden">
+          <div className="relative aspect-[9/2] rounded-lg overflow-hidden">
             <img
               src="/images/journalism.jpg"
               alt="Journalist with glasses"
@@ -18,12 +18,12 @@ export default function Journalism() {
             />
           </div>
         </div>
-        <div className="reveal-right stagger-2 md:w-1/2 md:pt-8">
-          <h3 className="text-2xl md:text-3xl font-semibold flex items-center gap-2">
+        <div className="reveal-right stagger-2 md:w-1/2">
+          <h3 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
             Journalism
             <span className="text-gray-500">👁</span>
           </h3>
-          <p className="text-gray-400 mt-4 leading-relaxed max-w-lg">
+          <p className="text-sm text-gray-400 mt-4 leading-relaxed max-w-lg">
             Reporting and long-form work that names systems of power,
             preserves testimony, and refuses the official frame. Stories
             made politically inconvenient, told with rigour and context.
@@ -35,9 +35,9 @@ export default function Journalism() {
       </div>
 
       {/* Political Education — text left, image right */}
-      <div className="flex flex-col md:flex-row-reverse gap-8 md:gap-16 items-start">
+      <div className="flex flex-col md:flex-row-reverse gap-8 md:gap-14 items-start">
         <div className="reveal-right stagger-1 md:w-1/2">
-          <div className="relative aspect-[4/3] rounded-lg overflow-hidden">
+          <div className="relative aspect-[9/2] rounded-lg overflow-hidden">
             <img
               src="/images/political-education.jpg"
               alt="Education workshop"
@@ -45,12 +45,12 @@ export default function Journalism() {
             />
           </div>
         </div>
-        <div className="reveal-left stagger-2 md:w-1/2 md:pt-8">
-          <h3 className="text-2xl md:text-3xl font-semibold flex items-center gap-2">
+        <div className="reveal-left stagger-2 md:w-1/2">
+          <h3 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
             Political Education
             <span className="text-gray-500">🌐</span>
           </h3>
-          <p className="text-gray-400 mt-4 leading-relaxed max-w-lg">
+          <p className="text-sm text-gray-400 mt-4 leading-relaxed max-w-lg">
             Free, and built as infrastructure rather than content. Tools for
             ethical narrative, journalism, and organising — for journalists,
             organisers, filmmakers, and political organisations who already

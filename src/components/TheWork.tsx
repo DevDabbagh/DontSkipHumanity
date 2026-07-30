@@ -10,10 +10,10 @@ export default function TheWork() {
     <section id="films" className="py-16 sm:py-20 lg:py-24 px-5 sm:px-8 max-w-[1400px] mx-auto" ref={sectionRef}>
       {/* Section header */}
       <div className="reveal mb-16 sm:mb-20 lg:mb-24">
-        <p className="text-xs tracking-[0.25em] text-gray-500 uppercase mb-4">
+        <p className="text-xs tracking-[0.25em] text-dsh-label uppercase mb-4">
           The work, in its forms
         </p>
-        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.6rem] font-semibold leading-tight max-w-5xl">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.6rem] font-semibold leading-tight max-w-5xl text-dsh-text-primary">
           Films, series, journalism, and education
           <br className="hidden sm:block" />
           that name power and refuse erasure.
