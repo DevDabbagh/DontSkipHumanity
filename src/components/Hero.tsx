@@ -68,7 +68,17 @@ export default function Hero() {
   const [typedChars, setTypedChars] = useState(initialChars);
   const [showCursor, setShowCursor] = useState(true);
   const [carouselState, setCarouselState] = useState<'hidden' | 'center-visible' | 'full-visible'>('hidden');
+  const [nearTop, setNearTop] = useState(true);
   const router = useRouter();
+
+  // Scroll indicator only lives near the top of the page — it unmounts as soon as
+  // you scroll away, and remounts (replaying its entrance) when you scroll back up.
+  useEffect(() => {
+    const handleScroll = () => setNearTop(window.scrollY < 120);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const fullText = HERO_LINES.map((l) => l.text).join("");
   const totalChars = fullText.length;
@@ -323,17 +333,21 @@ export default function Hero() {
       <div className={`welcome-animate text-center mt-10 sm:mt-14 transition-all duration-1000 ${carouselState === 'full-visible' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
         <p className="text-xs sm:text-sm text-gray-500 tracking-wide">Welcome to our world!</p>
 
-        {/* Scroll indicator — animated mouse with travelling wheel dot + bouncing chevron */}
-        <div className="scroll-indicator flex flex-col items-center mt-4">
-          <div className="scroll-indicator-mouse">
-            <span className="scroll-indicator-dot" />
+        {/* Scroll indicator — animated mouse with travelling wheel dot + bouncing chevron.
+            Mounted/unmounted (not just faded) based on scroll position so the entrance
+            animation genuinely replays every time you scroll back up to the top. */}
+        {nearTop && (
+          <div key={carouselState === 'full-visible' ? 'si-in' : 'si-pending'} className="scroll-indicator flex flex-col items-center mt-4">
+            <div className="scroll-indicator-mouse">
+              <span className="scroll-indicator-dot" />
+            </div>
+            <div className="scroll-indicator-chevron">
+              <svg width="12" height="7" viewBox="0 0 12 7" fill="none">
+                <path d="M1 1l5 4.5L11 1" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
           </div>
-          <div className="scroll-indicator-chevron">
-            <svg width="12" height="7" viewBox="0 0 12 7" fill="none">
-              <path d="M1 1l5 4.5L11 1" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
-        </div>
+        )}
       </div>
     </section>
   );

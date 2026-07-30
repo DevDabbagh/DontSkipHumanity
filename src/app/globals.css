@@ -8,7 +8,10 @@
   --color-dsh-purple: #9B59B6;
   --color-dsh-teal: #1ABC9C;
   --color-dsh-text: #FFFFFF;
+  --color-dsh-text-primary: #F0F0F0;
   --color-dsh-muted: #999999;
+  --color-dsh-nav: #999999;
+  --color-dsh-nav-hover: #F0F0F0;
   --font-sans: var(--font-inter);
 }
 
@@ -266,10 +269,13 @@ input:-webkit-autofill:active{
   opacity: 0;
 }
 
-/* Scroll indicator — mouse shape */
+/* Scroll indicator — mouse shape.
+   This element is mounted/unmounted by JS based on scroll position (see Hero.tsx),
+   so every animation here starts with no delay — mounting IS the trigger, and it
+   genuinely replays from frame zero each time it remounts (scrolling back to top). */
 .scroll-indicator {
   opacity: 0;
-  animation: fadeInUp 0.7s ease-out 5.2s forwards, gentleFloat 2.6s ease-in-out 5.9s infinite;
+  animation: fadeInUp 0.5s ease-out forwards;
 }
 .scroll-indicator-mouse {
   position: relative;
@@ -286,13 +292,13 @@ input:-webkit-autofill:active{
   height: 4px;
   border-radius: 50%;
   background: #1ABC9C;
-  animation: scrollWheel 1.6s ease-in-out 5.9s infinite;
+  animation: scrollWheel 1.6s ease-in-out 0.3s infinite;
 }
 .scroll-indicator-chevron {
   margin-top: 6px;
   display: flex;
   justify-content: center;
-  animation: scrollChevronBounce 1.6s ease-in-out 5.9s infinite;
+  animation: scrollChevronBounce 1.6s ease-in-out 0.3s infinite;
 }
 
 /* Scroll-triggered reveal classes */

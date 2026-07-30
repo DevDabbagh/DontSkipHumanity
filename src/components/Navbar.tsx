@@ -81,7 +81,7 @@ export default function Navbar() {
           ? "bg-[#0D0D0D]/85 backdrop-blur-xl border-b border-white/10 shadow-2xl py-1"
           : "bg-gradient-to-b from-black/80 via-black/40 to-transparent border-b border-transparent py-3"
       }`}>
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 grid grid-cols-[auto_1fr_auto] items-center">
           {/* Logo */}
           <Link href="/" className="flex items-center shrink-0">
             <Image
@@ -95,17 +95,18 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Nav — centered */}
-          <div className="hidden lg:flex items-center gap-7">
+          <div className="hidden lg:flex items-center justify-center gap-7">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.label}
                 href={link.href}
-                className="text-[13px] tracking-wide text-[#F0F0F0]/70 hover:text-[#F0F0F0] transition-colors"
+                className="text-[13px] tracking-wide text-dsh-nav hover:text-dsh-nav-hover transition-colors"
               >
                 {link.label}
               </Link>
             ))}
           </div>
+          <div className="lg:hidden" />
 
           {/* Right side — Auth + Hamburger */}
           <div className="flex items-center gap-2 sm:gap-4">
@@ -114,7 +115,7 @@ export default function Navbar() {
             ) : !isLoggedIn ? (
               <button
                 onClick={() => setIsLoginModalOpen(true)}
-                className="text-sm font-medium text-[#F0F0F0] border border-white/20 rounded-full px-4 py-1.5 hover:bg-white/10 transition-colors"
+                className="text-sm font-medium text-dsh-nav-hover border border-white/20 rounded-full px-4 py-1.5 hover:bg-white/10 transition-colors"
               >
                 Log in
               </button>
@@ -154,7 +155,7 @@ export default function Navbar() {
 
             {/* Hamburger — always visible */}
             <button
-              className="p-2 text-[#F0F0F0]/70 hover:text-[#F0F0F0] transition-colors"
+              className="p-2 text-dsh-nav hover:text-dsh-nav-hover transition-colors"
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="Toggle menu"
             >
@@ -178,9 +179,10 @@ export default function Navbar() {
         {/* Background */}
         <div className="absolute inset-0 bg-[#0D0D0D]" />
 
-        {/* Top bar inside overlay */}
-        <div className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between py-3">
-          <Link href="/" className="flex items-center shrink-0" onClick={() => setMenuOpen(false)}>
+        {/* Top bar inside overlay — 3-column: logo | centered nav | close */}
+        <div className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 grid grid-cols-3 items-center py-3">
+          {/* Left: Logo */}
+          <Link href="/" className="flex items-center shrink-0 justify-self-start" onClick={() => setMenuOpen(false)}>
             <Image
               src="/images/ic_logo.png"
               alt="Don't Skip Humanity"
@@ -191,23 +193,26 @@ export default function Navbar() {
             />
           </Link>
 
-          {/* Right: nav links (desktop) + CLOSE */}
-          <div className="flex items-center gap-6">
-            <div className="hidden lg:flex items-center gap-7">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.label}
-                  href={link.href}
-                  className="text-[13px] tracking-wide text-[#F0F0F0]/70 hover:text-[#F0F0F0] transition-colors"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </div>
+          {/* Center: nav links */}
+          <div className="hidden lg:flex items-center justify-center gap-7">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.label}
+                href={link.href}
+                className="text-[13px] tracking-wide text-dsh-nav hover:text-dsh-nav-hover transition-colors"
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+          <div className="lg:hidden" />
+
+          {/* Right: CLOSE */}
+          <div className="justify-self-end">
             <button
               onClick={() => setMenuOpen(false)}
-              className="flex items-center gap-2 text-[#F0F0F0]/70 hover:text-[#F0F0F0] transition-colors"
+              className="flex items-center gap-2 text-dsh-nav hover:text-dsh-nav-hover transition-colors"
             >
               <span className="text-xs tracking-widest uppercase hidden sm:inline">Close</span>
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -226,7 +231,7 @@ export default function Navbar() {
                 key={link.label}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
-                className={`text-[#F0F0F0] font-bold leading-none hover:text-[#1ABC9C] transition-colors duration-300 ${
+                className={`text-dsh-nav-hover font-bold leading-none hover:text-[#1ABC9C] transition-colors duration-300 ${
                   menuOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
                 }`}
                 style={{
@@ -246,7 +251,7 @@ export default function Navbar() {
                   setMenuOpen(false);
                   setIsLoginModalOpen(true);
                 }}
-                className={`text-left text-[#F0F0F0] font-bold leading-none hover:text-[#1ABC9C] transition-colors duration-300 ${
+                className={`text-left text-dsh-nav-hover font-bold leading-none hover:text-[#1ABC9C] transition-colors duration-300 ${
                   menuOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
                 }`}
                 style={{
@@ -270,7 +275,7 @@ export default function Navbar() {
                 target={link.href.startsWith("http") ? "_blank" : undefined}
                 rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
                 onClick={() => { if (!link.href.startsWith("http")) setMenuOpen(false); }}
-                className="text-[#F0F0F0]/40 text-sm hover:text-[#F0F0F0] transition-colors"
+                className="text-dsh-nav/50 text-sm hover:text-dsh-nav-hover transition-colors"
               >
                 {link.label}
               </a>
