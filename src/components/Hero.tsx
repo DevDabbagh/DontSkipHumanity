@@ -137,11 +137,11 @@ export default function Hero() {
   const visibleItems = getVisibleItems();
 
   return (
-    <section className="pt-24 sm:pt-28 lg:pt-32 pb-8 sm:pb-12">
+    <section className="pt-24 sm:pt-28 lg:pt-36 xl:pt-[170px] pb-8 sm:pb-12">
       {/* Hero text — typewriter effect */}
       <div className="max-w-[1200px] mx-auto px-5 sm:px-8 text-center mb-6 sm:mb-8 lg:mb-10">
         <div className="mb-1 sm:mb-2">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.2rem] font-semibold tracking-tight text-white/90 leading-[1.3]">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] xl:text-[50px] font-semibold tracking-tight text-white/90 leading-[1.3] xl:leading-[1.04]">
             {(() => {
               let charCount = 0;
               return HERO_LINES.map((line, i) => {
@@ -184,18 +184,19 @@ export default function Hero() {
             const isActive = offset === 0;
             const isNear = Math.abs(offset) === 1;
 
-            // Smaller cards so full slider visible on first load
+            // Card sizes — active/near/far each step down by the same ~5/6 ratio
+            // used in the Figma spec (360x450 / 300x375 / 250x313 at desktop).
             const cardWidth = isActive
-              ? "w-[180px] sm:w-[220px] md:w-[260px] lg:w-[300px]"
+              ? "w-[180px] sm:w-[220px] md:w-[260px] lg:w-[300px] xl:w-[360px]"
               : isNear
-                ? "w-[140px] sm:w-[170px] md:w-[210px] lg:w-[240px]"
-                : "w-[110px] sm:w-[140px] md:w-[170px] lg:w-[190px]";
+                ? "w-[140px] sm:w-[170px] md:w-[210px] lg:w-[240px] xl:w-[300px]"
+                : "w-[110px] sm:w-[140px] md:w-[170px] lg:w-[190px] xl:w-[250px]";
 
             const cardHeight = isActive
-              ? "h-[280px] sm:h-[320px] md:h-[380px] lg:h-[420px]"
+              ? "h-[280px] sm:h-[320px] md:h-[380px] lg:h-[420px] xl:h-[450px]"
               : isNear
-                ? "h-[230px] sm:h-[270px] md:h-[320px] lg:h-[360px]"
-                : "h-[190px] sm:h-[220px] md:h-[270px] lg:h-[300px]";
+                ? "h-[230px] sm:h-[270px] md:h-[320px] lg:h-[360px] xl:h-[375px]"
+                : "h-[190px] sm:h-[220px] md:h-[270px] lg:h-[300px] xl:h-[313px]";
 
             // Smooth Transform calculation using exact CSS to avoid Tailwind JIT issues
             let translateX = "-50%";
@@ -264,32 +265,46 @@ export default function Hero() {
                 <div className={`absolute bottom-0 left-0 right-0 p-3 sm:p-4 md:p-5 transition-all duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
                   isActive ? "opacity-100" : "opacity-70"
                 }`}>
-                  <span className={`text-[9px] sm:text-[10px] font-medium tracking-wider uppercase ${item.typeColor}`}>
+                  <span className={`font-medium tracking-wider uppercase ${item.typeColor} ${
+                    isActive
+                      ? "text-[9px] sm:text-[10px] xl:text-[13px]"
+                      : isNear
+                        ? "text-[9px] sm:text-[10px] xl:text-[12px]"
+                        : "text-[9px] sm:text-[10px] xl:text-[11px]"
+                  }`}>
                     {item.type}
                   </span>
                   <h3 className={`text-white font-bold whitespace-pre-line leading-[1.15] mt-1 transition-all duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
                     isActive
-                      ? "text-[20px] sm:text-[24px] md:text-[28px]"
+                      ? "text-[20px] sm:text-[24px] md:text-[28px] xl:text-[30px]"
                       : isNear
-                        ? "text-[16px] sm:text-[18px] md:text-[20px]"
-                        : "text-[13px] sm:text-[15px] md:text-[17px]"
+                        ? "text-[16px] sm:text-[18px] md:text-[20px] xl:text-[26px]"
+                        : "text-[13px] sm:text-[15px] md:text-[17px] xl:text-[22px]"
                   }`}>
                     {item.title}
                   </h3>
-                  {/* Pill button — backdrop blur, bordered */}
+                  {/* Pill button — backdrop blur, bordered. Padding/size decreases for near + far cards. */}
                   {item.slug ? (
                     <Link
                       href={`/film/${item.slug}`}
-                      className={`mt-2 sm:mt-3 inline-flex items-center gap-1.5 border border-white/20 rounded-full backdrop-blur-md bg-white/[0.08] px-3 py-1.5 text-white/60 hover:text-white hover:border-white/40 hover:bg-white/[0.14] transition-all duration-300 ${
-                        isActive ? "text-[11px] sm:text-[12px]" : "text-[9px] sm:text-[10px]"
+                      className={`mt-2 sm:mt-3 inline-flex items-center gap-1.5 border border-white/20 rounded-full backdrop-blur-md bg-white/[0.08] text-white/60 hover:text-white hover:border-white/40 hover:bg-white/[0.14] transition-all duration-300 ${
+                        isActive
+                          ? "px-3 py-1.5 text-[11px] sm:text-[12px] xl:px-5 xl:py-2.5 xl:text-[13px]"
+                          : isNear
+                            ? "px-3 py-1.5 text-[9px] sm:text-[10px] xl:px-4 xl:py-2 xl:text-[11px]"
+                            : "px-3 py-1.5 text-[9px] sm:text-[10px] xl:px-3 xl:py-1.5 xl:text-[10px]"
                       }`}
                       onClick={(e) => e.stopPropagation()}
                     >
                       view more <span className="text-[#D81B60]">+</span>
                     </Link>
                   ) : (
-                    <span className={`mt-2 sm:mt-3 inline-flex items-center gap-1.5 border border-white/20 rounded-full backdrop-blur-md bg-white/[0.08] px-3 py-1.5 text-white/60 ${
-                      isActive ? "text-[11px] sm:text-[12px]" : "text-[9px] sm:text-[10px]"
+                    <span className={`mt-2 sm:mt-3 inline-flex items-center gap-1.5 border border-white/20 rounded-full backdrop-blur-md bg-white/[0.08] text-white/60 ${
+                      isActive
+                        ? "px-3 py-1.5 text-[11px] sm:text-[12px] xl:px-5 xl:py-2.5 xl:text-[13px]"
+                        : isNear
+                          ? "px-3 py-1.5 text-[9px] sm:text-[10px] xl:px-4 xl:py-2 xl:text-[11px]"
+                          : "px-3 py-1.5 text-[9px] sm:text-[10px] xl:px-3 xl:py-1.5 xl:text-[10px]"
                     }`}>
                       view more <span className="text-[#D81B60]">+</span>
                     </span>
@@ -329,13 +344,18 @@ export default function Hero() {
         )}
       </div>
 
-      {/* Welcome text — delayed entrance */}
-      <div className={`welcome-animate text-center mt-10 sm:mt-14 transition-all duration-1000 ${carouselState === 'full-visible' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+      {/* Welcome text + scroll indicator — fades in once the hero settles, and fades
+          back out (not just via CSS delay, but tied to actual scroll position) as soon
+          as you scroll away. Comes back the moment you're back near the top. */}
+      <div className={`text-center mt-10 sm:mt-14 transition-all duration-700 ease-out ${
+        carouselState === 'full-visible' && nearTop
+          ? 'opacity-100 translate-y-0'
+          : 'opacity-0 translate-y-3 pointer-events-none'
+      }`}>
         <p className="text-xs sm:text-sm text-gray-500 tracking-wide">Welcome to our world!</p>
 
-        {/* Scroll indicator — animated mouse with travelling wheel dot + bouncing chevron.
-            Mounted/unmounted (not just faded) based on scroll position so the entrance
-            animation genuinely replays every time you scroll back up to the top. */}
+        {/* Mounted/unmounted (not just faded) based on scroll position so the dot +
+            chevron animation genuinely replays every time you scroll back up to the top. */}
         {nearTop && (
           <div key={carouselState === 'full-visible' ? 'si-in' : 'si-pending'} className="scroll-indicator flex flex-col items-center mt-4">
             <div className="scroll-indicator-mouse">
