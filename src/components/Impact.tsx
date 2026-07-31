@@ -97,32 +97,32 @@ export default function Impact() {
           ))}
         </div>
 
-        {/* Right: stats cards — bleed to the right edge, one shared background
-            image behind all of them, each row revealing its own tinted slice */}
-        <div className="relative lg:w-7/12 space-y-3 px-5 sm:px-8 lg:pr-0 lg:pl-8">
-          {/* Shared background photo — kept at its own portrait crop and confined
-              to the right edge (it's a 1500x1875 portrait still, so stretching it
-              across the full wide row would crop it down to an unrecognizable
-              sliver). Fades into the cards on its left edge instead of a hard cut. */}
-          <div className="absolute inset-y-0 right-0 w-[46%] max-w-[520px] overflow-hidden pointer-events-none hidden lg:block">
-            <img
-              src="/images/impact_metrics_background.jpg"
-              alt=""
-              className="w-full h-full object-cover object-[center_35%] opacity-60"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0D0D0D] via-[#0D0D0D]/50 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0D]/40 via-transparent to-[#0D0D0D]/40" />
-          </div>
-
+        {/* Right: stats cards — bleed to the right edge. One shared background
+            photo is sliced across all 5 equal-height rows: each card shows the
+            full image at 500% height, offset by background-position so row 0
+            reveals the top fifth, row 4 the bottom fifth — reconstructing one
+            continuous image top-to-bottom when read as a stack, and every row
+            starts flush at the same left edge. */}
+        <div className="lg:w-7/12 space-y-3 px-5 sm:px-8 lg:pr-0 lg:pl-8">
           {STATS.map((stat, i) => (
             <div
               key={stat.label}
-              className={`stat-reveal stagger-${i + 1} relative overflow-hidden lg:rounded-l-[6px] border-l`}
-              style={{
-                borderColor: tint(ACCENTS[i], 0.35),
-                background: `linear-gradient(90deg, ${tint(ACCENTS[i], 0.16)}, ${tint(ACCENTS[i], 0.05)} 60%, transparent)`,
-              }}
+              className={`stat-reveal stagger-${i + 1} relative overflow-hidden lg:rounded-l-[6px] border-l min-h-[92px] sm:min-h-[104px] flex items-center`}
+              style={{ borderColor: tint(ACCENTS[i], 0.35) }}
             >
+              <div
+                className="absolute inset-0 hidden lg:block"
+                style={{
+                  backgroundImage: "url(/images/impact_metrics_background.jpg)",
+                  backgroundSize: "100% 500%",
+                  backgroundPosition: `center ${i * 25}%`,
+                  opacity: 0.5,
+                }}
+              />
+              <div
+                className="absolute inset-0"
+                style={{ background: `linear-gradient(90deg, ${tint(ACCENTS[i], 0.55)}, ${tint(ACCENTS[i], 0.22)} 45%, ${tint("#0D0D0D", 0.55)} 100%)` }}
+              />
               <div className="relative p-5 sm:p-6 flex items-baseline gap-3">
                 <span className="text-2xl sm:text-3xl md:text-4xl font-bold" style={{ color: ACCENTS[i] }}>
                   {stat.value}
@@ -134,12 +134,25 @@ export default function Impact() {
             </div>
           ))}
 
-          {/* Bottom note card */}
+          {/* Bottom note card — 5th slice of the same image */}
           <div
-            className="reveal stagger-5 relative overflow-hidden lg:rounded-l-[6px] border-l p-5 sm:p-6"
-            style={{ borderColor: tint(ACCENTS[4], 0.35), background: tint(ACCENTS[4], 0.12) }}
+            className="reveal stagger-5 relative overflow-hidden lg:rounded-l-[6px] border-l min-h-[92px] sm:min-h-[104px] flex items-center p-5 sm:p-6"
+            style={{ borderColor: tint(ACCENTS[4], 0.35) }}
           >
-            <p className="text-sm" style={{ color: "#F0F0F0" }}>
+            <div
+              className="absolute inset-0 hidden lg:block"
+              style={{
+                backgroundImage: "url(/images/impact_metrics_background.jpg)",
+                backgroundSize: "100% 500%",
+                backgroundPosition: "center 100%",
+                opacity: 0.5,
+              }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{ background: `linear-gradient(90deg, ${tint(ACCENTS[4], 0.55)}, ${tint(ACCENTS[4], 0.22)} 45%, ${tint("#0D0D0D", 0.55)} 100%)` }}
+            />
+            <p className="relative text-sm" style={{ color: "#F0F0F0" }}>
               Numbers appear alongside the story behind them, never alone.
             </p>
           </div>

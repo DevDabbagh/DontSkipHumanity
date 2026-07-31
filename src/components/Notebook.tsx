@@ -6,33 +6,33 @@ import ScrollColorImage from "./ScrollColorImage";
 
 const ARTICLES = [
   {
-    category: "Film",
-    categoryColor: "bg-[#E74C3C]",
-    date: "20 Jun 2026",
-    title: "Free Fish: A Story of Resistance Under Siege",
-    desc: "A completed short documentary directed by Bisan Owda — looking at daily life under conditions designed to make life impossible.",
-    author: "Carolina Beltrão",
-    slug: "free-fish-story-of-resistance",
+    category: "Read",
+    categoryColor: "bg-[#1ABC9C]",
+    date: "23 Aug 2026",
+    title: "DSH redistributes $340K to community media projects",
+    desc: "Funds distributed to 14 grassroots media organisations across the Global South following our spring solidarity campaign.",
+    author: "Dima Mohammed",
+    slug: "dsh-redistributes-340k",
     image: "/images/slider2.jpg",
   },
   {
-    category: "Opinion",
-    categoryColor: "bg-amber-500",
-    date: "18 Jun 2026",
-    title: "Why Ethical Storytelling Demands Accountability",
-    desc: "Storytelling is never neutral. The way stories are told shapes whose lives are mourned and whose humanity is denied.",
-    author: "Carolina Beltrão",
-    slug: "ethical-storytelling-accountability",
+    category: "Academy",
+    categoryColor: "bg-[#32C6CC]",
+    date: "23 Aug 2026",
+    title: "New workshop: Ethical Narrative Journalism — open call",
+    desc: "A free intensive developed with frontline journalists. Tools for covering occupation, displacement, and state violence with rigour and care.",
+    author: "Margarida David Cardoso",
+    slug: "ethical-narrative-journalism",
     image: "/images/journalism.jpg",
   },
   {
-    category: "Interview",
-    categoryColor: "bg-indigo-500",
-    date: "25 Jun 2026",
-    title: "YALLA Podcast: Conversations with Palestinian Cultural Workers",
-    desc: "An interview series amplifying voices that have been systematically ignored, silenced, or misrepresented.",
-    author: "Tiago Zorro",
-    slug: "yalla-podcast-launch",
+    category: "Films",
+    categoryColor: "bg-[#B23495]",
+    date: "23 Aug 2026",
+    title: '"What We Carried" selected for IDFA 2026 competition',
+    desc: "Our latest feature documentary enters the international competition section at the International Documentary Film Festival Amsterdam.",
+    author: "Carolina Pereira",
+    slug: "what-we-carried-idfa",
     image: "/images/political-education.jpg",
   },
 ];
@@ -42,91 +42,114 @@ export default function Notebook() {
 
   return (
     <section id="read" className="py-16 sm:py-20 lg:py-24" ref={sectionRef}>
-      {/* Featured article — image bleeds full-width to the left edge on desktop */}
-      <div className="flex flex-col md:flex-row items-center mb-12 sm:mb-20">
-        <div className="reveal-left w-full md:w-5/12 px-5 sm:px-8 md:px-0 group">
-          <Link href={`/read/${ARTICLES[0].slug}`} className="block">
-            <ScrollColorImage
-              src="/images/note.jpg"
-              alt="Featured article"
-              className="aspect-[3/4] max-w-[360px] max-md:rounded-lg md:aspect-auto md:max-w-none md:h-[480px] md:rounded-tr-[6px] md:rounded-br-[6px] group-hover:scale-105 transition-transform duration-700"
-            />
-          </Link>
-        </div>
-        <div className="reveal-right w-full md:w-7/12 px-5 sm:px-8 md:pl-14 md:pr-[max(2rem,calc((100vw-1400px)/2+2rem))] md:pt-4 mt-8 md:mt-0">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-xs tracking-[0.25em] text-dsh-label uppercase">
-              Notebook
-            </p>
-            <Link
-              href="/read"
-              className="text-sm border border-dsh-text-primary/20 rounded-[3px] px-4 py-1.5 bg-dsh-btn-bg/20 text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:bg-dsh-btn-bg/30 transition-colors"
-            >
-              View All Notes <span className="text-[#1ABC9C]">↗</span>
+      {/* Featured article — contained layout */}
+      <div className="max-w-[1400px] mx-auto px-5 sm:px-8 mb-16 sm:mb-20">
+        <div className="flex flex-col md:flex-row items-start gap-8 md:gap-12">
+          {/* Image — contained, not full-bleed */}
+          <div className="reveal-left w-full md:w-5/12 group">
+            <Link href="/read/free-fish-distribution" className="block">
+              <ScrollColorImage
+                src="/images/note.jpg"
+                alt="Featured article"
+                className="aspect-[3/4] rounded-[6px] group-hover:scale-[1.02] transition-transform duration-700"
+              />
             </Link>
           </div>
 
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-xs px-2 py-0.5 rounded bg-[#1ABC9C] text-white font-medium">
-              Studio
-            </span>
-            <span className="text-xs text-gray-500">20 Jun 2026</span>
+          {/* Text content */}
+          <div className="reveal-right w-full md:w-7/12 md:pt-2">
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-xs tracking-[0.25em] text-dsh-label uppercase">
+                Read
+              </p>
+              <Link
+                href="/read"
+                className="text-sm border border-dsh-text-primary/20 rounded-[3px] px-4 py-1.5 bg-dsh-btn-bg/20 text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:bg-dsh-btn-bg/30 transition-colors"
+              >
+                View all articles <span className="text-[#1ABC9C]">↗</span>
+              </Link>
+            </div>
+
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-xs px-2.5 py-1 rounded-[3px] bg-[#8665A7] text-white font-medium">
+                Studio
+              </span>
+              <span className="text-xs text-[#1ABC9C]">23 Aug 2026</span>
+            </div>
+
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold leading-tight text-dsh-text-primary">
+              Free Fish — now available
+              <br />
+              to programmers and press
+            </h2>
+
+            <p className="text-sm text-dsh-desc mt-5 leading-relaxed max-w-lg">
+              Bisan Owda&apos;s short documentary enters distribution. Screeners
+              available on request for programmers, press, and partners. Bisan
+              Owda&apos;s short documentary enters distribution. Screeners
+              available on request for programmers, press, and partners.
+            </p>
+
+            <div className="mt-5 mb-6 w-12 border-t border-white/10" />
+
+            <p className="text-sm">
+              <span className="text-dsh-desc">by </span>
+              <span className="text-[#1ABC9C]">Diogo Faro</span>
+            </p>
+
+            <Link
+              href="/read/free-fish-distribution"
+              className="mt-6 inline-block text-sm border border-dsh-text-primary/20 rounded-[3px] px-5 py-2 bg-dsh-btn-bg/20 text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:bg-dsh-btn-bg/30 transition-colors"
+            >
+              Read more <span className="text-[#1ABC9C]">+</span>
+            </Link>
           </div>
-
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold leading-tight text-dsh-text-primary">
-            Free Fish — now available
-            <br />
-            to programmers and press
-          </h2>
-
-          <p className="text-dsh-desc mt-4 leading-relaxed max-w-lg">
-            Bisan Owda&apos;s short documentary enters distribution. Screeners
-            available on request for programmers, press, and partners. The film
-            follows fishermen navigating restricted waters off Gaza&apos;s coast.
-          </p>
-
-          <p className="text-sm text-[#1ABC9C] mt-4">by Carolina Beltrão</p>
-
-          <Link
-            href={`/read/${ARTICLES[0].slug}`}
-            className="mt-6 inline-block text-sm border border-dsh-text-primary/20 rounded-[3px] px-5 py-2 bg-dsh-btn-bg/20 text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:bg-dsh-btn-bg/30 transition-colors"
-          >
-            Read More <span className="text-[#1ABC9C]">+</span>
-          </Link>
         </div>
       </div>
 
-      {/* Article cards */}
-      <div className="max-w-[1400px] mx-auto px-5 sm:px-8 grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-5">
+      {/* Article cards grid */}
+      <div className="max-w-[1400px] mx-auto px-5 sm:px-8 grid sm:grid-cols-2 md:grid-cols-3 gap-8 sm:gap-6">
         {ARTICLES.map((article, i) => (
-          <Link
+          <div
             key={article.slug}
-            href={`/read/${article.slug}`}
-            className={`reveal-scale stagger-${i + 1} group cursor-pointer block`}
+            className={`reveal-scale stagger-${i + 1} group`}
           >
-            <div className="relative aspect-[4/3] rounded-lg overflow-hidden mb-4">
-              <img
-                src={article.image}
-                alt={article.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-            </div>
+            <Link href={`/read/${article.slug}`} className="block">
+              <div className="relative aspect-[4/3] rounded-[6px] overflow-hidden mb-4">
+                <img
+                  src={article.image}
+                  alt={article.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+            </Link>
 
-            <div className="flex items-center gap-2 mb-2">
-              <span className={`text-xs px-2 py-0.5 rounded ${article.categoryColor} text-white font-medium`}>
+            <div className="flex items-center gap-3 mb-3">
+              <span className={`text-xs px-2.5 py-1 rounded-[3px] ${article.categoryColor} text-white font-medium`}>
                 {article.category}
               </span>
-              <span className="text-xs text-gray-500">{article.date}</span>
+              <span className="text-xs text-[#1ABC9C]">{article.date}</span>
             </div>
 
-            <h3 className="font-semibold text-dsh-text-primary group-hover:text-gray-200 transition-colors leading-snug">
+            <h3 className="font-semibold text-dsh-text-primary leading-snug">
               {article.title}
             </h3>
-            <p className="text-sm text-dsh-desc mt-2 leading-relaxed line-clamp-2">
+            <p className="text-sm text-dsh-desc mt-2 leading-relaxed line-clamp-3">
               {article.desc}
             </p>
-            <p className="text-sm text-[#1ABC9C] mt-3">by {article.author}</p>
-          </Link>
+
+            <p className="text-sm mt-4">
+              <span className="text-dsh-desc">by </span>
+              <span className="text-[#1ABC9C]">{article.author}</span>
+            </p>
+
+            <Link
+              href={`/read/${article.slug}`}
+              className="mt-4 inline-block text-sm border border-dsh-text-primary/20 rounded-[3px] px-5 py-2 bg-dsh-btn-bg/20 text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:bg-dsh-btn-bg/30 transition-colors"
+            >
+              Read more <span className="text-[#1ABC9C]">+</span>
+            </Link>
+          </div>
         ))}
       </div>
     </section>
