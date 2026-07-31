@@ -1,6 +1,7 @@
 "use client";
 
 import { useReveal } from "@/hooks/useReveal";
+import { useScrollGrayscale } from "@/hooks/useScrollGrayscale";
 
 // One accent color per row — shared between the pillar's number (left column)
 // and that row's stat number (right column), per the Figma spec.
@@ -50,8 +51,41 @@ function tint(hex: string, alpha: number) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+// Row 0 ("47 · Countries reached") bleeds all the way to the viewport edge;
+// rows 1–4 are held back with a visible right edge, per the Figma reference —
+// the cards don't all end at the same place.
+function rowWidthClasses(i: number) {
+  return i === 0 ? "lg:rounded-r-none lg:border-r-0" : "lg:mr-10 xl:mr-20 lg:rounded-r-[6px] lg:border-r";
+}
+
+function BackgroundSlice({ position, colorAmount }: { position: string; colorAmount: number }) {
+  return (
+    <>
+      {/* Shared photo — one continuous image sliced by row via background-position,
+          held black & white until scrolled into view, then gains color. */}
+      <div
+        className="absolute inset-0 hidden lg:block transition-[filter] duration-100 ease-out"
+        style={{
+          backgroundImage: "url(/images/impact_metrics_background.jpg)",
+          backgroundSize: "100% 500%",
+          backgroundPosition: position,
+          opacity: 0.7,
+          filter: `grayscale(${1 - colorAmount})`,
+        }}
+      />
+      {/* Black shadow, strong on the left (behind the text) fading out to the
+          right, so the numbers stay legible over a busy photo. */}
+      <div
+        className="absolute inset-0 hidden lg:block"
+        style={{ background: "linear-gradient(90deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.45) 32%, rgba(0,0,0,0.1) 60%, transparent 85%)" }}
+      />
+    </>
+  );
+}
+
 export default function Impact() {
   const sectionRef = useReveal();
+  const { ref: photoRef, colorAmount } = useScrollGrayscale<HTMLDivElement>();
 
   return (
     <section id="about" className="py-16 sm:py-20 lg:py-24 overflow-hidden" ref={sectionRef}>
@@ -79,7 +113,7 @@ export default function Impact() {
 
       {/* Two-column: pillars (contained) + stats (bleed to the right edge, one
           shared background image split across the 5 rows) */}
-      <div className="flex flex-col lg:flex-row gap-10 lg:gap-0 mt-10 sm:mt-16">
+      <div className="flex flex-col lg:flex-row gap-10 lg:gap-0 mt-10 sm:mt-16" ref={photoRef}>
         {/* Left: numbered pillars — stays in container */}
         <div className="lg:w-5/12 space-y-8 px-5 sm:px-8 lg:pl-[max(2rem,calc((100vw-1400px)/2+2rem))]">
           {PILLARS.map((p, i) => (
@@ -97,31 +131,18 @@ export default function Impact() {
           ))}
         </div>
 
-        {/* Right: stats cards — bleed to the right edge. One shared background
-            photo is sliced across all 5 equal-height rows: each card shows the
-            full image at 500% height, offset by background-position so row 0
-            reveals the top fifth, row 4 the bottom fifth — reconstructing one
-            continuous image top-to-bottom when read as a stack, and every row
-            starts flush at the same left edge. */}
+        {/* Right: stats cards */}
         <div className="lg:w-7/12 space-y-3 px-5 sm:px-8 lg:pr-0 lg:pl-8">
           {STATS.map((stat, i) => (
             <div
               key={stat.label}
-              className={`stat-reveal stagger-${i + 1} relative overflow-hidden lg:rounded-l-[6px] border-l min-h-[92px] sm:min-h-[104px] flex items-center`}
+              className={`stat-reveal stagger-${i + 1} relative overflow-hidden lg:rounded-l-[6px] border-l min-h-[92px] sm:min-h-[104px] flex items-center ${rowWidthClasses(i)}`}
               style={{ borderColor: tint(ACCENTS[i], 0.35) }}
             >
-              <div
-                className="absolute inset-0 hidden lg:block"
-                style={{
-                  backgroundImage: "url(/images/impact_metrics_background.jpg)",
-                  backgroundSize: "100% 500%",
-                  backgroundPosition: `center ${i * 25}%`,
-                  opacity: 0.5,
-                }}
-              />
+              <BackgroundSlice position={`center ${i * 25}%`} colorAmount={colorAmount} />
               <div
                 className="absolute inset-0"
-                style={{ background: `linear-gradient(90deg, ${tint(ACCENTS[i], 0.55)}, ${tint(ACCENTS[i], 0.22)} 45%, ${tint("#0D0D0D", 0.55)} 100%)` }}
+                style={{ background: `linear-gradient(90deg, ${tint(ACCENTS[i], 0.3)}, transparent 55%)` }}
               />
               <div className="relative p-5 sm:p-6 flex items-baseline gap-3">
                 <span className="text-2xl sm:text-3xl md:text-4xl font-bold" style={{ color: ACCENTS[i] }}>
@@ -136,21 +157,13 @@ export default function Impact() {
 
           {/* Bottom note card — 5th slice of the same image */}
           <div
-            className="reveal stagger-5 relative overflow-hidden lg:rounded-l-[6px] border-l min-h-[92px] sm:min-h-[104px] flex items-center p-5 sm:p-6"
+            className={`reveal stagger-5 relative overflow-hidden lg:rounded-l-[6px] border-l min-h-[92px] sm:min-h-[104px] flex items-center p-5 sm:p-6 ${rowWidthClasses(4)}`}
             style={{ borderColor: tint(ACCENTS[4], 0.35) }}
           >
-            <div
-              className="absolute inset-0 hidden lg:block"
-              style={{
-                backgroundImage: "url(/images/impact_metrics_background.jpg)",
-                backgroundSize: "100% 500%",
-                backgroundPosition: "center 100%",
-                opacity: 0.5,
-              }}
-            />
+            <BackgroundSlice position="center 100%" colorAmount={colorAmount} />
             <div
               className="absolute inset-0"
-              style={{ background: `linear-gradient(90deg, ${tint(ACCENTS[4], 0.55)}, ${tint(ACCENTS[4], 0.22)} 45%, ${tint("#0D0D0D", 0.55)} 100%)` }}
+              style={{ background: `linear-gradient(90deg, ${tint(ACCENTS[4], 0.3)}, transparent 55%)` }}
             />
             <p className="relative text-sm" style={{ color: "#F0F0F0" }}>
               Numbers appear alongside the story behind them, never alone.
