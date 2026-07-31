@@ -100,12 +100,18 @@ export default function Impact() {
         {/* Right: stats cards — bleed to the right edge, one shared background
             image behind all of them, each row revealing its own tinted slice */}
         <div className="relative lg:w-7/12 space-y-3 px-5 sm:px-8 lg:pr-0 lg:pl-8">
-          <div className="absolute inset-0 pointer-events-none hidden lg:block">
+          {/* Shared background photo — kept at its own portrait crop and confined
+              to the right edge (it's a 1500x1875 portrait still, so stretching it
+              across the full wide row would crop it down to an unrecognizable
+              sliver). Fades into the cards on its left edge instead of a hard cut. */}
+          <div className="absolute inset-y-0 right-0 w-[46%] max-w-[520px] overflow-hidden pointer-events-none hidden lg:block">
             <img
               src="/images/impact_metrics_background.jpg"
               alt=""
-              className="w-full h-full object-cover opacity-40"
+              className="w-full h-full object-cover object-[center_35%] opacity-60"
             />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0D0D0D] via-[#0D0D0D]/50 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0D]/40 via-transparent to-[#0D0D0D]/40" />
           </div>
 
           {STATS.map((stat, i) => (
