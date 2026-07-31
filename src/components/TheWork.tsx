@@ -33,8 +33,8 @@ export default function TheWork() {
         <div className="reveal-right stagger-2 w-full md:w-1/2 px-5 sm:px-8 md:pl-14 md:pr-[max(2rem,calc((100vw-1400px)/2+2rem))]">
           <h3 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
             Films
-            <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 010 1.972l-11.54 6.347a1.125 1.125 0 01-1.667-.986V5.653z" />
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16.2111 11.1056L9.73666 7.86833C8.93878 7.46939 8 8.04958 8 8.94164V15.0584C8 15.9504 8.93878 16.5306 9.73666 16.1317L16.2111 12.8944C16.9482 12.5259 16.9482 11.4741 16.2111 11.1056Z" stroke="#B23495" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </h3>
           <p className="text-sm text-gray-400 mt-4 leading-relaxed max-w-lg">
@@ -57,7 +57,11 @@ export default function TheWork() {
         <div className="reveal-left stagger-2 w-full md:w-1/2 px-5 sm:px-8 md:pr-14 md:pl-[max(2rem,calc((100vw-1400px)/2+2rem))]">
           <h3 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
             Studio
-            <span className="text-gray-500 text-lg">🎙</span>
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="9" y="3" width="6" height="11" rx="3" stroke="#8665A7" strokeLinejoin="round"/>
+              <path d="M5.5 11C5.5 12.7239 6.18482 14.3772 7.40381 15.5962C8.62279 16.8152 10.2761 17.5 12 17.5C13.7239 17.5 15.3772 16.8152 16.5962 15.5962C17.8152 14.3772 18.5 12.7239 18.5 11" stroke="#8665A7" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M12 21V19" stroke="#8665A7" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           </h3>
           <p className="text-sm text-gray-400 mt-4 leading-relaxed max-w-lg">
             Docuseries, videocasts, podcasts, and series — and the production
