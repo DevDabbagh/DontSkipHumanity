@@ -60,9 +60,9 @@ export default function Notebook() {
             </p>
             <Link
               href="/read"
-              className="text-sm border border-white/15 rounded-full px-4 py-1.5 text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+              className="text-sm border border-white/15 rounded-[3px] px-4 py-1.5 text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
             >
-              view all notes ↗
+              View All Notes <span className="text-[#1ABC9C]">↗</span>
             </Link>
           </div>
 
@@ -89,9 +89,9 @@ export default function Notebook() {
 
           <Link
             href={`/read/${ARTICLES[0].slug}`}
-            className="mt-6 inline-block text-sm border border-white/15 rounded-full px-5 py-2 text-white hover:bg-white/5 transition-colors"
+            className="mt-6 inline-block text-sm border border-white/15 rounded-[3px] px-5 py-2 text-white hover:bg-white/5 transition-colors"
           >
-            Read more +
+            Read More <span className="text-[#1ABC9C]">+</span>
           </Link>
         </div>
       </div>

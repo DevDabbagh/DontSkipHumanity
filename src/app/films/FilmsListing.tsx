@@ -83,13 +83,13 @@ export default function FilmsListing({ films }: { films: Film[] }) {
           <div className="flex items-center gap-3 mt-8">
             <button
               onClick={() => setFormFilter("documentary")}
-              className="text-sm border border-white/15 rounded-full px-5 py-2.5 text-white hover:bg-white/5 transition-colors"
+              className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white hover:bg-white/5 transition-colors"
             >
               Explore documentaries
             </button>
             <button
               onClick={() => setFormFilter("fiction")}
-              className="text-sm border border-white/15 rounded-full px-5 py-2.5 text-white hover:bg-white/5 transition-colors"
+              className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white hover:bg-white/5 transition-colors"
             >
               Explore fiction
             </button>
@@ -149,7 +149,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
                       href={featured.trailerUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm border border-white/15 rounded-full px-5 py-2 text-white hover:bg-white/5 transition-colors flex items-center gap-1.5"
+                      className="text-sm border border-white/15 rounded-[3px] px-5 py-2 text-white hover:bg-white/5 transition-colors flex items-center gap-1.5"
                     >
                       Watch trailer <span className="text-[#D81B60]">▶</span>
                     </a>
@@ -182,7 +182,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
                 <button
                   key={tab.value}
                   onClick={() => setStageFilter(tab.value)}
-                  className={`text-xs px-4 py-2 rounded-full border transition-colors ${
+                  className={`text-xs px-4 py-2 rounded-[3px] border transition-colors ${
                     stageFilter === tab.value
                       ? "bg-[#D81B60] border-[#D81B60] text-white"
                       : "border-white/15 text-gray-400 hover:text-white hover:border-white/30"
@@ -197,7 +197,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
                 <button
                   key={tab.value}
                   onClick={() => setFormFilter(tab.value)}
-                  className={`text-xs px-4 py-2 rounded-full border transition-colors ${
+                  className={`text-xs px-4 py-2 rounded-[3px] border transition-colors ${
                     formFilter === tab.value
                       ? "bg-white/10 border-white/30 text-white"
                       : "border-white/15 text-gray-400 hover:text-white hover:border-white/30"
@@ -250,7 +250,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
                           href={film.trailerUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs border border-white/15 rounded-full px-3.5 py-1.5 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
+                          className="text-xs border border-white/15 rounded-[3px] px-3.5 py-1.5 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
                         >
                           Watch trailer ▶
                         </a>

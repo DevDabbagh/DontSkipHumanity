@@ -33,8 +33,8 @@ export default function Academy() {
             frameworks, tools, and resources to turn ideas into organised
             action. Free by principle.
           </p>
-          <Link href="/academy" className="mt-6 inline-block text-sm border border-white/15 rounded-full px-5 py-2 text-white hover:bg-white/5 transition-colors">
-            Enter the Academy +
+          <Link href="/academy" className="mt-6 inline-block text-sm border border-white/15 rounded-[3px] px-5 py-2 text-white hover:bg-white/5 transition-colors">
+            Explore Academy <span className="text-[#32C6CC]">+</span>
           </Link>
         </div>
       </div>

@@ -85,8 +85,8 @@ export default function SupportCTA() {
             <p className="text-sm text-gray-400 mt-2">
               Ongoing solidarity. The most useful kind.
             </p>
-            <button className="mt-6 w-full py-3 rounded-lg gradient-fill-btn text-sm text-white font-medium flex items-center justify-center gap-2">
-              Give monthly ♡
+            <button className="mt-6 w-full py-3 rounded-[3px] gradient-fill-btn text-sm text-white font-medium flex items-center justify-center gap-2">
+              Give Monthly ♡
             </button>
           </div>
 
@@ -99,8 +99,8 @@ export default function SupportCTA() {
             <p className="text-sm text-gray-400 mt-2">
               A single contribution, any amount.
             </p>
-            <button className="mt-6 w-full py-3 rounded-lg border border-white/15 text-sm text-white font-medium flex items-center justify-center gap-2 hover:bg-white/5 transition-colors">
-              Support our work ♡
+            <button className="mt-6 w-full py-3 rounded-[3px] border border-white/15 text-sm text-white font-medium flex items-center justify-center gap-2 hover:bg-white/5 transition-colors">
+              Support Our Work ♡
             </button>
           </div>
         </div>

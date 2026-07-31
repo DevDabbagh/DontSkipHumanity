@@ -43,8 +43,8 @@ export default function TheWork() {
             through which violence is made acceptable. Festivals, screenings,
             distribution, and the political context around each film.
           </p>
-          <Link href="/film/free-fish" className="mt-6 inline-block text-sm border border-white/15 rounded-full px-5 py-2 text-white hover:bg-white/5 transition-colors">
-            Explore films +
+          <Link href="/film/free-fish" className="mt-6 inline-block text-sm border border-white/15 rounded-[3px] px-5 py-2 text-white hover:bg-white/5 transition-colors">
+            Explore Films <span className="text-[#B23495]">+</span>
           </Link>
         </div>
       </div>
@@ -68,8 +68,8 @@ export default function TheWork() {
             and co-production capacity behind them. Bold, independent media
             that strengthens movements, made with the same politics and care.
           </p>
-          <Link href="/film/beneath-the-canopy" className="mt-6 inline-block text-sm border border-white/15 rounded-full px-5 py-2 text-white hover:bg-white/5 transition-colors">
-            Explore studio +
+          <Link href="/film/beneath-the-canopy" className="mt-6 inline-block text-sm border border-white/15 rounded-[3px] px-5 py-2 text-white hover:bg-white/5 transition-colors">
+            Explore Studio <span className="text-[#8665A7]">+</span>
           </Link>
         </div>
       </div>

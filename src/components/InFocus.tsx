@@ -41,8 +41,8 @@ export default function InFocus() {
           </p>
 
           <div className="flex items-center gap-4 mt-8">
-            <button className="text-sm border border-white/15 rounded-full px-5 py-2 text-white hover:bg-white/5 transition-colors">
-              view more +
+            <button className="text-sm border border-white/15 rounded-[3px] px-5 py-2 text-white hover:bg-white/5 transition-colors">
+              View More <span className="text-[#9B59B6]">+</span>
             </button>
             <a href="#support" className="text-sm text-gray-400 hover:text-white transition-colors">
               Support our work

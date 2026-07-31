@@ -58,7 +58,7 @@ export default function SupportBanner() {
           {/* Right — CTA */}
           <a
             href="/support"
-            className="shrink-0 bg-white text-[#C0392B] text-sm font-semibold px-5 py-2 rounded-full hover:bg-white/90 transition-colors whitespace-nowrap"
+            className="shrink-0 bg-white text-[#C0392B] text-sm font-semibold px-5 py-2 rounded-[3px] hover:bg-white/90 transition-colors whitespace-nowrap"
           >
             Fund the work
           </a>
