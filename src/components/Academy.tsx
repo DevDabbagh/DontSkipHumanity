@@ -2,29 +2,7 @@
 
 import Link from "next/link";
 import { useReveal } from "@/hooks/useReveal";
-
-const ACADEMY_ITEMS = [
-  {
-    num: "01",
-    title: "Courses & masterclasses",
-    desc: "Learn from activists, journalists, and cultural workers on the frontlines.",
-  },
-  {
-    num: "02",
-    title: "Toolkits & resources",
-    desc: "Practical guides on advocacy, storytelling, and naming systems of power.",
-  },
-  {
-    num: "03",
-    title: "Workshops & live trainings",
-    desc: "Hands-on sessions to sharpen organising and storytelling skills.",
-  },
-  {
-    num: "04",
-    title: "Mentorships & collaborations",
-    desc: "Connect with grassroots movements and experienced practitioners.",
-  },
-];
+import ScrollColorImage from "./ScrollColorImage";
 
 export default function Academy() {
   const sectionRef = useReveal();
@@ -32,62 +10,31 @@ export default function Academy() {
   return (
     <section id="academy" className="py-12 sm:py-16 lg:py-20" ref={sectionRef}>
       <div className="px-5 sm:px-8 max-w-[1400px] mx-auto">
-        <div className="flex flex-col lg:flex-row gap-10 lg:gap-0">
-          {/* Left — text + numbered items on clean dark background */}
-          <div className="reveal-left lg:w-[45%] lg:pr-16">
-            <p className="text-xs tracking-[0.25em] text-gray-500 uppercase mb-4">
-              Academy
-            </p>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight">
-              Knowledge is power.
-              <br />
-              Education is resistance.
-            </h2>
-
-            <p className="text-gray-400 mt-6 leading-relaxed max-w-lg">
-              The Academy is political education built as infrastructure — a digital
-              school, a living archive, and a space for collective learning. Not a film
-              school, not a training agency. We share the frameworks, tools, and
-              resources to turn ideas into organised action.
-            </p>
-
-            <p className="text-[#1ABC9C] text-sm mt-4">Free by principle</p>
-
-            {/* Numbered items — plain text, no cards */}
-            <div className="mt-8 space-y-5">
-              {ACADEMY_ITEMS.map((item, i) => (
-                <div key={item.num} className={`reveal stagger-${i + 1}`}>
-                  <span className="text-xs text-[#1ABC9C] font-mono">{item.num}</span>
-                  <h4 className="text-white font-medium mt-1">{item.title}</h4>
-                  <p className="text-sm text-gray-500 mt-1">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Buttons */}
-            <div className="reveal stagger-5 flex items-center gap-4 mt-8">
-              <Link href="/academy" className="text-sm border border-white/15 rounded-full px-5 py-2 text-white hover:bg-white/5 transition-colors">
-                Enter the Academy +
-              </Link>
-              <Link href="/course/community-screening-toolkit" className="text-sm text-gray-400 hover:text-white transition-colors flex items-center gap-1">
-                Browse resources
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 17L17 7M17 7H7M17 7v10" />
-                </svg>
-              </Link>
-            </div>
+        {/* Academy — image left, text right (matching Films/Studio alternating pattern) */}
+        <div className="flex flex-col md:flex-row gap-8 md:gap-14 items-start">
+          <div className="reveal-left stagger-1 md:w-1/2">
+            <ScrollColorImage
+              src="/images/political-education.jpg"
+              alt="Academy — political education"
+              className="aspect-[4/3] rounded-lg"
+            />
           </div>
-
-          {/* Right — background image only, no overlay cards */}
-          <div className="reveal-right lg:w-[55%] relative min-h-[300px] sm:min-h-[400px] lg:min-h-[500px]">
-            <div className="absolute inset-0 rounded-lg overflow-hidden">
-              <img
-                src="/images/political-education.jpg"
-                alt=""
-                className="w-full h-full object-cover opacity-[0.35]"
-              />
-              <div className="absolute inset-0 bg-[#0D0D0D]/40" />
-            </div>
+          <div className="reveal-right stagger-2 md:w-1/2 md:pt-8">
+            <h3 className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-dsh-text-primary">
+              Academy
+              <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342" />
+              </svg>
+            </h3>
+            <p className="text-sm text-gray-400 mt-4 leading-relaxed max-w-lg">
+              Political education built as infrastructure — a digital school, a
+              living archive, and a space for collective learning. We share
+              frameworks, tools, and resources to turn ideas into organised
+              action. Free by principle.
+            </p>
+            <Link href="/academy" className="mt-6 inline-block text-sm border border-white/15 rounded-full px-5 py-2 text-white hover:bg-white/5 transition-colors">
+              Enter the Academy +
+            </Link>
           </div>
         </div>
       </div>
