@@ -287,7 +287,7 @@ export default function Hero() {
                   {item.slug ? (
                     <Link
                       href={`/film/${item.slug}`}
-                      className={`mt-2 sm:mt-3 inline-flex items-center gap-1.5 border border-dsh-text-primary/20 rounded-[3px] bg-dsh-btn-bg/20 text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:bg-dsh-btn-bg/30 transition-all duration-300 ${
+                      className={`mt-2 sm:mt-3 inline-flex items-center gap-1.5 border border-dsh-text-primary/20 rounded-[3px] bg-dsh-btn-bg/20 backdrop-blur-md text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:bg-dsh-btn-bg/30 transition-all duration-300 ${
                         isActive
                           ? "px-3 py-1.5 text-[11px] sm:text-[12px] xl:px-5 xl:py-2.5 xl:text-[13px]"
                           : isNear
