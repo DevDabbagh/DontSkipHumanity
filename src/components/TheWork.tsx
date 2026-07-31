@@ -28,7 +28,7 @@ export default function TheWork() {
           scroll treatment: it starts black & white and gains color as it scrolls into view. */}
       <div className="flex flex-col md:flex-row items-center mb-20 sm:mb-24 lg:mb-28">
         <div className="reveal-left stagger-1 w-full md:w-1/2 px-5 sm:px-8 md:px-0">
-          <ScrollColorImage src="/images/slider1.jpg" alt="Elderly hands clasped together" className="aspect-[9/2]" />
+          <ScrollColorImage src="/images/slider1.jpg" alt="Elderly hands clasped together" className="aspect-[9/2] max-md:rounded-lg md:rounded-tr-[6px] md:rounded-br-[6px]" />
         </div>
         <div className="reveal-right stagger-2 w-full md:w-1/2 px-5 sm:px-8 md:pl-14 md:pr-[max(2rem,calc((100vw-1400px)/2+2rem))]">
           <h3 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
@@ -52,7 +52,7 @@ export default function TheWork() {
       {/* Studio — mirrored: text left, image bleeds full-width to the right edge. */}
       <div id="studio" className="flex flex-col md:flex-row-reverse items-center">
         <div className="reveal-right stagger-1 w-full md:w-1/2 px-5 sm:px-8 md:px-0">
-          <ScrollColorImage src="/images/studio.jpg" alt="Studio portrait" className="aspect-[9/2]" />
+          <ScrollColorImage src="/images/studio.jpg" alt="Studio portrait" className="aspect-[9/2] max-md:rounded-lg md:rounded-tl-[6px] md:rounded-bl-[6px]" />
         </div>
         <div className="reveal-left stagger-2 w-full md:w-1/2 px-5 sm:px-8 md:pr-14 md:pl-[max(2rem,calc((100vw-1400px)/2+2rem))]">
           <h3 className="text-xl md:text-2xl font-semibold flex items-center gap-2">

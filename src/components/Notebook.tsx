@@ -49,7 +49,7 @@ export default function Notebook() {
             <ScrollColorImage
               src="/images/note.jpg"
               alt="Featured article"
-              className="aspect-[3/4] max-w-[360px] md:aspect-auto md:max-w-none md:h-[480px] group-hover:scale-105 transition-transform duration-700"
+              className="aspect-[3/4] max-w-[360px] max-md:rounded-lg md:aspect-auto md:max-w-none md:h-[480px] md:rounded-tr-[6px] md:rounded-br-[6px] group-hover:scale-105 transition-transform duration-700"
             />
           </Link>
         </div>

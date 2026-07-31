@@ -14,7 +14,7 @@ export default function InFocus() {
           <ScrollColorImage
             src="/images/infocus.jpg"
             alt="Catarina Marques Rodrigues"
-            className="aspect-[3/4] max-w-[400px] md:aspect-auto md:max-w-none md:h-[520px]"
+            className="aspect-[3/4] max-w-[400px] max-md:rounded-lg md:aspect-auto md:max-w-none md:h-[520px] md:rounded-tr-[6px] md:rounded-br-[6px]"
           />
         </div>
 
