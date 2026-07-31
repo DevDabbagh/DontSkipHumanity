@@ -46,14 +46,14 @@ export default function Impact() {
   const sectionRef = useReveal();
 
   return (
-    <section id="about" className="py-16 sm:py-20 lg:py-24 px-5 sm:px-8 max-w-[1400px] mx-auto" ref={sectionRef}>
-      {/* Header */}
-      <div className="reveal mb-6">
-        <p className="text-xs tracking-[0.25em] text-gray-500 uppercase mb-4">
+    <section id="about" className="py-16 sm:py-20 lg:py-24 overflow-hidden" ref={sectionRef}>
+      {/* Header — contained */}
+      <div className="reveal mb-6 px-5 sm:px-8 max-w-[1400px] mx-auto">
+        <p className="text-xs tracking-[0.25em] text-dsh-label uppercase mb-4">
           Impact
         </p>
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight max-w-xl">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight max-w-xl text-dsh-text-primary">
             Impact is not a dashboard.
             <br />
             It is the line between the work
@@ -64,46 +64,47 @@ export default function Impact() {
             href="#"
             className="text-sm border border-dsh-text-primary/20 rounded-[3px] px-5 py-2 bg-dsh-btn-bg/20 text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:bg-dsh-btn-bg/30 transition-colors self-start"
           >
-            Full impact report ↗
+            Full impact report <span className="text-[#1ABC9C]">↗</span>
           </a>
         </div>
       </div>
 
-      {/* Two-column: pillars + stats */}
-      <div className="flex flex-col lg:flex-row gap-10 lg:gap-12 mt-10 sm:mt-16">
-        {/* Left: numbered pillars */}
-        <div className="lg:w-1/2 space-y-8">
+      {/* Two-column: pillars (contained) + stats (bleed right) */}
+      <div className="flex flex-col lg:flex-row gap-10 lg:gap-0 mt-10 sm:mt-16">
+        {/* Left: numbered pillars — stays in container */}
+        <div className="lg:w-5/12 space-y-8 px-5 sm:px-8 lg:pl-[max(2rem,calc((100vw-1400px)/2+2rem))]">
           {PILLARS.map((p, i) => (
             <div key={p.num} className={`reveal stagger-${i + 1} flex gap-6 items-start`}>
               <span className={`text-xs font-mono ${p.color} mt-1`}>{p.num}</span>
               <div className="border-l border-white/10 pl-6">
-                <h4 className="text-white font-medium">{p.title}</h4>
-                <p className="text-sm text-gray-500 mt-1">{p.desc}</p>
+                <h4 className="text-dsh-text-primary font-medium">{p.title}</h4>
+                <p className="text-sm text-dsh-desc mt-1">{p.desc}</p>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Right: stats cards */}
-        <div className="lg:w-1/2 space-y-4">
+        {/* Right: stats cards — bleed to the right edge */}
+        <div className="lg:w-7/12 space-y-3 px-5 sm:px-8 lg:pr-0 lg:pl-8">
           {STATS.map((stat, i) => (
             <div
               key={stat.label}
-              className={`stat-reveal stagger-${i + 1} relative rounded-xl bg-[#1A1A1A] border border-white/5 p-6 overflow-hidden`}
+              className={`stat-reveal stagger-${i + 1} relative bg-[#1A1A1A]/60 border-l border-white/5 p-5 sm:p-6 overflow-hidden lg:rounded-l-[6px]`}
             >
-              <div className="absolute top-0 right-0 bottom-0 w-2/3 bg-gradient-to-r from-transparent to-[#1a1a2e]/50 rounded-r-xl" />
+              {/* Gradient bleed to right edge */}
+              <div className="absolute top-0 right-0 bottom-0 w-1/2 bg-gradient-to-r from-transparent via-[#1a1a2e]/30 to-[#2a1a2e]/20" />
               <div className="relative flex items-baseline gap-3">
                 <span className={`text-2xl sm:text-3xl md:text-4xl font-bold ${stat.color}`}>
                   {stat.value}
                 </span>
-                <span className="text-sm text-gray-500">{stat.label}</span>
+                <span className="text-sm text-dsh-desc">{stat.label}</span>
               </div>
             </div>
           ))}
 
           {/* Bottom note card */}
-          <div className="reveal stagger-5 rounded-xl bg-[#1A1A1A] border border-white/5 p-6">
-            <p className="text-sm text-gray-400">
+          <div className="reveal stagger-5 bg-[#1A1A1A]/60 border-l border-white/5 p-5 sm:p-6 lg:rounded-l-[6px]">
+            <p className="text-sm text-dsh-desc">
               Numbers appear alongside the story behind them, never alone.
             </p>
           </div>
