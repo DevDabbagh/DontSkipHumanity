@@ -296,7 +296,7 @@ export default function Hero() {
                       }`}
                       onClick={(e) => e.stopPropagation()}
                     >
-                      view more <span className="text-[#D81B60]">+</span>
+                      view more <span className="text-[#B23495]">+</span>
                     </Link>
                   ) : (
                     <span className={`mt-2 sm:mt-3 inline-flex items-center gap-1.5 border border-dsh-text-primary/20 rounded-[3px] bg-dsh-btn-bg/20 text-dsh-text-primary/40 ${
@@ -306,7 +306,7 @@ export default function Hero() {
                           ? "px-3 py-1.5 text-[9px] sm:text-[10px] xl:px-4 xl:py-2 xl:text-[11px]"
                           : "px-3 py-1.5 text-[9px] sm:text-[10px] xl:px-3 xl:py-1.5 xl:text-[10px]"
                     }`}>
-                      view more <span className="text-[#D81B60]">+</span>
+                      view more <span className="text-[#B23495]">+</span>
                     </span>
                   )}
                 </div>
