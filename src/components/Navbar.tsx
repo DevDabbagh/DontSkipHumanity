@@ -3,8 +3,17 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import LoginModal from "./LoginModal";
 import { useAuth } from "@/contexts/AuthContext";
+
+const NAV_ACTIVE_COLOR = "#B23495";
+
+function isNavLinkActive(pathname: string, href: string) {
+  if (href.startsWith("/#")) return false; // anchor links never count as a page match
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 const NAV_LINKS = [
   { label: "Films", href: "/films" },
@@ -28,6 +37,7 @@ const SOCIAL_LINKS = [
 ];
 
 export default function Navbar() {
+  const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -96,15 +106,19 @@ export default function Navbar() {
 
           {/* Desktop Nav — centered */}
           <div className="hidden lg:flex items-center justify-center gap-7">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="text-[13px] tracking-wide text-dsh-nav hover:text-dsh-nav-hover transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {NAV_LINKS.map((link) => {
+              const active = isNavLinkActive(pathname, link.href);
+              return (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className={`text-[13px] tracking-wide transition-colors ${active ? "" : "text-dsh-nav hover:text-dsh-nav-hover"}`}
+                  style={active ? { color: NAV_ACTIVE_COLOR } : undefined}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </div>
           <div className="lg:hidden" />
 
@@ -195,16 +209,20 @@ export default function Navbar() {
 
           {/* Center: nav links */}
           <div className="hidden lg:flex items-center justify-center gap-7">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="text-[13px] tracking-wide text-dsh-nav hover:text-dsh-nav-hover transition-colors"
-                onClick={() => setMenuOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {NAV_LINKS.map((link) => {
+              const active = isNavLinkActive(pathname, link.href);
+              return (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className={`text-[13px] tracking-wide transition-colors ${active ? "" : "text-dsh-nav hover:text-dsh-nav-hover"}`}
+                  style={active ? { color: NAV_ACTIVE_COLOR } : undefined}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </div>
           <div className="lg:hidden" />
 
@@ -226,24 +244,28 @@ export default function Navbar() {
         <div className="relative z-10 flex flex-col justify-between h-[calc(100vh-80px)] max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-16">
           {/* Large navigation links */}
           <nav className="flex flex-col gap-1 pt-8 sm:pt-16">
-            {MENU_LINKS.map((link, i) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                onClick={() => setMenuOpen(false)}
-                className={`text-dsh-nav-hover font-bold leading-none hover:text-[#1ABC9C] transition-colors duration-300 ${
-                  menuOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-                }`}
-                style={{
-                  fontSize: "clamp(2rem, 5vw, 3.5rem)",
-                  transitionDelay: menuOpen ? `${i * 60}ms` : "0ms",
-                  paddingTop: "0.4em",
-                  paddingBottom: "0.4em",
-                }}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {MENU_LINKS.map((link, i) => {
+              const active = isNavLinkActive(pathname, link.href);
+              return (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  onClick={() => setMenuOpen(false)}
+                  className={`font-bold leading-none hover:text-[#1ABC9C] transition-colors duration-300 ${
+                    active ? "" : "text-dsh-nav-hover"
+                  } ${menuOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
+                  style={{
+                    fontSize: "clamp(2rem, 5vw, 3.5rem)",
+                    transitionDelay: menuOpen ? `${i * 60}ms` : "0ms",
+                    paddingTop: "0.4em",
+                    paddingBottom: "0.4em",
+                    ...(active ? { color: NAV_ACTIVE_COLOR } : {}),
+                  }}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
             {/* Login link in menu */}
             {!isLoggedIn && (
               <button

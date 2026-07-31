@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useReveal } from "@/hooks/useReveal";
+import { useParallax } from "@/hooks/useParallax";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SupportCTA from "@/components/SupportCTA";
@@ -26,6 +27,7 @@ const FORM_TABS: { value: "all" | Film["credits"]["form"]; label: string }[] = [
 export default function FilmsListing({ films }: { films: Film[] }) {
   const heroRef = useReveal();
   const sectionRef = useReveal();
+  const { ref: heroBgRef, offset: heroBgOffset } = useParallax<HTMLDivElement>(0.15);
   const featuredFilms = useMemo(() => films.filter((f) => f.isFeatured), [films]);
   const [featuredIndex, setFeaturedIndex] = useState(0);
   const featured = featuredFilms[featuredIndex] ?? null;
@@ -49,48 +51,48 @@ export default function FilmsListing({ films }: { films: Film[] }) {
     <main className="min-h-screen bg-[#0D0D0D] text-white">
       <Navbar />
 
-      {/* Hero — text left, full-bleed image right */}
-      <section className="pt-14" ref={heroRef}>
-        <div className="flex flex-col md:flex-row items-center">
-          <div className="reveal-left w-full md:w-1/2 px-5 sm:px-8 pt-14 sm:pt-16 pb-10 md:pl-14 md:pr-8">
-            <p className="text-[10px] tracking-[0.3em] text-gray-500 uppercase mb-4">Films & Studio</p>
-            <h1 className="text-3xl sm:text-4xl md:text-[2.6rem] font-bold leading-[1.15] tracking-tight">
-              Documentary and fiction that stay close
-              <span className="gradient-text"> and refuse erasure.</span>
-            </h1>
-            <p className="text-gray-400 mt-5 max-w-lg leading-relaxed">
-              DSH makes documentary and fiction — from development and production to
-              festivals and distribution. Films are not streamed here. This section
-              presents the work with rigour and context, and opens paths to
-              screenings and press.
-            </p>
-            <div className="flex items-center gap-3 mt-8">
-              <button
-                onClick={() => setFormFilter("documentary")}
-                className="text-sm border border-white/15 rounded-full px-5 py-2.5 text-white hover:bg-white/5 transition-colors"
-              >
-                Explore documentaries
-              </button>
-              <button
-                onClick={() => setFormFilter("fiction")}
-                className="text-sm border border-white/15 rounded-full px-5 py-2.5 text-white hover:bg-white/5 transition-colors"
-              >
-                Explore fiction
-              </button>
-            </div>
-          </div>
-          <div className="reveal-right w-full md:w-1/2 h-[260px] sm:h-[340px] md:h-[440px] px-5 sm:px-8 md:px-0">
-            <div className="relative w-full h-full overflow-hidden md:rounded-tl-[6px] md:rounded-bl-[6px]">
-              {featured && (
-                <img
-                  src={featured.posterUrl || featured.thumbnailUrl}
-                  alt=""
-                  className="w-full h-full object-cover grayscale"
-                />
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0D] via-[#0D0D0D]/30 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-r from-[#0D0D0D]/60 md:from-[#0D0D0D]/40 via-transparent to-transparent" />
-            </div>
+      {/* Hero — one continuous full-bleed background image (with a slow parallax
+          drift on scroll) dimmed under a gradient, text overlaid on top. No hard
+          column seam — the image reads as one atmospheric backdrop, not a split panel. */}
+      <section className="relative pt-14 overflow-hidden" ref={heroRef}>
+        <div ref={heroBgRef} className="absolute inset-0 overflow-hidden">
+          {featured && (
+            <img
+              src={featured.posterUrl || featured.thumbnailUrl}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover grayscale"
+              style={{ transform: `translateY(${heroBgOffset}px) scale(1.15)` }}
+            />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0D0D0D] via-[#0D0D0D]/85 to-[#0D0D0D]/40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0D] via-transparent to-[#0D0D0D]/30" />
+        </div>
+
+        <div className="reveal-left relative max-w-[1400px] mx-auto px-5 sm:px-8 pt-16 sm:pt-20 pb-16 sm:pb-24">
+          <p className="text-[10px] tracking-[0.3em] text-gray-500 uppercase mb-4">Films & Studio</p>
+          <h1 className="text-3xl sm:text-4xl md:text-[2.6rem] font-bold leading-[1.15] tracking-tight max-w-2xl">
+            Documentary and fiction that stay close
+            <span className="gradient-text"> and refuse erasure.</span>
+          </h1>
+          <p className="text-gray-400 mt-5 max-w-lg leading-relaxed">
+            DSH makes documentary and fiction — from development and production to
+            festivals and distribution. Films are not streamed here. This section
+            presents the work with rigour and context, and opens paths to
+            screenings and press.
+          </p>
+          <div className="flex items-center gap-3 mt-8">
+            <button
+              onClick={() => setFormFilter("documentary")}
+              className="text-sm border border-white/15 rounded-full px-5 py-2.5 text-white hover:bg-white/5 transition-colors"
+            >
+              Explore documentaries
+            </button>
+            <button
+              onClick={() => setFormFilter("fiction")}
+              className="text-sm border border-white/15 rounded-full px-5 py-2.5 text-white hover:bg-white/5 transition-colors"
+            >
+              Explore fiction
+            </button>
           </div>
         </div>
       </section>
