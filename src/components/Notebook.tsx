@@ -55,12 +55,12 @@ export default function Notebook() {
         </div>
         <div className="reveal-right w-full md:w-7/12 px-5 sm:px-8 md:pl-14 md:pr-[max(2rem,calc((100vw-1400px)/2+2rem))] md:pt-4 mt-8 md:mt-0">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-xs tracking-[0.25em] text-gray-500 uppercase">
+            <p className="text-xs tracking-[0.25em] text-dsh-label uppercase">
               Notebook
             </p>
             <Link
               href="/read"
-              className="text-sm border border-white/15 rounded-[3px] px-4 py-1.5 text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+              className="text-sm border border-dsh-text-primary/20 rounded-[3px] px-4 py-1.5 bg-dsh-btn-bg/20 text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:bg-dsh-btn-bg/30 transition-colors"
             >
               View All Notes <span className="text-[#1ABC9C]">↗</span>
             </Link>
@@ -73,13 +73,13 @@ export default function Notebook() {
             <span className="text-xs text-gray-500">20 Jun 2026</span>
           </div>
 
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold leading-tight">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold leading-tight text-dsh-text-primary">
             Free Fish — now available
             <br />
             to programmers and press
           </h2>
 
-          <p className="text-gray-400 mt-4 leading-relaxed max-w-lg">
+          <p className="text-dsh-desc mt-4 leading-relaxed max-w-lg">
             Bisan Owda&apos;s short documentary enters distribution. Screeners
             available on request for programmers, press, and partners. The film
             follows fishermen navigating restricted waters off Gaza&apos;s coast.
@@ -89,7 +89,7 @@ export default function Notebook() {
 
           <Link
             href={`/read/${ARTICLES[0].slug}`}
-            className="mt-6 inline-block text-sm border border-white/15 rounded-[3px] px-5 py-2 text-white hover:bg-white/5 transition-colors"
+            className="mt-6 inline-block text-sm border border-dsh-text-primary/20 rounded-[3px] px-5 py-2 bg-dsh-btn-bg/20 text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:bg-dsh-btn-bg/30 transition-colors"
           >
             Read More <span className="text-[#1ABC9C]">+</span>
           </Link>
@@ -119,10 +119,10 @@ export default function Notebook() {
               <span className="text-xs text-gray-500">{article.date}</span>
             </div>
 
-            <h3 className="font-semibold text-white group-hover:text-gray-200 transition-colors leading-snug">
+            <h3 className="font-semibold text-dsh-text-primary group-hover:text-gray-200 transition-colors leading-snug">
               {article.title}
             </h3>
-            <p className="text-sm text-gray-500 mt-2 leading-relaxed line-clamp-2">
+            <p className="text-sm text-dsh-desc mt-2 leading-relaxed line-clamp-2">
               {article.desc}
             </p>
             <p className="text-sm text-[#1ABC9C] mt-3">by {article.author}</p>

@@ -52,7 +52,7 @@ export default function Agenda() {
         </div>
         <Link
           href="/agenda"
-          className="text-sm border border-white/15 rounded-[3px] px-5 py-2 text-white hover:bg-white/5 transition-colors self-start"
+          className="text-sm border border-dsh-text-primary/20 rounded-[3px] px-5 py-2 bg-dsh-btn-bg/20 text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:bg-dsh-btn-bg/30 transition-colors self-start"
         >
           View All Events <span className="text-[#1ABC9C]">↗</span>
         </Link>
@@ -85,7 +85,7 @@ export default function Agenda() {
               </div>
 
               <div className="shrink-0 self-start sm:self-center">
-                <span className="text-xs border border-white/15 rounded-[3px] px-4 py-1.5 text-gray-400 group-hover:text-white group-hover:border-white/30 transition-colors inline-flex items-center gap-1.5">
+                <span className="text-xs border border-dsh-text-primary/20 rounded-[3px] px-4 py-1.5 bg-dsh-btn-bg/20 text-dsh-text-primary/40 group-hover:text-dsh-text-primary/60 group-hover:border-dsh-text-primary/30 transition-colors inline-flex items-center gap-1.5">
                   details
                   <svg className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />

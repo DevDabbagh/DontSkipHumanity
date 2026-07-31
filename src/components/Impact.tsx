@@ -62,7 +62,7 @@ export default function Impact() {
           </h2>
           <a
             href="#"
-            className="text-sm border border-white/15 rounded-[3px] px-5 py-2 text-white hover:bg-white/5 transition-colors self-start"
+            className="text-sm border border-dsh-text-primary/20 rounded-[3px] px-5 py-2 bg-dsh-btn-bg/20 text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:bg-dsh-btn-bg/30 transition-colors self-start"
           >
             Full impact report ↗
           </a>

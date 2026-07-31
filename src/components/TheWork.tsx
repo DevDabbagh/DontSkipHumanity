@@ -31,19 +31,19 @@ export default function TheWork() {
           <ScrollColorImage src="/images/slider1.jpg" alt="Elderly hands clasped together" className="aspect-[9/2] max-md:rounded-lg md:rounded-tr-[6px] md:rounded-br-[6px]" />
         </div>
         <div className="reveal-right stagger-2 w-full md:w-1/2 px-5 sm:px-8 md:pl-14 md:pr-[max(2rem,calc((100vw-1400px)/2+2rem))]">
-          <h3 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
+          <h3 className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-dsh-text-primary">
             Films
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M16.2111 11.1056L9.73666 7.86833C8.93878 7.46939 8 8.04958 8 8.94164V15.0584C8 15.9504 8.93878 16.5306 9.73666 16.1317L16.2111 12.8944C16.9482 12.5259 16.9482 11.4741 16.2111 11.1056Z" stroke="#B23495" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </h3>
-          <p className="text-sm text-gray-400 mt-4 leading-relaxed max-w-lg">
+          <p className="text-sm text-dsh-desc mt-4 leading-relaxed max-w-lg">
             Documentary and fiction that stay close — to siege, displacement,
             and the daily labour of remaining human — and refuse the distance
             through which violence is made acceptable. Festivals, screenings,
             distribution, and the political context around each film.
           </p>
-          <Link href="/film/free-fish" className="mt-6 inline-block text-sm border border-white/15 rounded-[3px] px-5 py-2 text-white hover:bg-white/5 transition-colors">
+          <Link href="/film/free-fish" className="mt-6 inline-block text-sm border border-dsh-text-primary/20 rounded-[3px] px-5 py-2 bg-dsh-btn-bg/20 text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:bg-dsh-btn-bg/30 transition-colors">
             Explore Films <span className="text-[#B23495]">+</span>
           </Link>
         </div>
@@ -55,7 +55,7 @@ export default function TheWork() {
           <ScrollColorImage src="/images/studio.jpg" alt="Studio portrait" className="aspect-[9/2] max-md:rounded-lg md:rounded-tl-[6px] md:rounded-bl-[6px]" />
         </div>
         <div className="reveal-left stagger-2 w-full md:w-1/2 px-5 sm:px-8 md:pr-14 md:pl-[max(2rem,calc((100vw-1400px)/2+2rem))]">
-          <h3 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
+          <h3 className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-dsh-text-primary">
             Studio
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="9" y="3" width="6" height="11" rx="3" stroke="#8665A7" strokeLinejoin="round"/>
@@ -63,12 +63,12 @@ export default function TheWork() {
               <path d="M12 21V19" stroke="#8665A7" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </h3>
-          <p className="text-sm text-gray-400 mt-4 leading-relaxed max-w-lg">
+          <p className="text-sm text-dsh-desc mt-4 leading-relaxed max-w-lg">
             Docuseries, videocasts, podcasts, and series — and the production
             and co-production capacity behind them. Bold, independent media
             that strengthens movements, made with the same politics and care.
           </p>
-          <Link href="/film/beneath-the-canopy" className="mt-6 inline-block text-sm border border-white/15 rounded-[3px] px-5 py-2 text-white hover:bg-white/5 transition-colors">
+          <Link href="/film/beneath-the-canopy" className="mt-6 inline-block text-sm border border-dsh-text-primary/20 rounded-[3px] px-5 py-2 bg-dsh-btn-bg/20 text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:bg-dsh-btn-bg/30 transition-colors">
             Explore Studio <span className="text-[#8665A7]">+</span>
           </Link>
         </div>

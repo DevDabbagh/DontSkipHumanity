@@ -20,11 +20,11 @@ export default function InFocus() {
 
         {/* Content */}
         <div className="reveal-right w-full md:w-7/12 px-5 sm:px-8 md:pl-14 md:pr-[max(2rem,calc((100vw-1400px)/2+2rem))] md:pt-4 mt-8 md:mt-0">
-          <p className="text-xs tracking-[0.25em] text-gray-500 uppercase mb-3">
+          <p className="text-xs tracking-[0.25em] text-dsh-label uppercase mb-3">
             In Focus
           </p>
           <p className="text-sm text-[#9B59B6]">Youtube series · 2026</p>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight mt-3">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight mt-3 text-dsh-text-primary">
             We look where the world
             <br />
             is told not to look
@@ -33,7 +33,7 @@ export default function InFocus() {
           <div className="gradient-divider my-6 max-w-md" />
 
           <p className="text-[#9B59B6] text-sm mb-3">Catarina Marques Rodrigues</p>
-          <p className="text-gray-400 leading-relaxed max-w-lg">
+          <p className="text-dsh-desc leading-relaxed max-w-lg">
             Documentary and fiction that stay close — to siege, displacement,
             and the daily labour of remaining human — and refuse the distance
             through which violence is made acceptable. Festivals, screenings,
@@ -41,10 +41,10 @@ export default function InFocus() {
           </p>
 
           <div className="flex items-center gap-4 mt-8">
-            <button className="text-sm border border-white/15 rounded-[3px] px-5 py-2 text-white hover:bg-white/5 transition-colors">
+            <button className="text-sm border border-dsh-text-primary/20 rounded-[3px] px-5 py-2 bg-dsh-btn-bg/20 text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:bg-dsh-btn-bg/30 transition-colors">
               View More <span className="text-[#9B59B6]">+</span>
             </button>
-            <a href="#support" className="text-sm text-gray-400 hover:text-white transition-colors">
+            <a href="#support" className="text-sm text-dsh-desc hover:text-dsh-text-primary transition-colors">
               Support our work
             </a>
           </div>
