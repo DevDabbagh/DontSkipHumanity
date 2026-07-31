@@ -2,45 +2,53 @@
 
 import { useReveal } from "@/hooks/useReveal";
 
+// One accent color per row — shared between the pillar's number (left column)
+// and that row's stat number (right column), per the Figma spec.
+const ACCENTS = ["#B23495", "#8665A7", "#32C6CC", "#5D94B9", "#595C5C"];
+
 const PILLARS = [
   {
     num: "01",
     title: "Storytelling for justice",
     desc: "We reclaim narratives to expose injustice and shift power.",
-    color: "text-[#9B59B6]",
   },
   {
     num: "02",
     title: "Learning to organise",
     desc: "We equip people to unlearn, organise, and build collective power.",
-    color: "text-[#1ABC9C]",
   },
   {
     num: "03",
     title: "Movement support",
     desc: "We co-create strategy with frontline and grassroots movements.",
-    color: "text-[#3498DB]",
   },
   {
     num: "04",
     title: "Care as practice",
     desc: "We make care a political commitment and a daily structure.",
-    color: "text-[#E67E22]",
   },
   {
     num: "05",
     title: "Action and amplification",
     desc: "We spark action, deepen connection, and amplify resistance.",
-    color: "text-[#1ABC9C]",
   },
 ];
 
 const STATS = [
-  { value: "47", label: "Countries reached", color: "text-[#9B59B6]" },
-  { value: "8,200", label: "Academy participants", color: "text-[#1ABC9C]" },
-  { value: "23", label: "Festival selections", color: "text-[#3498DB]" },
-  { value: "€2.4M", label: "Redistributed", color: "text-[#E67E22]" },
+  { value: "47", label: "Countries reached", labelColor: "#595C5C" },
+  { value: "8,200", label: "Academy participants", labelColor: "#595C5C" },
+  { value: "23", label: "Festival selections", labelColor: "#9D9C9C" },
+  { value: "€2.4M", label: "Redistributed", labelColor: "#595C5C" },
 ];
+
+// hex + 0-1 alpha -> rgba(), so each card can tint the shared background image
+// with its own row accent without needing a Tailwind class per hex value.
+function tint(hex: string, alpha: number) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
 
 export default function Impact() {
   const sectionRef = useReveal();
@@ -49,11 +57,11 @@ export default function Impact() {
     <section id="about" className="py-16 sm:py-20 lg:py-24 overflow-hidden" ref={sectionRef}>
       {/* Header — contained */}
       <div className="reveal mb-6 px-5 sm:px-8 max-w-[1400px] mx-auto">
-        <p className="text-xs tracking-[0.25em] text-dsh-label uppercase mb-4">
+        <p className="text-xs tracking-[0.25em] uppercase mb-4" style={{ color: "#363636" }}>
           Impact
         </p>
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight max-w-xl text-dsh-text-primary">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight max-w-xl text-white">
             Impact is not a dashboard.
             <br />
             It is the line between the work
@@ -62,49 +70,70 @@ export default function Impact() {
           </h2>
           <a
             href="#"
-            className="text-sm border border-dsh-text-primary/20 rounded-[3px] px-5 py-2 bg-dsh-btn-bg/20 text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:bg-dsh-btn-bg/30 transition-colors self-start"
+            className="text-sm border border-white/20 rounded-[3px] px-5 py-2 bg-white/[0.03] text-white/40 hover:text-white/60 hover:bg-white/[0.06] transition-colors self-start"
           >
             Full impact report <span className="text-[#1ABC9C]">↗</span>
           </a>
         </div>
       </div>
 
-      {/* Two-column: pillars (contained) + stats (bleed right) */}
+      {/* Two-column: pillars (contained) + stats (bleed to the right edge, one
+          shared background image split across the 5 rows) */}
       <div className="flex flex-col lg:flex-row gap-10 lg:gap-0 mt-10 sm:mt-16">
         {/* Left: numbered pillars — stays in container */}
         <div className="lg:w-5/12 space-y-8 px-5 sm:px-8 lg:pl-[max(2rem,calc((100vw-1400px)/2+2rem))]">
           {PILLARS.map((p, i) => (
             <div key={p.num} className={`reveal stagger-${i + 1} flex gap-6 items-start`}>
-              <span className={`text-xs font-mono ${p.color} mt-1`}>{p.num}</span>
+              <span className="text-xs font-mono mt-1" style={{ color: ACCENTS[i] }}>
+                {p.num}
+              </span>
               <div className="border-l border-white/10 pl-6">
-                <h4 className="text-dsh-text-primary font-medium">{p.title}</h4>
-                <p className="text-sm text-dsh-desc mt-1">{p.desc}</p>
+                <h4 className="text-white font-medium">{p.title}</h4>
+                <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>
+                  {p.desc}
+                </p>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Right: stats cards — bleed to the right edge */}
-        <div className="lg:w-7/12 space-y-3 px-5 sm:px-8 lg:pr-0 lg:pl-8">
+        {/* Right: stats cards — bleed to the right edge, one shared background
+            image behind all of them, each row revealing its own tinted slice */}
+        <div className="relative lg:w-7/12 space-y-3 px-5 sm:px-8 lg:pr-0 lg:pl-8">
+          <div className="absolute inset-0 pointer-events-none hidden lg:block">
+            <img
+              src="/images/impact_metrics_background.jpg"
+              alt=""
+              className="w-full h-full object-cover opacity-40"
+            />
+          </div>
+
           {STATS.map((stat, i) => (
             <div
               key={stat.label}
-              className={`stat-reveal stagger-${i + 1} relative bg-[#1A1A1A]/60 border-l border-white/5 p-5 sm:p-6 overflow-hidden lg:rounded-l-[6px]`}
+              className={`stat-reveal stagger-${i + 1} relative overflow-hidden lg:rounded-l-[6px] border-l`}
+              style={{
+                borderColor: tint(ACCENTS[i], 0.35),
+                background: `linear-gradient(90deg, ${tint(ACCENTS[i], 0.16)}, ${tint(ACCENTS[i], 0.05)} 60%, transparent)`,
+              }}
             >
-              {/* Gradient bleed to right edge */}
-              <div className="absolute top-0 right-0 bottom-0 w-1/2 bg-gradient-to-r from-transparent via-[#1a1a2e]/30 to-[#2a1a2e]/20" />
-              <div className="relative flex items-baseline gap-3">
-                <span className={`text-2xl sm:text-3xl md:text-4xl font-bold ${stat.color}`}>
+              <div className="relative p-5 sm:p-6 flex items-baseline gap-3">
+                <span className="text-2xl sm:text-3xl md:text-4xl font-bold" style={{ color: ACCENTS[i] }}>
                   {stat.value}
                 </span>
-                <span className="text-sm text-dsh-desc">{stat.label}</span>
+                <span className="text-sm" style={{ color: stat.labelColor }}>
+                  {stat.label}
+                </span>
               </div>
             </div>
           ))}
 
           {/* Bottom note card */}
-          <div className="reveal stagger-5 bg-[#1A1A1A]/60 border-l border-white/5 p-5 sm:p-6 lg:rounded-l-[6px]">
-            <p className="text-sm text-dsh-desc">
+          <div
+            className="reveal stagger-5 relative overflow-hidden lg:rounded-l-[6px] border-l p-5 sm:p-6"
+            style={{ borderColor: tint(ACCENTS[4], 0.35), background: tint(ACCENTS[4], 0.12) }}
+          >
+            <p className="text-sm" style={{ color: "#F0F0F0" }}>
               Numbers appear alongside the story behind them, never alone.
             </p>
           </div>
