@@ -7,9 +7,23 @@ export default function InFocus() {
   const sectionRef = useReveal();
 
   return (
-    <section className="py-16 sm:py-20 lg:py-24" ref={sectionRef}>
-      <div className="flex flex-col md:flex-row items-center">
-        {/* Image — bleeds full-width to the left edge on desktop */}
+    <section className="py-16 sm:py-20 lg:py-24 relative" ref={sectionRef}>
+      {/* Background strip (شريط) — cropped bottom portion of the same image,
+          stretched full-width behind the content as a dark atmospheric band */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-[320px] sm:h-[380px] md:h-[420px]">
+          <img
+            src="/images/infocus.jpg"
+            alt=""
+            className="w-full h-full object-cover object-bottom opacity-[0.08]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0D0D0D] via-transparent to-[#0D0D0D]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0D0D0D] via-transparent to-[#0D0D0D]" />
+        </div>
+      </div>
+
+      <div className="relative flex flex-col md:flex-row items-center">
+        {/* Portrait thumbnail — bleeds to the left edge on desktop */}
         <div className="reveal-left w-full md:w-5/12 px-5 sm:px-8 md:px-0">
           <ScrollColorImage
             src="/images/infocus.jpg"
@@ -30,9 +44,7 @@ export default function InFocus() {
             is told not to look
           </h2>
 
-          <div className="gradient-divider my-6 max-w-md" />
-
-          <p className="text-[#9B59B6] text-sm mb-3">Catarina Marques Rodrigues</p>
+          <p className="text-[#9B59B6] text-sm mt-6 mb-3">Catarina Marques Rodrigues</p>
           <p className="text-dsh-desc leading-relaxed max-w-lg">
             Documentary and fiction that stay close — to siege, displacement,
             and the daily labour of remaining human — and refuse the distance
