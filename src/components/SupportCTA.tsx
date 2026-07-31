@@ -7,19 +7,19 @@ const SUPPORT_PILLARS = [
     num: "01",
     title: "Production",
     desc: "Getting films, journalism, and studio work made and finished.",
-    color: "text-[#E67E22]",
+    color: "#B23495",
   },
   {
     num: "02",
     title: "Free education",
     desc: "Keeping the Academy free and open.",
-    color: "text-[#1ABC9C]",
+    color: "#32C6CC",
   },
   {
     num: "03",
     title: "Redistribution",
     desc: "Direct support to the communities the work comes from.",
-    color: "text-[#9B59B6]",
+    color: "#8665A7",
   },
 ];
 
@@ -33,9 +33,9 @@ export default function SupportCTA() {
         <img
           src="/images/support.jpg"
           alt=""
-          className="w-full h-full object-cover opacity-20"
+          className="w-full h-full object-cover opacity-[0.08]"
         />
-        <div className="absolute inset-0 bg-[#0D0D0D]/60" />
+        <div className="absolute inset-0 bg-[#0D0D0D]/70" />
       </div>
 
       <div className="relative px-5 sm:px-8 max-w-[1400px] mx-auto">
@@ -43,15 +43,15 @@ export default function SupportCTA() {
         <div className="flex flex-col md:flex-row gap-8 md:gap-12 mb-10 sm:mb-16">
           {/* Left: text */}
           <div className="reveal-left md:w-1/2">
-            <p className="text-xs tracking-[0.25em] text-gray-500 uppercase mb-4">
+            <p className="text-xs tracking-[0.25em] text-dsh-label uppercase mb-4">
               Support
             </p>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight text-dsh-text-primary">
               Not pity — solidarity.
               <br />
-              <span className="text-gray-500">Lorem ipsum new line please.</span>
+              <span className="text-dsh-desc">Lorem ipsum new line please.</span>
             </h2>
-            <p className="text-gray-400 mt-6 leading-relaxed max-w-lg">
+            <p className="text-sm text-dsh-desc mt-6 leading-relaxed max-w-lg">
               Independent political film, journalism, and education don&apos;t pay for
               themselves, and we don&apos;t want them owned by those who could.
               Support keeps the work free of editorial strings: it funds production,
@@ -64,10 +64,10 @@ export default function SupportCTA() {
           <div className="reveal-right md:w-1/2 space-y-8 md:pt-12">
             {SUPPORT_PILLARS.map((p, i) => (
               <div key={p.num} className={`reveal stagger-${i + 1} flex gap-6 items-start`}>
-                <span className={`text-xs font-mono ${p.color} mt-1`}>{p.num}</span>
+                <span className="text-xs font-mono mt-1" style={{ color: p.color }}>{p.num}</span>
                 <div>
-                  <h4 className="text-white font-medium">{p.title}</h4>
-                  <p className="text-sm text-gray-500 mt-1">{p.desc}</p>
+                  <h4 className="text-dsh-text-primary font-medium">{p.title}</h4>
+                  <p className="text-sm text-dsh-desc mt-1">{p.desc}</p>
                 </div>
               </div>
             ))}
@@ -77,12 +77,12 @@ export default function SupportCTA() {
         {/* Two CTA cards */}
         <div className="grid md:grid-cols-2 gap-6">
           {/* Give monthly */}
-          <div className="reveal-scale stagger-1 rounded-xl bg-[#1A1A1A]/80 backdrop-blur-sm border border-white/5 p-8">
-            <p className="text-xs tracking-[0.2em] text-gray-500 uppercase mb-2">
+          <div className="reveal-scale stagger-1 rounded-[6px] bg-[#1A1A1A]/80 backdrop-blur-sm border border-white/5 p-8">
+            <p className="text-xs tracking-[0.2em] text-dsh-label uppercase mb-2">
               Recurring
             </p>
-            <h3 className="text-2xl font-semibold">Give monthly</h3>
-            <p className="text-sm text-gray-400 mt-2">
+            <h3 className="text-2xl font-semibold text-dsh-text-primary">Give monthly</h3>
+            <p className="text-sm text-dsh-desc mt-2">
               Ongoing solidarity. The most useful kind.
             </p>
             <button className="mt-6 w-full py-3 rounded-[3px] gradient-fill-btn text-sm text-white font-medium flex items-center justify-center gap-2">
@@ -91,15 +91,15 @@ export default function SupportCTA() {
           </div>
 
           {/* Support the work */}
-          <div className="reveal-scale stagger-2 rounded-xl bg-[#1A1A1A]/80 backdrop-blur-sm border border-white/5 p-8">
-            <p className="text-xs tracking-[0.2em] text-gray-500 uppercase mb-2">
+          <div className="reveal-scale stagger-2 rounded-[6px] bg-[#1A1A1A]/80 backdrop-blur-sm border border-white/5 p-8">
+            <p className="text-xs tracking-[0.2em] text-dsh-label uppercase mb-2">
               One-time
             </p>
-            <h3 className="text-2xl font-semibold">Support the work</h3>
-            <p className="text-sm text-gray-400 mt-2">
+            <h3 className="text-2xl font-semibold text-dsh-text-primary">Support the work</h3>
+            <p className="text-sm text-dsh-desc mt-2">
               A single contribution, any amount.
             </p>
-            <button className="mt-6 w-full py-3 rounded-[3px] border border-white/15 text-sm text-white font-medium flex items-center justify-center gap-2 hover:bg-white/5 transition-colors">
+            <button className="mt-6 w-full py-3 rounded-[3px] border border-dsh-text-primary/20 text-sm text-dsh-text-primary/60 font-medium flex items-center justify-center gap-2 hover:bg-dsh-btn-bg/20 transition-colors">
               Support Our Work ♡
             </button>
           </div>
