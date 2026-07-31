@@ -114,14 +114,13 @@ export default function Notebook() {
             key={article.slug}
             className={`reveal-scale stagger-${i + 1} group`}
           >
-            <Link href={`/read/${article.slug}`} className="block">
-              <div className="relative aspect-[4/3] rounded-[6px] overflow-hidden mb-4">
-                <img
-                  src={article.image}
-                  alt={article.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-              </div>
+            <Link href={`/read/${article.slug}`} className="block mb-4">
+              <ScrollColorImage
+                src={article.image}
+                alt={article.title}
+                className="aspect-[4/3] rounded-[6px]"
+                imgClassName="group-hover:scale-105 transition-transform duration-500"
+              />
             </Link>
 
             <div className="flex items-center gap-3 mb-3">

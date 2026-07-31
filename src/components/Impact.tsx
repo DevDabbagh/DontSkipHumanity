@@ -51,33 +51,41 @@ function tint(hex: string, alpha: number) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-// Row 0 ("47 · Countries reached") bleeds all the way to the viewport edge;
-// rows 1–4 are held back with a visible right edge, per the Figma reference —
-// the cards don't all end at the same place.
-function rowWidthClasses(i: number) {
-  return i === 0 ? "lg:rounded-r-none lg:border-r-0" : "lg:mr-10 xl:mr-20 lg:rounded-r-[6px] lg:border-r";
-}
+// Per the Figma: every card bleeds to the RIGHT viewport edge; the stagger is
+// on the LEFT edge — each row starts at a slightly different x, giving the
+// stack a loose, organic silhouette instead of a rigid block.
+const ROW_LEFT_OFFSETS = ["lg:ml-0", "lg:ml-11", "lg:ml-8", "lg:ml-1", "lg:ml-3"];
 
-function BackgroundSlice({ position, colorAmount }: { position: string; colorAmount: number }) {
+function BackgroundSlice({ position, colorAmount, accent }: { position: string; colorAmount: number; accent: string }) {
   return (
     <>
       {/* Shared photo — one continuous image sliced by row via background-position,
-          held black & white until scrolled into view, then gains color. */}
+          held black & white until scrolled into view, then gently colored.
+          Kept quiet: in the design the photo is a whisper on the right half,
+          not a loud texture across the card. */}
       <div
         className="absolute inset-0 hidden lg:block transition-[filter] duration-100 ease-out"
         style={{
           backgroundImage: "url(/images/impact_metrics_background.jpg)",
           backgroundSize: "100% 500%",
           backgroundPosition: position,
-          opacity: 0.7,
+          opacity: 0.35,
           filter: `grayscale(${1 - colorAmount})`,
         }}
       />
-      {/* Black shadow, strong on the left (behind the text) fading out to the
-          right, so the numbers stay legible over a busy photo. */}
+      {/* Heavy black fade from the left: near-solid behind the number/label,
+          releasing the photo only toward the right edge. */}
       <div
         className="absolute inset-0 hidden lg:block"
-        style={{ background: "linear-gradient(90deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.45) 32%, rgba(0,0,0,0.1) 60%, transparent 85%)" }}
+        style={{
+          background:
+            "linear-gradient(90deg, #101010 0%, rgba(16,16,16,0.96) 35%, rgba(16,16,16,0.75) 55%, rgba(16,16,16,0.35) 78%, rgba(16,16,16,0.15) 100%)",
+        }}
+      />
+      {/* Soft accent tint over the photo side only */}
+      <div
+        className="absolute inset-0 hidden lg:block"
+        style={{ background: `linear-gradient(90deg, transparent 45%, ${tint(accent, 0.18)} 100%)` }}
       />
     </>
   );
@@ -131,21 +139,17 @@ export default function Impact() {
           ))}
         </div>
 
-        {/* Right: stats cards */}
+        {/* Right: stats cards — all bleed to the right viewport edge; left edges
+            stagger slightly per row, matching the Figma silhouette. */}
         <div className="lg:w-7/12 space-y-3 px-5 sm:px-8 lg:pr-0 lg:pl-8">
           {STATS.map((stat, i) => (
             <div
               key={stat.label}
-              className={`stat-reveal stagger-${i + 1} relative overflow-hidden lg:rounded-l-[6px] border-l min-h-[92px] sm:min-h-[104px] flex items-center ${rowWidthClasses(i)}`}
-              style={{ borderColor: tint(ACCENTS[i], 0.35) }}
+              className={`stat-reveal stagger-${i + 1} relative overflow-hidden rounded-[6px] lg:rounded-r-none border lg:border-r-0 border-white/[0.08] min-h-[88px] sm:min-h-[96px] flex items-center ${ROW_LEFT_OFFSETS[i]}`}
             >
-              <BackgroundSlice position={`center ${i * 25}%`} colorAmount={colorAmount} />
-              <div
-                className="absolute inset-0"
-                style={{ background: `linear-gradient(90deg, ${tint(ACCENTS[i], 0.3)}, transparent 55%)` }}
-              />
-              <div className="relative p-5 sm:p-6 flex items-baseline gap-3">
-                <span className="text-2xl sm:text-3xl md:text-4xl font-bold" style={{ color: ACCENTS[i] }}>
+              <BackgroundSlice position={`center ${i * 25}%`} colorAmount={colorAmount} accent={ACCENTS[i]} />
+              <div className="relative p-5 sm:p-6 flex items-baseline gap-4">
+                <span className="text-2xl sm:text-3xl md:text-[34px] font-bold" style={{ color: ACCENTS[i] }}>
                   {stat.value}
                 </span>
                 <span className="text-sm" style={{ color: stat.labelColor }}>
@@ -157,14 +161,9 @@ export default function Impact() {
 
           {/* Bottom note card — 5th slice of the same image */}
           <div
-            className={`reveal stagger-5 relative overflow-hidden lg:rounded-l-[6px] border-l min-h-[92px] sm:min-h-[104px] flex items-center p-5 sm:p-6 ${rowWidthClasses(4)}`}
-            style={{ borderColor: tint(ACCENTS[4], 0.35) }}
+            className={`reveal stagger-5 relative overflow-hidden rounded-[6px] lg:rounded-r-none border lg:border-r-0 border-white/[0.08] min-h-[88px] sm:min-h-[96px] flex items-center p-5 sm:p-6 ${ROW_LEFT_OFFSETS[4]}`}
           >
-            <BackgroundSlice position="center 100%" colorAmount={colorAmount} />
-            <div
-              className="absolute inset-0"
-              style={{ background: `linear-gradient(90deg, ${tint(ACCENTS[4], 0.3)}, transparent 55%)` }}
-            />
+            <BackgroundSlice position="center 100%" colorAmount={colorAmount} accent={ACCENTS[4]} />
             <p className="relative text-sm" style={{ color: "#F0F0F0" }}>
               Numbers appear alongside the story behind them, never alone.
             </p>
