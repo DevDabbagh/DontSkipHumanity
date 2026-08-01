@@ -2,37 +2,42 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { useReveal } from "@/hooks/useReveal";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import SupportCTA from "@/components/SupportCTA";
 import type { Film, FilmStage } from "@/lib/types";
 
-const STAGE_LABELS: Record<string, { label: string; color: string }> = {
-  development: { label: "Development", color: "bg-indigo-500/20 text-indigo-300" },
-  production: { label: "Production", color: "bg-amber-500/20 text-amber-300" },
-  post_production: { label: "Post-production", color: "bg-orange-500/20 text-orange-300" },
-  festivals: { label: "Festivals", color: "bg-[#9B59B6]/20 text-[#c084fc]" },
-  distribution: { label: "Distribution", color: "bg-[#1ABC9C]/20 text-[#1ABC9C]" },
-  impact: { label: "Impact", color: "bg-emerald-500/20 text-emerald-300" },
+/* ── Constants ── */
+
+const STAGE_LABELS: Record<string, string> = {
+  development: "Development",
+  production: "Production",
+  post_production: "Post-production",
+  festivals: "Festivals",
+  distribution: "Distribution",
+  impact: "Impact",
 };
 
-const FORM_TABS: { value: "all" | Film["credits"]["form"]; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "documentary", label: "Documentary" },
-  { value: "fiction", label: "Fiction" },
-];
+/* ── Shared button style ── */
+const BTN =
+  "text-xs border border-white/15 rounded-[3px] px-4 py-2 text-white/80 hover:text-white hover:border-white/25 transition-colors inline-flex items-center gap-1.5";
+const BTN_ACTIVE =
+  "text-xs rounded-[3px] px-4 py-2 bg-[#B23495] border border-[#B23495] text-white";
+
+/* ── Component ── */
 
 export default function FilmsListing({ films }: { films: Film[] }) {
-  const heroRef = useReveal();
-  const sectionRef = useReveal();
+  /* Featured */
   const featuredFilms = useMemo(() => films.filter((f) => f.isFeatured), [films]);
-  const [featuredIndex, setFeaturedIndex] = useState(0);
-  const featured = featuredFilms[featuredIndex] ?? null;
+  const [featuredIdx, setFeaturedIdx] = useState(0);
+  const featured = featuredFilms[featuredIdx] ?? films[0] ?? null;
 
+  /* Filters */
   const stageTabs = useMemo(() => {
     const present = Array.from(new Set(films.map((f) => f.stage))) as FilmStage[];
-    return [{ value: "all" as const, label: "View All" }, ...present.map((s) => ({ value: s, label: STAGE_LABELS[s]?.label ?? s }))];
+    return [
+      { value: "all" as const, label: "View All" },
+      ...present.map((s) => ({ value: s, label: STAGE_LABELS[s] ?? s })),
+    ];
   }, [films]);
 
   const [stageFilter, setStageFilter] = useState<"all" | FilmStage>("all");
@@ -45,279 +50,288 @@ export default function FilmsListing({ films }: { films: Film[] }) {
     return stageOk && formOk;
   });
 
+  /* Pair films into rows of 2 for the editorial grid */
+  const rows: Film[][] = [];
+  for (let i = 0; i < filtered.length; i += 2) {
+    rows.push(filtered.slice(i, i + 2));
+  }
+
   return (
-    <main className="min-h-screen bg-[#090909] text-white">
+    <main className="min-h-screen bg-[#0A0A0A] text-white">
       <Navbar />
 
-      {/* Hero — editorial breakout composition. Text stays inside the site's
-          content grid; the hero image breaks out of that grid and bleeds to
-          the right browser edge. The far-left sliver is the SAME image,
-          just a different crop of it — not a separate photo — so both
-          pieces read as one continuous cinematic canvas. No parallax or
-          motion in this pass. */}
-      <section className="relative overflow-hidden" ref={heroRef}>
-        {/* Far-left sliver — the SAME image, another crop. Fixed visible width
-            (~80px) that hugs the browser's left edge; a wider img sits inside
-            an overflow-hidden window so it reads as a larger image continuing
-            off-screen. Visible width stays constant on every viewport. */}
-        {featured && (
-          <div className="hidden lg:block absolute top-[90px] left-0 w-[80px] h-[720px] overflow-hidden pointer-events-none select-none">
-            <img
-              src={featured.posterUrl || featured.thumbnailUrl}
-              alt=""
-              className="absolute top-0 left-0 h-full max-w-none"
-              style={{
-                width: "460px",
-                objectFit: "cover",
-                objectPosition: "18% 42%",
-                filter: "grayscale(1) brightness(0.5) contrast(0.92)",
-              }}
-            />
-            <div className="absolute inset-0 bg-black/45" />
-          </div>
-        )}
+      {/* ═══════════════════════════════════════
+          FEATURED SECTION
+         ═══════════════════════════════════════ */}
+      {featured && (
+        <section className="max-w-[1200px] mx-auto px-5 sm:px-8 pt-28 sm:pt-32 lg:pt-36 pb-16 sm:pb-20">
+          {/* Label */}
+          <p className="text-[10px] tracking-[0.3em] text-white/25 uppercase mb-6">
+            Featured
+          </p>
 
-        {/* Art-directed composition — NOT a responsive grid. The text block is
-            a FIXED width that never scales; the image is the ONLY fluid element
-            (flex-1) so all extra viewport width is absorbed by the image alone.
-            Preview strip, text width, spacing and line breaks stay locked. */}
-        <div className="reveal-left relative flex flex-col lg:flex-row lg:items-stretch gap-10 lg:gap-0 pt-24 sm:pt-28 lg:pt-[90px] pb-16 sm:pb-20 lg:pb-0">
-          {/* Text — FIXED width column (never grows/shrinks/reflows). shrink-0
-              + grow-0 + a hard basis lock it at exactly 500px on desktop, so
-              the title's line breaks are identical at 1366 / 1600 / 1920 / 2560. */}
-          <div className="shrink-0 grow-0 basis-auto w-full lg:w-[500px] flex flex-col justify-center px-5 sm:px-8 lg:pl-[120px] lg:pr-6">
-            <p className="text-[10px] tracking-[0.3em] text-white/30 uppercase mb-6">Films</p>
-            <h1 className="text-3xl sm:text-4xl md:text-[2.6rem] font-semibold leading-[1.2] tracking-tight">
-              Documentary
-              <br className="hidden sm:block" />
-              and fiction that
-              <br className="hidden sm:block" />
-              stay close and
-              <br className="hidden sm:block" />
-              <span className="gradient-text">refuse erasure.</span>
-            </h1>
-            <p className="text-white/40 mt-8 max-w-sm leading-relaxed text-sm">
-              DSH makes documentary and fiction — from development and
-              production to festivals and distribution. Films are not
-              streamed here. This section presents the work with rigour
-              and context, and opens paths to screenings, distribution,
-              and press.
-            </p>
-            <div className="flex items-center gap-3 mt-14">
-              <button
-                onClick={() => setFormFilter("documentary")}
-                className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white/80 bg-transparent hover:border-white/30 hover:text-white transition-colors"
-              >
-                Explore documentaries
-              </button>
-              <button
-                onClick={() => setFormFilter("fiction")}
-                className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white/80 bg-transparent hover:border-white/30 hover:text-white transition-colors"
-              >
-                Explore fiction
-              </button>
+          <div className="flex flex-col md:flex-row gap-8 md:gap-10">
+            {/* Poster — left */}
+            <div className="relative w-full md:w-[42%] shrink-0">
+              <Link href={`/film/${featured.slug}`} className="block group">
+                <div className="relative aspect-[4/3] rounded-[6px] overflow-hidden border border-white/[0.06] shadow-lg shadow-black/40">
+                  <img
+                    src={featured.posterUrl || featured.thumbnailUrl}
+                    alt={featured.title}
+                    className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
+                    style={{ filter: "grayscale(0.15) brightness(0.85) contrast(1.05)" }}
+                  />
+                </div>
+              </Link>
+              {/* Navigation arrow — centered vertically on the poster */}
+              {featuredFilms.length > 1 && (
+                <button
+                  onClick={() =>
+                    setFeaturedIdx((i) => (i + 1) % featuredFilms.length)
+                  }
+                  aria-label="Next featured film"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 border border-white/20 flex items-center justify-center text-white/70 hover:text-white hover:bg-black/70 transition-colors backdrop-blur-sm"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              )}
+            </div>
+
+            {/* Info — right */}
+            <div className="flex-1 md:pt-2">
+              {/* Category + year */}
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-[#B23495] text-sm">
+                  {featured.credits.form === "documentary" ? "Documentary" : "Fiction"}
+                </span>
+                <span className="text-white/30 text-sm">{featured.credits.year}</span>
+              </div>
+
+              {/* Title */}
+              <h2 className="text-2xl sm:text-[28px] font-bold leading-tight">
+                {featured.title}
+              </h2>
+
+              {/* Short description */}
+              <p className="text-[13px] text-white/40 mt-4 leading-relaxed max-w-md">
+                {featured.synopsisShort || featured.logline}
+              </p>
+
+              {/* Directed by */}
+              <p className="text-[10px] tracking-[0.2em] text-white/20 uppercase mt-6 mb-1">
+                Directed by
+              </p>
+              <p className="text-[13px] text-white/60">
+                {featured.credits.direction}
+              </p>
+
+              {/* Longer description */}
+              <p className="text-[13px] text-white/35 mt-6 leading-relaxed max-w-lg">
+                {featured.editorialContext || featured.logline}
+              </p>
+
+              {/* Buttons */}
+              <div className="flex items-center gap-4 mt-8">
+                {featured.trailerUrl && (
+                  <a
+                    href={featured.trailerUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={BTN}
+                  >
+                    Watch trailer <span className="text-[#B23495]">▶</span>
+                  </a>
+                )}
+                <Link
+                  href={`/film/${featured.slug}`}
+                  className="text-xs text-white/35 hover:text-white/60 transition-colors"
+                >
+                  Know more
+                </Link>
+              </div>
             </div>
           </div>
+        </section>
+      )}
 
-          {/* Hero image — the ONLY fluid element. flex-1 + w-0 gives it a zero
-              flex-basis so it never influences the text column's size; it simply
-              absorbs ALL remaining viewport width. object-cover reveals more of
-              the image as the browser widens — text/preview never move. */}
-          <div className="w-full lg:flex-1 lg:w-0 lg:min-w-0 pl-5 pr-5 sm:pl-8 sm:pr-8 lg:pl-0 lg:pr-0">
-            {featured && (
-              <div
-                className="relative aspect-[4/3] lg:aspect-auto lg:h-[720px] overflow-hidden"
-                style={{ boxShadow: "inset 40px 0 60px -30px rgba(0,0,0,0.85), inset -40px 0 60px -30px rgba(0,0,0,0.85)" }}
-              >
-                <img
-                  src={featured.posterUrl || featured.thumbnailUrl}
-                  alt=""
-                  className="absolute inset-0 w-full h-full object-cover"
-                  style={{
-                    objectPosition: "68% 42%",
-                    filter: "grayscale(1) brightness(0.45) contrast(0.95)",
-                  }}
-                />
-                {/* Cinematic overlay — image sits in the background behind the text */}
-                <div className="absolute inset-0 bg-black/50" />
-              </div>
-            )}
-          </div>
+      {/* ═══════════════════════════════════════
+          GRADIENT BANNER
+         ═══════════════════════════════════════ */}
+      <section className="relative overflow-hidden py-14 sm:py-16 lg:py-20">
+        {/* Layer 1: cinematic B&W image, very dark */}
+        <img
+          src="/images/studio.jpg"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{
+            filter: "grayscale(1) brightness(0.12) contrast(0.9)",
+            opacity: 0.35,
+          }}
+        />
+        {/* Layer 2: black overlay */}
+        <div className="absolute inset-0 bg-black/70" />
+        {/* Layer 3: purple gradient from right */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: "linear-gradient(270deg, rgba(178,52,149,0.18) 0%, rgba(134,101,167,0.08) 40%, transparent 70%)",
+          }}
+        />
+
+        {/* Text */}
+        <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
+          <h3 className="text-xl sm:text-2xl md:text-[28px] font-semibold leading-snug max-w-2xl text-white">
+            Development, Production, Post-production
+            <br className="hidden sm:block" />
+            choose whatever feels right to you
+          </h3>
         </div>
       </section>
 
-      <div ref={sectionRef}>
-        {/* Featured film */}
-        {featured && (
-          <div className="max-w-[1400px] mx-auto px-5 sm:px-8 py-14 sm:py-16">
-            <p className="text-[10px] tracking-[0.3em] text-gray-500 uppercase mb-6">Featured</p>
-            <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-center">
-              <div className="reveal-left relative w-full md:w-5/12 group">
-                <Link href={`/film/${featured.slug}`} className="block">
-                  <div className="relative aspect-[16/10] rounded-lg overflow-hidden">
-                    <img
-                      src={featured.thumbnailUrl}
-                      alt={featured.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                  </div>
-                </Link>
-                {featuredFilms.length > 1 && (
-                  <>
-                    <button
-                      onClick={() => setFeaturedIndex((i) => (i - 1 + featuredFilms.length) % featuredFilms.length)}
-                      aria-label="Previous featured film"
-                      className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 border border-white/20 flex items-center justify-center text-white/80 hover:text-white hover:bg-black/70 transition-colors backdrop-blur-sm"
-                    >
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => setFeaturedIndex((i) => (i + 1) % featuredFilms.length)}
-                      aria-label="Next featured film"
-                      className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 border border-white/20 flex items-center justify-center text-white/80 hover:text-white hover:bg-black/70 transition-colors backdrop-blur-sm"
-                    >
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
-                  </>
-                )}
+      {/* ═══════════════════════════════════════
+          FILTER BAR
+         ═══════════════════════════════════════ */}
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-8 pt-12 sm:pt-14">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-12 sm:mb-14">
+          {/* Left — stage filters */}
+          <div className="flex flex-wrap items-center gap-2">
+            {stageTabs.map((tab) => (
+              <button
+                key={tab.value}
+                onClick={() => setStageFilter(tab.value)}
+                className={stageFilter === tab.value ? BTN_ACTIVE : BTN}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+          {/* Right — form filters */}
+          <div className="flex items-center gap-2">
+            {[
+              { value: "all" as const, label: "All" },
+              { value: "documentary" as const, label: "Documentary" },
+              { value: "fiction" as const, label: "Fiction" },
+            ].map((tab) => (
+              <button
+                key={tab.value}
+                onClick={() => setFormFilter(tab.value)}
+                className={
+                  formFilter === tab.value
+                    ? "text-xs rounded-[3px] px-4 py-2 bg-white/10 border border-white/25 text-white"
+                    : BTN
+                }
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ═══════════════════════════════════════
+            FILM GRID — 2-column editorial rows
+           ═══════════════════════════════════════ */}
+        {filtered.length === 0 ? (
+          <p className="text-white/30 text-sm py-16 text-center">
+            No films match these filters yet.
+          </p>
+        ) : (
+          <div className="space-y-14 sm:space-y-16 pb-20 sm:pb-24">
+            {rows.map((row, ri) => (
+              <div
+                key={ri}
+                className="grid md:grid-cols-2 gap-10 md:gap-8 lg:gap-10"
+              >
+                {row.map((film) => (
+                  <FilmRow key={film.slug} film={film} />
+                ))}
               </div>
-              <div className="reveal-right w-full md:w-7/12">
-                <p className="text-sm text-[#D81B60] mb-2">
-                  {featured.credits.form === "documentary" ? "Documentary" : "Fiction"} · {featured.credits.year}
-                </p>
-                <h2 className="text-2xl sm:text-3xl font-bold">{featured.title}</h2>
-                <p className="text-gray-500 mt-2 text-sm">Directed by {featured.credits.direction}</p>
-                <p className="text-gray-400 mt-4 leading-relaxed max-w-xl">{featured.logline}</p>
-                <div className="flex items-center gap-4 mt-6">
-                  {featured.trailerUrl && (
-                    <a
-                      href={featured.trailerUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm border border-white/15 rounded-[3px] px-5 py-2 text-white hover:bg-white/5 transition-colors flex items-center gap-1.5"
-                    >
-                      Watch trailer <span className="text-[#D81B60]">▶</span>
-                    </a>
-                  )}
-                  <Link href={`/film/${featured.slug}`} className="text-sm text-gray-400 hover:text-white transition-colors">
-                    Know more
-                  </Link>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         )}
-
-        {/* Gradient banner */}
-        <div className="reveal-scale bg-gradient-to-r from-[#9B59B6]/25 via-[#7A3F94]/25 to-[#1ABC9C]/15 border-y border-white/5 py-10">
-          <div className="max-w-[1400px] mx-auto px-5 sm:px-8">
-            <h3 className="text-xl sm:text-2xl font-semibold leading-snug max-w-2xl">
-              Development, Production, Post-production
-              <br className="hidden sm:block" />
-              choose whatever feels right to you
-            </h3>
-          </div>
-        </div>
-
-        <div className="max-w-[1400px] mx-auto px-5 sm:px-8 py-12 sm:py-16">
-          {/* Filter tabs */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
-            <div className="flex flex-wrap items-center gap-2">
-              {stageTabs.map((tab) => (
-                <button
-                  key={tab.value}
-                  onClick={() => setStageFilter(tab.value)}
-                  className={`text-xs px-4 py-2 rounded-[3px] border transition-colors ${
-                    stageFilter === tab.value
-                      ? "bg-[#D81B60] border-[#D81B60] text-white"
-                      : "border-white/15 text-gray-400 hover:text-white hover:border-white/30"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-            <div className="flex items-center gap-2">
-              {FORM_TABS.map((tab) => (
-                <button
-                  key={tab.value}
-                  onClick={() => setFormFilter(tab.value)}
-                  className={`text-xs px-4 py-2 rounded-[3px] border transition-colors ${
-                    formFilter === tab.value
-                      ? "bg-white/10 border-white/30 text-white"
-                      : "border-white/15 text-gray-400 hover:text-white hover:border-white/30"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Film grid */}
-          {filtered.length === 0 ? (
-            <p className="text-gray-500 text-sm py-10 text-center">No films match these filters yet.</p>
-          ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-7 gap-y-12">
-              {filtered.map((film, i) => {
-                const stage = STAGE_LABELS[film.stage];
-                return (
-                  <div key={film.slug} className={`reveal-scale stagger-${Math.min(i + 1, 5)} group`}>
-                    <Link href={`/film/${film.slug}`} className="block">
-                      <div className="relative aspect-[3/4] rounded-lg overflow-hidden mb-4">
-                        <img
-                          src={film.posterUrl || film.thumbnailUrl}
-                          alt={film.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                        <div className="absolute top-3 left-3 flex items-center gap-2">
-                          <span className="text-[10px] px-2.5 py-1 rounded-full bg-[#D81B60]/90 text-white font-medium">
-                            {film.credits.form === "documentary" ? "Documentary" : "Fiction"}
-                          </span>
-                          <span className={`text-[10px] px-2.5 py-1 rounded-full backdrop-blur-sm ${stage?.color}`}>
-                            {stage?.label}
-                          </span>
-                        </div>
-                      </div>
-                    </Link>
-                    <p className="text-xs text-gray-500">{film.credits.year}</p>
-                    <Link href={`/film/${film.slug}`}>
-                      <h3 className="text-lg font-semibold text-white mt-1 group-hover:text-gray-200 transition-colors">
-                        {film.title}
-                      </h3>
-                    </Link>
-                    <p className="text-sm text-gray-500 mt-1.5 line-clamp-2 leading-relaxed">{film.logline}</p>
-                    <p className="text-xs text-gray-600 mt-2">Directed by {film.credits.direction}</p>
-                    <div className="flex items-center gap-3 mt-3">
-                      {film.trailerUrl && (
-                        <a
-                          href={film.trailerUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs border border-white/15 rounded-[3px] px-3.5 py-1.5 text-white/80 hover:text-white hover:bg-white/5 transition-colors"
-                        >
-                          Watch trailer ▶
-                        </a>
-                      )}
-                      <Link href={`/film/${film.slug}`} className="text-xs text-gray-500 hover:text-white transition-colors">
-                        Know more
-                      </Link>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
       </div>
 
-      <SupportCTA />
       <Footer />
     </main>
+  );
+}
+
+/* ── Film row item — editorial layout matching Figma ── */
+
+function FilmRow({ film }: { film: Film }) {
+  const stage = STAGE_LABELS[film.stage] ?? film.stage;
+
+  return (
+    <div className="flex gap-5">
+      {/* Poster — B&W, cinematic */}
+      <Link
+        href={`/film/${film.slug}`}
+        className="shrink-0 w-[160px] sm:w-[180px] group"
+      >
+        <div className="relative aspect-[3/4] rounded-[4px] overflow-hidden border border-white/[0.06]">
+          <img
+            src={film.posterUrl || film.thumbnailUrl}
+            alt={film.title}
+            className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+            style={{
+              filter: "grayscale(1) brightness(0.55) contrast(1.1)",
+            }}
+          />
+        </div>
+      </Link>
+
+      {/* Info */}
+      <div className="flex-1 min-w-0 pt-1">
+        {/* Category chips + year */}
+        <div className="flex flex-wrap items-center gap-2 mb-2">
+          <span className="text-[10px] px-2 py-0.5 rounded-[3px] bg-[#B23495] text-white font-medium">
+            {film.credits.form === "documentary" ? "Documentary" : "Fiction"}
+          </span>
+          <span className="text-[10px] px-2 py-0.5 rounded-[3px] border border-white/10 text-white/50">
+            {stage}
+          </span>
+          <span className="text-[10px] text-white/30">{film.credits.year}</span>
+        </div>
+
+        {/* Title */}
+        <Link href={`/film/${film.slug}`}>
+          <h3 className="text-base sm:text-lg font-bold text-white leading-snug hover:text-white/80 transition-colors">
+            {film.title}
+          </h3>
+        </Link>
+
+        {/* Description */}
+        <p className="text-[12px] text-white/35 mt-2 leading-relaxed line-clamp-3">
+          {film.logline}
+        </p>
+
+        {/* Directed by */}
+        <p className="text-[9px] tracking-[0.2em] text-white/15 uppercase mt-4 mb-0.5">
+          Directed by
+        </p>
+        <p className="text-[12px] text-white/45">{film.credits.direction}</p>
+
+        {/* Buttons */}
+        <div className="flex items-center gap-3 mt-4">
+          {film.trailerUrl && (
+            <a
+              href={film.trailerUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={BTN}
+            >
+              Watch trailer <span className="text-[#B23495]">▶</span>
+            </a>
+          )}
+          <Link
+            href={`/film/${film.slug}`}
+            className="text-xs text-white/30 hover:text-white/55 transition-colors"
+          >
+            Know more
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 }
