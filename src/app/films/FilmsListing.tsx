@@ -61,7 +61,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
             an overflow-hidden window so it reads as a larger image continuing
             off-screen. Visible width stays constant on every viewport. */}
         {featured && (
-          <div className="hidden lg:block absolute top-20 bottom-20 left-0 w-[80px] overflow-hidden pointer-events-none select-none">
+          <div className="hidden lg:block absolute top-[90px] left-0 w-[80px] h-[720px] overflow-hidden pointer-events-none select-none">
             <img
               src={featured.posterUrl || featured.thumbnailUrl}
               alt=""
@@ -77,24 +77,29 @@ export default function FilmsListing({ films }: { films: Film[] }) {
           </div>
         )}
 
-        {/* Grid, not a flex 50/50 split — the text column is a fixed/clamped
-            width so it doesn't grow with the viewport; the image column is
-            1fr, so all extra width on large monitors is consumed by the
-            image, never by empty background. */}
-        <div className="reveal-left relative grid grid-cols-1 lg:grid-cols-[minmax(420px,38vw)_1fr] lg:items-center gap-10 lg:gap-0 pt-24 sm:pt-28 lg:pt-16 pb-16 sm:pb-20 lg:pb-0">
-          {/* Text — aligned to the site's content grid */}
-          <div className="w-full px-5 sm:px-8 lg:pl-[max(1.25rem,calc((100vw-1400px)/2+1.25rem))] lg:pr-10">
+        {/* Art-directed composition — NOT a responsive grid. The text block is
+            a FIXED width that never scales; the image is the ONLY fluid element
+            (flex-1) so all extra viewport width is absorbed by the image alone.
+            Preview strip, text width, spacing and line breaks stay locked. */}
+        <div className="reveal-left relative flex flex-col lg:flex-row lg:items-stretch gap-10 lg:gap-0 pt-24 sm:pt-28 lg:pt-[90px] pb-16 sm:pb-20 lg:pb-0">
+          {/* Text — FIXED width column, never resizes with viewport */}
+          <div className="shrink-0 w-full lg:w-[620px] flex flex-col justify-center px-5 sm:px-8 lg:pl-[120px] lg:pr-12">
             <p className="text-[10px] tracking-[0.3em] text-white/30 uppercase mb-6">Films</p>
-            <h1 className="text-3xl sm:text-4xl md:text-[2.6rem] font-semibold leading-[1.2] tracking-tight max-w-xl">
-              Documentary and fiction that stay close and
+            <h1 className="text-3xl sm:text-4xl md:text-[2.6rem] font-semibold leading-[1.2] tracking-tight">
+              Documentary and fiction that
+              <br className="hidden sm:block" />
+              stay close and
               <br className="hidden sm:block" />
               <span className="gradient-text">refuse erasure.</span>
             </h1>
-            <p className="text-white/40 mt-7 max-w-sm leading-relaxed text-sm">
-              From development to distribution — films made with
-              rigour, context, and care for the people they carry.
+            <p className="text-white/40 mt-8 max-w-sm leading-relaxed text-sm">
+              DSH makes documentary and fiction — from development and
+              production to festivals and distribution. Films are not
+              streamed here. This section presents the work with rigour
+              and context, and opens paths to screenings, distribution,
+              and press.
             </p>
-            <div className="flex items-center gap-3 mt-10">
+            <div className="flex items-center gap-3 mt-14">
               <button
                 onClick={() => setFormFilter("documentary")}
                 className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white/80 bg-transparent hover:border-white/30 hover:text-white transition-colors"
@@ -110,12 +115,13 @@ export default function FilmsListing({ films }: { films: Film[] }) {
             </div>
           </div>
 
-          {/* Hero image — this column is 1fr, so it absorbs all extra viewport
-              width and bleeds to the right browser edge, on every screen size */}
-          <div className="w-full pl-5 pr-5 sm:pl-8 sm:pr-8 lg:pl-0 lg:pr-0">
+          {/* Hero image — the ONLY fluid element. flex-1 absorbs all remaining
+              viewport width; object-cover simply reveals more of the image as
+              the browser widens. Never scales the text or preview strip. */}
+          <div className="grow w-full pl-5 pr-5 sm:pl-8 sm:pr-8 lg:pl-0 lg:pr-0">
             {featured && (
               <div
-                className="relative aspect-[4/3] lg:aspect-auto lg:h-[620px] overflow-hidden"
+                className="relative aspect-[4/3] lg:aspect-auto lg:h-[720px] overflow-hidden"
                 style={{ boxShadow: "inset 40px 0 60px -30px rgba(0,0,0,0.85), inset -40px 0 60px -30px rgba(0,0,0,0.85)" }}
               >
                 <img
@@ -124,11 +130,11 @@ export default function FilmsListing({ films }: { films: Film[] }) {
                   className="absolute inset-0 w-full h-full object-cover"
                   style={{
                     objectPosition: "68% 42%",
-                    filter: "grayscale(1) brightness(0.5) contrast(0.92)",
+                    filter: "grayscale(1) brightness(0.45) contrast(0.95)",
                   }}
                 />
-                {/* Cinematic overlay — darkens without crushing detail, same grading as the left sliver */}
-                <div className="absolute inset-0 bg-black/45" />
+                {/* Cinematic overlay — image sits in the background behind the text */}
+                <div className="absolute inset-0 bg-black/50" />
               </div>
             )}
           </div>
