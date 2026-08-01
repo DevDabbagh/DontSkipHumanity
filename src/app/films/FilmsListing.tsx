@@ -73,7 +73,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
       <section className="relative overflow-hidden pt-[96px] lg:pt-[104px]">
         {/* Far-left preview strip — SAME image, another crop, fixed 80px */}
         {featured && (
-          <div className="hidden lg:block absolute top-[104px] left-0 w-[80px] h-[646px] overflow-hidden pointer-events-none select-none">
+          <div className="hidden lg:block absolute top-[104px] left-0 w-[80px] h-[clamp(560px,42vw,780px)] overflow-hidden pointer-events-none select-none">
             <img
               src={featured.posterUrl || featured.thumbnailUrl}
               alt=""
@@ -137,7 +137,10 @@ export default function FilmsListing({ films }: { films: Film[] }) {
               remaining viewport width; object-cover reveals more as it widens. */}
           <div className="w-full lg:flex-1 lg:w-0 lg:min-w-0 px-5 sm:px-8 lg:px-0">
             {featured && (
-              <div className="relative aspect-[4/3] lg:aspect-auto lg:h-[646px] overflow-hidden rounded-[6px] lg:rounded-l-[6px] lg:rounded-r-none border-[1.5px] border-[#F0F0F0]/10">
+              <div
+                className="relative aspect-[4/3] lg:aspect-auto lg:h-[clamp(560px,42vw,780px)] overflow-hidden rounded-[6px] lg:rounded-l-[6px] lg:rounded-r-none border-[1.5px] border-white/[0.14]"
+                style={{ boxShadow: "0 24px 70px -20px rgba(0,0,0,0.7)" }}
+              >
                 <img
                   src={featured.posterUrl || featured.thumbnailUrl}
                   alt=""
@@ -149,6 +152,8 @@ export default function FilmsListing({ films }: { films: Film[] }) {
                 />
                 {/* Light cinematic overlay — image is clearly visible, text sits beside it */}
                 <div className="absolute inset-0 bg-black/20" />
+                {/* Shadow layer — soft left-side gradient so the image blends toward the text */}
+                <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-transparent to-transparent" />
               </div>
             )}
           </div>
