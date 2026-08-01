@@ -49,7 +49,7 @@ export default function Footer() {
         <div className="reveal grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-8 sm:gap-6">
           {Object.entries(FOOTER_LINKS).map(([heading, links]) => (
             <div key={heading}>
-              <h4 className="text-xs tracking-[0.2em] text-gray-500 uppercase mb-4">
+              <h4 className="text-xs tracking-[0.2em] text-[#363636] uppercase mb-4">
                 {heading}
               </h4>
               <ul className="space-y-2.5">
@@ -57,7 +57,7 @@ export default function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm text-gray-500 hover:text-white transition-colors"
+                      className="text-sm text-[#595C5C] hover:text-white transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -79,14 +79,17 @@ export default function Footer() {
               className="h-7 w-auto"
             />
           </Link>
-          <p className="text-xs text-gray-600 text-center">
-            Copyright {new Date().getFullYear()} &copy; Don&apos;t Skip Humanity – an independent media company. All rights reserved.
+          <p className="text-xs text-[#363636] text-center">
+            Copyright 2026 &copy; Don&apos;t Skip Humanity – an independent media company. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
-            <Link href="#" className="text-xs text-gray-600 hover:text-white transition-colors">
+            <Link href="#" className="text-xs text-[#363636] hover:text-white transition-colors">
               Privacy Policy
             </Link>
-            <Link href="#" className="text-xs text-gray-600 hover:text-white transition-colors">
+            <Link href="#" className="text-xs text-[#363636] hover:text-white transition-colors">
+              Cookie Policy
+            </Link>
+            <Link href="#" className="text-xs text-[#363636] hover:text-white transition-colors">
               Terms
             </Link>
           </div>

@@ -143,12 +143,12 @@ export default function FilmsListing({ films }: { films: Film[] }) {
                   alt=""
                   className="absolute inset-0 w-full h-full object-cover"
                   style={{
-                    objectPosition: "68% 42%",
-                    filter: "grayscale(1) brightness(0.5) contrast(0.92)",
+                    objectPosition: "55% 42%",
+                    filter: "grayscale(1) brightness(0.8) contrast(1)",
                   }}
                 />
-                {/* Dark cinematic overlay so text dominates */}
-                <div className="absolute inset-0 bg-black/45" />
+                {/* Light cinematic overlay — image is clearly visible, text sits beside it */}
+                <div className="absolute inset-0 bg-black/20" />
               </div>
             )}
           </div>
