@@ -60,7 +60,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
         {featured && (
           <div
             className="hidden lg:block absolute top-20 bottom-20 w-[220px] pointer-events-none select-none"
-            style={{ left: "-185px" }}
+            style={{ left: "-198px" }}
           >
             <img
               src={featured.posterUrl || featured.thumbnailUrl}
