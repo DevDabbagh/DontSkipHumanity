@@ -64,8 +64,9 @@ export default function FilmsListing({ films }: { films: Film[] }) {
             src="/images/political-education.jpg"
             alt=""
             className="w-full h-full object-cover"
-            style={{ filter: "grayscale(1) brightness(0.55)" }}
+            style={{ filter: "grayscale(1) brightness(0.22)" }}
           />
+          <div className="absolute inset-0 bg-black/55" />
         </div>
 
         <div className="reveal-left relative flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-0 pt-24 sm:pt-28 lg:pt-16 pb-16 sm:pb-20 lg:pb-0">
@@ -108,8 +109,13 @@ export default function FilmsListing({ films }: { films: Film[] }) {
                   src={featured.posterUrl || featured.thumbnailUrl}
                   alt=""
                   className="absolute inset-0 w-full h-full object-cover"
-                  style={{ filter: "brightness(0.9) contrast(0.92) saturate(0.85)" }}
+                  style={{
+                    objectPosition: "68% 42%",
+                    filter: "brightness(0.85) contrast(1) saturate(1)",
+                  }}
                 />
+                {/* Cinematic overlay — darkens without crushing detail */}
+                <div className="absolute inset-0 bg-black/45" />
               </div>
             )}
           </div>
