@@ -4,6 +4,9 @@ import Link from "next/link";
 import { useReveal } from "@/hooks/useReveal";
 import ScrollColorImage from "./ScrollColorImage";
 
+/* Cinematic image treatment matching the dark interface */
+const IMG_STYLE = { filter: "brightness(0.92) contrast(0.95) saturate(0.88)" };
+
 const ARTICLES = [
   {
     category: "Read",
@@ -42,64 +45,72 @@ export default function Notebook() {
 
   return (
     <section id="read" className="py-10 sm:py-12 lg:py-16" ref={sectionRef}>
-      {/* Featured article — contained layout */}
-      <div className="max-w-[1400px] mx-auto px-5 sm:px-8 mb-16 sm:mb-20">
-        <div className="flex flex-col md:flex-row items-start gap-8 md:gap-12">
-          {/* Image — contained, not full-bleed */}
-          <div className="reveal-left w-full md:w-5/12 group">
+      {/* ── Featured article ── */}
+      <div className="max-w-[1400px] mx-auto px-5 sm:px-8 mb-20 sm:mb-28 lg:mb-32">
+        <div className="flex flex-col md:flex-row items-start gap-10 md:gap-14">
+          {/* Portrait — slightly smaller, cinematic treatment */}
+          <div className="reveal-left w-full md:w-[38%] max-w-[380px] group">
             <Link href="/read/free-fish-distribution" className="block">
               <ScrollColorImage
                 src="/images/note.jpg"
                 alt="Featured article"
-                className="aspect-[3/4] rounded-[6px] group-hover:scale-[1.02] transition-transform duration-700"
+                className="aspect-[3/4] rounded-[4px] border border-white/[0.08] shadow-[0_12px_30px_rgba(0,0,0,0.25)]"
+                imgClassName="group-hover:scale-[1.02] transition-transform duration-700"
               />
             </Link>
           </div>
 
-          {/* Text content */}
-          <div className="reveal-right w-full md:w-7/12 md:pt-2">
-            <div className="flex items-center justify-between mb-6">
-              <p className="text-xs tracking-[0.25em] text-dsh-label uppercase">
+          {/* Content — top-aligned with image */}
+          <div className="reveal-right w-full md:w-[62%] md:pt-0">
+            {/* Label + View all — separated row */}
+            <div className="flex items-center justify-between mb-8">
+              <p className="text-[10px] tracking-[0.3em] text-dsh-label/40 uppercase">
                 Read
               </p>
               <Link
                 href="/read"
-                className="text-sm border border-dsh-text-primary/20 rounded-[3px] px-4 py-1.5 bg-dsh-btn-bg/20 text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:bg-dsh-btn-bg/30 transition-colors"
+                className="text-xs border border-dsh-text-primary/15 rounded-[3px] px-3.5 py-1.5 text-dsh-text-primary/35 hover:text-dsh-text-primary/55 hover:border-dsh-text-primary/25 transition-colors"
               >
                 View all articles <span className="text-[#1ABC9C]">↗</span>
               </Link>
             </div>
 
-            <div className="flex items-center gap-3 mb-4">
-              <span className="text-xs px-2.5 py-1 rounded-[3px] bg-[#8665A7] text-white font-medium">
+            {/* Category + date */}
+            <div className="flex items-center gap-3 mb-5">
+              <span className="text-[11px] px-2 py-0.5 rounded-[3px] bg-[#8665A7] text-white font-medium">
                 Studio
               </span>
               <span className="text-xs text-[#1ABC9C]">23 Aug 2026</span>
             </div>
 
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold leading-tight text-dsh-text-primary">
+            {/* Headline */}
+            <h2 className="text-xl sm:text-2xl md:text-[28px] font-semibold leading-[1.2] text-[#F0F0F0] max-w-md">
               Free Fish — now available
               <br />
               to programmers and press
             </h2>
 
-            <p className="text-sm text-dsh-desc mt-5 leading-relaxed max-w-lg">
+            {/* Description */}
+            <p className="text-[13px] text-dsh-desc mt-6 leading-[1.7] max-w-md">
               Bisan Owda&apos;s short documentary enters distribution. Screeners
               available on request for programmers, press, and partners. Bisan
               Owda&apos;s short documentary enters distribution. Screeners
               available on request for programmers, press, and partners.
             </p>
 
-            <div className="mt-5 mb-6 w-12 border-t border-white/10" />
+            {/* Divider */}
+            <div className="mt-6 mb-5 w-10 border-t border-white/[0.08]" />
 
-            <p className="text-sm">
+            {/* Author */}
+            <p className="text-[13px]">
               <span className="text-dsh-desc">by </span>
               <span className="text-[#1ABC9C]">Diogo Faro</span>
             </p>
 
+            {/* Button — minimal */}
             <Link
               href="/read/free-fish-distribution"
-              className="mt-6 inline-block text-sm border border-dsh-text-primary/20 rounded-[3px] px-5 py-2 bg-dsh-btn-bg/20 text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:bg-dsh-btn-bg/30 transition-colors"
+              className="mt-7 inline-block text-xs border border-dsh-text-primary/15 rounded-[3px] px-4 py-1.5 text-dsh-text-primary/35 hover:text-dsh-text-primary/55 hover:border-dsh-text-primary/25 transition-colors"
             >
               Read more <span className="text-[#1ABC9C]">+</span>
             </Link>
@@ -107,44 +118,51 @@ export default function Notebook() {
         </div>
       </div>
 
-      {/* Article cards grid */}
-      <div className="max-w-[1400px] mx-auto px-5 sm:px-8 grid sm:grid-cols-2 md:grid-cols-3 gap-8 sm:gap-6">
+      {/* ── Editorial grid ── */}
+      <div className="max-w-[1400px] mx-auto px-5 sm:px-8 grid sm:grid-cols-2 md:grid-cols-3 gap-10 md:gap-8 lg:gap-10">
         {ARTICLES.map((article, i) => (
           <div
             key={article.slug}
             className={`reveal-scale stagger-${i + 1} group`}
           >
-            <Link href={`/read/${article.slug}`} className="block mb-4">
+            {/* Image — uniform aspect, cinematic treatment */}
+            <Link href={`/read/${article.slug}`} className="block mb-5">
               <ScrollColorImage
                 src={article.image}
                 alt={article.title}
-                className="aspect-[4/3] rounded-[6px]"
-                imgClassName="group-hover:scale-105 transition-transform duration-500"
+                className="aspect-[16/10] rounded-[4px] border border-white/[0.06]"
+                imgClassName="group-hover:scale-[1.03] transition-transform duration-500"
               />
             </Link>
 
-            <div className="flex items-center gap-3 mb-3">
-              <span className={`text-xs px-2.5 py-1 rounded-[3px] ${article.categoryColor} text-white font-medium`}>
+            {/* Category + date */}
+            <div className="flex items-center gap-3 mb-4">
+              <span className={`text-[11px] px-2 py-0.5 rounded-[3px] ${article.categoryColor} text-white font-medium`}>
                 {article.category}
               </span>
               <span className="text-xs text-[#1ABC9C]">{article.date}</span>
             </div>
 
-            <h3 className="font-semibold text-dsh-text-primary leading-snug">
+            {/* Headline */}
+            <h3 className="text-[15px] sm:text-base font-semibold text-[#F0F0F0] leading-snug">
               {article.title}
             </h3>
-            <p className="text-sm text-dsh-desc mt-2 leading-relaxed line-clamp-3">
+
+            {/* Description */}
+            <p className="text-[13px] text-dsh-desc mt-3 leading-[1.7] line-clamp-3">
               {article.desc}
             </p>
 
-            <p className="text-sm mt-4">
+            {/* Author */}
+            <p className="text-[13px] mt-5">
               <span className="text-dsh-desc">by </span>
               <span className="text-[#1ABC9C]">{article.author}</span>
             </p>
 
+            {/* Button */}
             <Link
               href={`/read/${article.slug}`}
-              className="mt-4 inline-block text-sm border border-dsh-text-primary/20 rounded-[3px] px-5 py-2 bg-dsh-btn-bg/20 text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:bg-dsh-btn-bg/30 transition-colors"
+              className="mt-5 inline-block text-xs border border-dsh-text-primary/15 rounded-[3px] px-4 py-1.5 text-dsh-text-primary/35 hover:text-dsh-text-primary/55 hover:border-dsh-text-primary/25 transition-colors"
             >
               Read more <span className="text-[#1ABC9C]">+</span>
             </Link>

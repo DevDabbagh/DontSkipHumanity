@@ -8,40 +8,53 @@ export default function InFocus() {
 
   return (
     <section className="relative py-10 sm:py-12 lg:py-16 overflow-hidden" ref={sectionRef}>
-      {/* ── Background: same portrait image, cropped to lower body, barely visible ── */}
+      {/* ── Background: same portrait image, cropped low (shoulders/arms, face lost
+          in darkness), pushed right, whisper-quiet — atmosphere, not a picture ── */}
       <div className="absolute inset-0 pointer-events-none">
         <img
           src="/images/infocus.jpg"
           alt=""
-          className="absolute w-full h-full object-cover blur-[2px]"
+          className="absolute w-full h-full object-cover"
           style={{
-            objectPosition: "70% 85%",
+            objectPosition: "72% 92%",
             transform: "scale(2.5)",
-            transformOrigin: "70% 85%",
-            filter: "brightness(0.12) contrast(0.8) saturate(0.7) blur(2px)",
-            opacity: 0.07,
+            transformOrigin: "72% 92%",
+            filter: "brightness(0.11) contrast(0.82) saturate(0.77) blur(2px)",
+            opacity: 0.055,
           }}
         />
-        {/* Dark overlay */}
-        <div className="absolute inset-0 bg-[rgba(0,0,0,0.88)]" />
-        {/* Subtle radial glow so the section isn't perfectly flat */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_40%_50%,rgba(255,255,255,0.02)_0%,transparent_70%)]" />
+        {/* Dominant dark overlay — the image only whispers through */}
+        <div className="absolute inset-0 bg-[rgba(0,0,0,0.9)]" />
+        {/* Cinematic vignette: edges slightly darker, center barely brighter */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_45%_50%,transparent_0%,transparent_55%,rgba(0,0,0,0.35)_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_40%_50%,rgba(255,255,255,0.015)_0%,transparent_65%)]" />
+        {/* Near-imperceptible noise so the black isn't sterile */}
+        <div
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+            backgroundRepeat: "repeat",
+          }}
+        />
       </div>
 
       {/* Content */}
       <div className="relative max-w-[1400px] mx-auto px-5 sm:px-8 py-8 sm:py-12 lg:py-16">
-        <div className="flex flex-col md:flex-row items-start gap-10 md:gap-16">
-          {/* Portrait thumbnail — visual anchor */}
-          <div className="reveal-left w-full md:w-5/12 max-w-[420px]">
-            <ScrollColorImage
-              src="/images/infocus.jpg"
-              alt="Catarina Marques Rodrigues"
-              className="aspect-square rounded-[4px] shadow-xl shadow-black/30 border border-white/[0.06]"
-            />
+        <div className="flex flex-col md:flex-row items-start gap-10 md:gap-[4.5rem]">
+          {/* Portrait thumbnail — visual anchor, slightly smaller for editorial breathing room */}
+          <div className="reveal-left w-full md:w-[39%] max-w-[396px]">
+            <div style={{ filter: "brightness(0.95) contrast(0.95) saturate(0.90)" }}>
+              <ScrollColorImage
+                src="/images/infocus.jpg"
+                alt="Catarina Marques Rodrigues"
+                className="aspect-square rounded-[4px] shadow-xl shadow-black/30 border border-white/[0.08]"
+              />
+            </div>
           </div>
 
-          {/* Text content — aligned with the upper portion of the portrait */}
-          <div className="reveal-right w-full md:w-7/12 md:pt-2">
+          {/* Text content — top-aligned with portrait, not centered */}
+          <div className="reveal-right w-full md:w-[61%] md:pt-1">
             <p className="text-[10px] tracking-[0.3em] text-dsh-label/40 uppercase mb-5">
               In Focus
             </p>
@@ -56,7 +69,7 @@ export default function InFocus() {
 
             <p className="text-[#8665A7] text-sm mt-8 mb-4">Catarina Marques Rodrigues</p>
 
-            <p className="text-sm text-dsh-desc leading-relaxed max-w-xl">
+            <p className="text-sm text-dsh-desc leading-relaxed max-w-[600px]">
               Documentary and fiction that stay close — to siege, displacement,
               and the daily labour of remaining human — and refuse the distance
               through which violence is made acceptable. Festivals, screenings,
