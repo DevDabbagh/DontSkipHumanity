@@ -7,28 +7,28 @@ export default function InFocus() {
   const sectionRef = useReveal();
 
   return (
-    <section className="relative py-10 sm:py-12 lg:py-16 overflow-hidden" ref={sectionRef}>
-      {/* ── Background: same portrait image, cropped low (shoulders/arms, face lost
-          in darkness), pushed right, whisper-quiet — atmosphere, not a picture ── */}
-      <div className="absolute inset-0 pointer-events-none">
+    <section className="relative py-10 sm:py-12 lg:py-20 pb-16 sm:pb-20 lg:pb-28 overflow-hidden" ref={sectionRef}>
+      {/* ── Background: same portrait, lower-body crop, atmospheric — visible but
+          never the focal point. Extends well past the content into the transition ── */}
+      <div className="absolute inset-0 pointer-events-none" style={{ bottom: "-4rem" }}>
         <img
           src="/images/infocus.jpg"
           alt=""
           className="absolute w-full h-full object-cover"
           style={{
-            objectPosition: "72% 92%",
+            objectPosition: "70% 88%",
             transform: "scale(2.5)",
-            transformOrigin: "72% 92%",
-            filter: "brightness(0.11) contrast(0.82) saturate(0.77) blur(2px)",
-            opacity: 0.055,
+            transformOrigin: "70% 88%",
+            filter: "brightness(0.15) contrast(0.85) saturate(0.80) blur(2px)",
+            opacity: 0.075,
           }}
         />
-        {/* Dominant dark overlay — the image only whispers through */}
-        <div className="absolute inset-0 bg-[rgba(0,0,0,0.9)]" />
-        {/* Cinematic vignette: edges slightly darker, center barely brighter */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_45%_50%,transparent_0%,transparent_55%,rgba(0,0,0,0.35)_100%)]" />
+        {/* Cinematic overlay — image reads as atmosphere, not a picture */}
+        <div className="absolute inset-0 bg-[rgba(0,0,0,0.86)]" />
+        {/* Vignette: edges darker, center barely lifted */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_45%_50%,transparent_0%,transparent_55%,rgba(0,0,0,0.30)_100%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_40%_50%,rgba(255,255,255,0.015)_0%,transparent_65%)]" />
-        {/* Near-imperceptible noise so the black isn't sterile */}
+        {/* Near-imperceptible noise texture */}
         <div
           className="absolute inset-0 opacity-[0.02]"
           style={{
