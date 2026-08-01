@@ -49,53 +49,66 @@ export default function FilmsListing({ films }: { films: Film[] }) {
     <main className="min-h-screen bg-[#090909] text-white">
       <Navbar />
 
-      {/* Hero — contained two-column editorial layout. Image sits within the
-          site's max-width container as a large right-column element, not a
-          full-bleed/full-screen background. No parallax/motion in this pass. */}
-      <section className="relative" ref={heroRef}>
-        <div className="reveal-left relative max-w-[1400px] mx-auto px-5 sm:px-8 pt-24 sm:pt-28 lg:pt-32 pb-16 sm:pb-20 lg:pb-24">
-          <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
-            {/* Left — label, headline, description, buttons */}
-            <div className="w-full lg:w-1/2">
-              <p className="text-[10px] tracking-[0.3em] text-white/30 uppercase mb-6">Films</p>
-              <h1 className="text-3xl sm:text-4xl md:text-[2.6rem] font-semibold leading-[1.2] tracking-tight max-w-xl">
-                Documentary and fiction that stay close and
-                <br className="hidden sm:block" />
-                <span className="gradient-text">refuse erasure.</span>
-              </h1>
-              <p className="text-white/40 mt-7 max-w-sm leading-relaxed text-sm">
-                From development to distribution — films made with
-                rigour, context, and care for the people they carry.
-              </p>
-              <div className="flex items-center gap-3 mt-10">
-                <button
-                  onClick={() => setFormFilter("documentary")}
-                  className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white/80 bg-transparent hover:border-white/30 hover:text-white transition-colors"
-                >
-                  Explore documentaries
-                </button>
-                <button
-                  onClick={() => setFormFilter("fiction")}
-                  className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white/80 bg-transparent hover:border-white/30 hover:text-white transition-colors"
-                >
-                  Explore fiction
-                </button>
-              </div>
-            </div>
+      {/* Hero — editorial breakout composition. Text stays inside the site's
+          content grid; the hero image breaks out of that grid and bleeds to
+          the right browser edge; a narrow, mostly off-screen image sliver
+          sits on the far left as pure decorative composition. No parallax
+          or motion in this pass. */}
+      <section className="relative overflow-hidden" ref={heroRef}>
+        {/* Far-left cropped sliver — mostly outside the viewport */}
+        <div
+          className="hidden lg:block absolute top-20 bottom-20 w-[220px] pointer-events-none select-none"
+          style={{ left: "-160px" }}
+        >
+          <img
+            src="/images/political-education.jpg"
+            alt=""
+            className="w-full h-full object-cover"
+            style={{ filter: "grayscale(1) brightness(0.55)" }}
+          />
+        </div>
 
-            {/* Right — large cinematic image, confined to this column, not full-bleed */}
-            <div className="w-full lg:w-1/2">
-              {featured && (
-                <div className="relative aspect-[4/3] rounded-[2px] overflow-hidden">
-                  <img
-                    src={featured.posterUrl || featured.thumbnailUrl}
-                    alt=""
-                    className="absolute inset-0 w-full h-full object-cover"
-                    style={{ filter: "brightness(0.9) contrast(0.92) saturate(0.85)" }}
-                  />
-                </div>
-              )}
+        <div className="reveal-left relative flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-0 pt-24 sm:pt-28 lg:pt-16 pb-16 sm:pb-20 lg:pb-0">
+          {/* Text — aligned to the site's content grid */}
+          <div className="w-full lg:w-1/2 px-5 sm:px-8 lg:pl-[max(1.25rem,calc((100vw-1400px)/2+1.25rem))] lg:pr-10">
+            <p className="text-[10px] tracking-[0.3em] text-white/30 uppercase mb-6">Films</p>
+            <h1 className="text-3xl sm:text-4xl md:text-[2.6rem] font-semibold leading-[1.2] tracking-tight max-w-xl">
+              Documentary and fiction that stay close and
+              <br className="hidden sm:block" />
+              <span className="gradient-text">refuse erasure.</span>
+            </h1>
+            <p className="text-white/40 mt-7 max-w-sm leading-relaxed text-sm">
+              From development to distribution — films made with
+              rigour, context, and care for the people they carry.
+            </p>
+            <div className="flex items-center gap-3 mt-10">
+              <button
+                onClick={() => setFormFilter("documentary")}
+                className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white/80 bg-transparent hover:border-white/30 hover:text-white transition-colors"
+              >
+                Explore documentaries
+              </button>
+              <button
+                onClick={() => setFormFilter("fiction")}
+                className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white/80 bg-transparent hover:border-white/30 hover:text-white transition-colors"
+              >
+                Explore fiction
+              </button>
             </div>
+          </div>
+
+          {/* Hero image — breaks out of the content grid, bleeds to the right edge */}
+          <div className="w-full lg:w-1/2 pl-5 pr-5 sm:pl-8 sm:pr-8 lg:pl-0 lg:pr-0">
+            {featured && (
+              <div className="relative aspect-[4/3] lg:aspect-auto lg:h-[620px] rounded-[2px] overflow-hidden">
+                <img
+                  src={featured.posterUrl || featured.thumbnailUrl}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{ filter: "brightness(0.9) contrast(0.92) saturate(0.85)" }}
+                />
+              </div>
+            )}
           </div>
         </div>
       </section>
