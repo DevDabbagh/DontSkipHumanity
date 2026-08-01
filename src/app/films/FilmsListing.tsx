@@ -139,7 +139,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
           <div className="w-full lg:flex-1 lg:w-0 lg:min-w-0 px-5 sm:px-8 lg:px-0">
             {featured && (
               <div
-                className="relative aspect-[4/3] lg:aspect-auto lg:h-[clamp(560px,42vw,780px)] overflow-hidden border-[1.5px] border-white/[0.14]"
+                className="relative aspect-[4/3] lg:aspect-auto lg:h-[clamp(560px,42vw,780px)] overflow-hidden"
                 style={{ boxShadow: "0 24px 70px -20px rgba(0,0,0,0.7)" }}
               >
                 <img
@@ -155,6 +155,8 @@ export default function FilmsListing({ films }: { films: Film[] }) {
                 <div className="absolute inset-0 bg-black/20" />
                 {/* Shadow layer — soft left-side gradient so the image blends toward the text */}
                 <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-transparent to-transparent" />
+                {/* Bottom shadow — the image fades into darkness at the bottom */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
               </div>
             )}
           </div>
