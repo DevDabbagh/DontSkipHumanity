@@ -8,7 +8,7 @@ export default function Academy() {
   const sectionRef = useReveal();
 
   return (
-    <section id="academy" className="py-16 sm:py-20 lg:py-24" ref={sectionRef}>
+    <section id="academy" className="py-10 sm:py-12 lg:py-16" ref={sectionRef}>
       {/* Academy — same full-bleed pattern as Films: image bleeds left, text right */}
       <div className="flex flex-col md:flex-row items-center">
         <div className="reveal-left stagger-1 w-full md:w-1/2 px-5 sm:px-8 md:px-0">

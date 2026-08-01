@@ -27,7 +27,7 @@ export default function SupportCTA() {
   const sectionRef = useReveal();
 
   return (
-    <section id="support" className="relative py-16 sm:py-20 lg:py-24" ref={sectionRef}>
+    <section id="support" className="relative py-10 sm:py-12 lg:py-16" ref={sectionRef}>
       {/* Full-section background image */}
       <div className="absolute inset-0 overflow-hidden">
         <img

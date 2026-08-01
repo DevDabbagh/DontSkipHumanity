@@ -8,7 +8,7 @@ export default function Newsletter() {
   const sectionRef = useReveal();
 
   return (
-    <section className="relative py-16 sm:py-20 lg:py-24 overflow-hidden" ref={sectionRef}>
+    <section className="relative py-10 sm:py-12 lg:py-16 overflow-hidden" ref={sectionRef}>
       {/* Background image */}
       <img
         src="/images/impact_metrics_background.jpg"

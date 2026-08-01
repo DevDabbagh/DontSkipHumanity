@@ -8,7 +8,7 @@ export default function TheWork() {
   const sectionRef = useReveal();
 
   return (
-    <section id="films" className="py-16 sm:py-20 lg:py-24" ref={sectionRef}>
+    <section id="films" className="py-10 sm:py-12 lg:py-16" ref={sectionRef}>
       {/* Section header — stays within the normal reading column */}
       <div className="max-w-[1400px] mx-auto px-5 sm:px-8">
         <div className="reveal mb-16 sm:mb-20 lg:mb-24">

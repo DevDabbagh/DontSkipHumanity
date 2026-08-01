@@ -41,7 +41,7 @@ export default function Notebook() {
   const sectionRef = useReveal();
 
   return (
-    <section id="read" className="py-16 sm:py-20 lg:py-24" ref={sectionRef}>
+    <section id="read" className="py-10 sm:py-12 lg:py-16" ref={sectionRef}>
       {/* Featured article — contained layout */}
       <div className="max-w-[1400px] mx-auto px-5 sm:px-8 mb-16 sm:mb-20">
         <div className="flex flex-col md:flex-row items-start gap-8 md:gap-12">

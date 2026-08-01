@@ -13,7 +13,7 @@ export default function Journalism() {
   const sectionRef = useReveal();
 
   return (
-    <section id="read-section" className="py-16 sm:py-20 lg:py-24" ref={sectionRef}>
+    <section id="read-section" className="py-10 sm:py-12 lg:py-16" ref={sectionRef}>
       {/* Read — mirrored: text left, image bleeds full-width to the right edge */}
       <div className="flex flex-col md:flex-row-reverse items-center">
         <div className="reveal-right stagger-1 w-full md:w-1/2 px-5 sm:px-8 md:px-0">

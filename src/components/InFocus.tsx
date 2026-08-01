@@ -9,7 +9,7 @@ export default function InFocus() {
   const imageRef = useRef<HTMLDivElement>(null);
 
   return (
-    <section className="relative pt-16 sm:pt-20 lg:pt-24" ref={sectionRef}>
+    <section className="relative pt-10 sm:pt-12 lg:pt-16" ref={sectionRef}>
       {/* ── Top area: no strip background ── */}
 
       {/* ── Strip container — starts at a fixed offset and runs to the bottom ──

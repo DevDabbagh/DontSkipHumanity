@@ -50,7 +50,7 @@ export default function Agenda() {
   const sectionRef = useReveal();
 
   return (
-    <section className="py-16 sm:py-20 lg:py-24 px-5 sm:px-8 max-w-[1400px] mx-auto" ref={sectionRef}>
+    <section className="py-10 sm:py-12 lg:py-16 px-5 sm:px-8 max-w-[1400px] mx-auto" ref={sectionRef}>
       {/* Header */}
       <div className="reveal mb-12">
         <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold leading-tight max-w-2xl text-dsh-text-primary">
