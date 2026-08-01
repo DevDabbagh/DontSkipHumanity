@@ -1,24 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { useReveal } from "@/hooks/useReveal";
+import { motion } from "framer-motion";
+import { useCinematicScroll } from "@/hooks/useParallax";
 import ScrollColorImage from "./ScrollColorImage";
 
 export default function Academy() {
-  const sectionRef = useReveal();
+  const { ref, image, text, button } = useCinematicScroll();
 
   return (
-    <section id="academy" className="py-10 sm:py-12 lg:py-16" ref={sectionRef}>
-      {/* Academy — same full-bleed pattern as Films: image bleeds left, text right */}
-      <div className="flex flex-col md:flex-row items-center">
-        <div className="reveal-left stagger-1 w-full md:w-1/2 px-5 sm:px-8 md:px-0">
+    <section id="academy" className="py-10 sm:py-12 lg:py-16">
+      <div ref={ref} className="flex flex-col md:flex-row items-center">
+        <motion.div
+          style={image}
+          className="w-full md:w-1/2 px-5 sm:px-8 md:px-0"
+        >
           <ScrollColorImage
             src="/images/political-education.jpg"
             alt="Academy — political education"
             className="aspect-[9/2] max-md:rounded-lg md:rounded-tr-[6px] md:rounded-br-[6px]"
           />
-        </div>
-        <div className="reveal-right stagger-2 w-full md:w-1/2 px-5 sm:px-8 md:pl-14 md:pr-[max(2rem,calc((100vw-1400px)/2+2rem))]">
+        </motion.div>
+        <motion.div
+          style={text}
+          className="w-full md:w-1/2 px-5 sm:px-8 md:pl-14 md:pr-[max(2rem,calc((100vw-1400px)/2+2rem))]"
+        >
           <h3 className="text-xl md:text-2xl font-semibold flex items-center gap-2 text-dsh-text-primary">
             Academy
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -33,10 +39,12 @@ export default function Academy() {
             frameworks, tools, and resources to turn ideas into organised
             action. Free by principle.
           </p>
-          <Link href="/academy" className="mt-6 inline-block text-sm border border-dsh-text-primary/20 rounded-[3px] px-5 py-2 bg-dsh-btn-bg/20 text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:bg-dsh-btn-bg/30 transition-colors">
-            Explore Academy <span className="text-[#32C6CC]">+</span>
-          </Link>
-        </div>
+          <motion.div style={button}>
+            <Link href="/academy" className="mt-6 inline-block text-sm border border-dsh-text-primary/20 rounded-[3px] px-5 py-2 bg-dsh-btn-bg/20 text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:bg-dsh-btn-bg/30 transition-colors">
+              Explore Academy <span className="text-[#32C6CC]">+</span>
+            </Link>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );
