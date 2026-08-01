@@ -8,24 +8,31 @@ export default function InFocus() {
 
   return (
     <section className="relative py-10 sm:py-12 lg:py-20 pb-16 sm:pb-20 lg:pb-28 overflow-hidden" ref={sectionRef}>
-      {/* ── Background: same portrait, lower-body crop, atmospheric — visible but
-          never the focal point. Extends well past the content into the transition ── */}
+      {/* ── Layer 1: Oversized decorative portrait ──
+          An independent, absolutely positioned copy of the SAME portrait used
+          in the thumbnail. Anchored right, cropped to lower body, heavily
+          darkened. Discovered only after careful looking. */}
       <div className="absolute inset-0 pointer-events-none" style={{ bottom: "-4rem" }}>
+        {/* The oversized portrait element — NOT a CSS background */}
         <img
           src="/images/infocus.jpg"
           alt=""
-          className="absolute w-full h-full object-cover"
+          className="absolute pointer-events-none select-none"
           style={{
-            objectPosition: "70% 88%",
-            transform: "scale(2.5)",
-            transformOrigin: "70% 88%",
+            /* Size: ~250% of the thumbnail, anchored right */
+            width: "65%",
+            height: "130%",
+            right: "-2%",
+            top: "-10%",
+            objectFit: "cover",
+            objectPosition: "center 70%",
             filter: "brightness(0.15) contrast(0.85) saturate(0.80) blur(2px)",
-            opacity: 0.075,
+            opacity: 0.08,
           }}
         />
-        {/* Cinematic overlay — image reads as atmosphere, not a picture */}
+        {/* Heavy black overlay above the portrait */}
         <div className="absolute inset-0 bg-[rgba(0,0,0,0.86)]" />
-        {/* Vignette: edges darker, center barely lifted */}
+        {/* Subtle vignette */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_45%_50%,transparent_0%,transparent_55%,rgba(0,0,0,0.30)_100%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_40%_50%,rgba(255,255,255,0.015)_0%,transparent_65%)]" />
         {/* Near-imperceptible noise texture */}
@@ -39,10 +46,10 @@ export default function InFocus() {
         />
       </div>
 
-      {/* Content */}
+      {/* ── Layer 2: Content ── */}
       <div className="relative max-w-[1400px] mx-auto px-5 sm:px-8 py-8 sm:py-12 lg:py-16">
         <div className="flex flex-col md:flex-row items-start gap-10 md:gap-[4.5rem]">
-          {/* Portrait thumbnail — visual anchor, slightly smaller for editorial breathing room */}
+          {/* Portrait thumbnail card — the visible, sharp version */}
           <div className="reveal-left w-full md:w-[39%] max-w-[396px]">
             <div style={{ filter: "brightness(0.95) contrast(0.95) saturate(0.90)" }}>
               <ScrollColorImage
@@ -53,7 +60,7 @@ export default function InFocus() {
             </div>
           </div>
 
-          {/* Text content — top-aligned with portrait, not centered */}
+          {/* Text content — top-aligned with portrait */}
           <div className="reveal-right w-full md:w-[61%] md:pt-1">
             <p className="text-[10px] tracking-[0.3em] text-dsh-label/40 uppercase mb-5">
               In Focus
