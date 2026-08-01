@@ -92,7 +92,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
         <div className="flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-0">
           {/* Text column — FIXED width, aligned to the page's 1200 container.
               shrink-0 + grow-0 lock it; never scales or reflows. */}
-          <div className="shrink-0 grow-0 w-full px-5 sm:px-8 lg:px-0 lg:pl-[max(2rem,calc((100vw-1200px)/2+2rem))] lg:pr-[64px]">
+          <div className="shrink-0 grow-0 w-full lg:w-auto px-5 sm:px-8 lg:px-0 lg:pl-[max(2rem,calc((100vw-1200px)/2+2rem))] lg:pr-[64px]">
             <div className="lg:w-[408px]">
               <p className="text-[11px] leading-[24px] tracking-[0.28em] text-white/30 uppercase mb-[14px]">
                 Films
