@@ -56,18 +56,20 @@ export default function FilmsListing({ films }: { films: Film[] }) {
           pieces read as one continuous cinematic canvas. No parallax or
           motion in this pass. */}
       <section className="relative overflow-hidden" ref={heroRef}>
-        {/* Far-left sliver — same image/source as the Hero, mostly off-screen */}
+        {/* Far-left sliver — the SAME image, another crop. Fixed visible width
+            (~80px) that hugs the browser's left edge; a wider img sits inside
+            an overflow-hidden window so it reads as a larger image continuing
+            off-screen. Visible width stays constant on every viewport. */}
         {featured && (
-          <div
-            className="hidden lg:block absolute top-20 bottom-20 pointer-events-none select-none"
-            style={{ left: "-14vw", width: "16vw" }}
-          >
+          <div className="hidden lg:block absolute top-20 bottom-20 left-0 w-[80px] overflow-hidden pointer-events-none select-none">
             <img
               src={featured.posterUrl || featured.thumbnailUrl}
               alt=""
-              className="w-full h-full object-cover"
+              className="absolute top-0 left-0 h-full max-w-none"
               style={{
-                objectPosition: "20% 42%",
+                width: "460px",
+                objectFit: "cover",
+                objectPosition: "18% 42%",
                 filter: "grayscale(1) brightness(0.5) contrast(0.92)",
               }}
             />
@@ -113,7 +115,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
           <div className="w-full pl-5 pr-5 sm:pl-8 sm:pr-8 lg:pl-0 lg:pr-0">
             {featured && (
               <div
-                className="relative aspect-[4/3] lg:aspect-auto lg:h-[620px] rounded-[2px] overflow-hidden"
+                className="relative aspect-[4/3] lg:aspect-auto lg:h-[620px] overflow-hidden"
                 style={{ boxShadow: "inset 40px 0 60px -30px rgba(0,0,0,0.85), inset -40px 0 60px -30px rgba(0,0,0,0.85)" }}
               >
                 <img
