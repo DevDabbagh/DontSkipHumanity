@@ -73,15 +73,16 @@ export default function FilmsListing({ films }: { films: Film[] }) {
       <section className="relative overflow-hidden pt-[96px] lg:pt-[104px]">
         {/* Far-left preview strip — SAME image, another crop, fixed 80px */}
         {featured && (
-          <div className="hidden lg:block absolute top-[104px] left-0 w-[80px] h-[clamp(560px,42vw,780px)] overflow-hidden pointer-events-none select-none">
+          <div
+            className="hidden xl:block absolute top-[104px] left-0 h-[clamp(560px,42vw,780px)] overflow-hidden pointer-events-none select-none"
+            style={{ width: "max(64px, calc((100vw - 1264px) / 2))" }}
+          >
             <img
               src={featured.posterUrl || featured.thumbnailUrl}
               alt=""
-              className="absolute top-0 left-0 h-full max-w-none"
+              className="absolute inset-0 w-full h-full object-cover"
               style={{
-                width: "460px",
-                objectFit: "cover",
-                objectPosition: "18% 42%",
+                objectPosition: "20% 42%",
                 filter: "grayscale(1) brightness(0.5) contrast(0.92)",
               }}
             />
@@ -138,7 +139,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
           <div className="w-full lg:flex-1 lg:w-0 lg:min-w-0 px-5 sm:px-8 lg:px-0">
             {featured && (
               <div
-                className="relative aspect-[4/3] lg:aspect-auto lg:h-[clamp(560px,42vw,780px)] overflow-hidden rounded-[6px] lg:rounded-l-[6px] lg:rounded-r-none border-[1.5px] border-white/[0.14]"
+                className="relative aspect-[4/3] lg:aspect-auto lg:h-[clamp(560px,42vw,780px)] overflow-hidden border-[1.5px] border-white/[0.14]"
                 style={{ boxShadow: "0 24px 70px -20px rgba(0,0,0,0.7)" }}
               >
                 <img
