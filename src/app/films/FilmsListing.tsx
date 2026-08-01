@@ -82,11 +82,15 @@ export default function FilmsListing({ films }: { films: Film[] }) {
             (flex-1) so all extra viewport width is absorbed by the image alone.
             Preview strip, text width, spacing and line breaks stay locked. */}
         <div className="reveal-left relative flex flex-col lg:flex-row lg:items-stretch gap-10 lg:gap-0 pt-24 sm:pt-28 lg:pt-[90px] pb-16 sm:pb-20 lg:pb-0">
-          {/* Text — FIXED width column, never resizes with viewport */}
-          <div className="shrink-0 w-full lg:w-[620px] flex flex-col justify-center px-5 sm:px-8 lg:pl-[120px] lg:pr-12">
+          {/* Text — FIXED width column (never grows/shrinks/reflows). shrink-0
+              + grow-0 + a hard basis lock it at exactly 500px on desktop, so
+              the title's line breaks are identical at 1366 / 1600 / 1920 / 2560. */}
+          <div className="shrink-0 grow-0 basis-auto w-full lg:w-[500px] flex flex-col justify-center px-5 sm:px-8 lg:pl-[120px] lg:pr-6">
             <p className="text-[10px] tracking-[0.3em] text-white/30 uppercase mb-6">Films</p>
             <h1 className="text-3xl sm:text-4xl md:text-[2.6rem] font-semibold leading-[1.2] tracking-tight">
-              Documentary and fiction that
+              Documentary
+              <br className="hidden sm:block" />
+              and fiction that
               <br className="hidden sm:block" />
               stay close and
               <br className="hidden sm:block" />
@@ -115,10 +119,11 @@ export default function FilmsListing({ films }: { films: Film[] }) {
             </div>
           </div>
 
-          {/* Hero image — the ONLY fluid element. flex-1 absorbs all remaining
-              viewport width; object-cover simply reveals more of the image as
-              the browser widens. Never scales the text or preview strip. */}
-          <div className="grow w-full pl-5 pr-5 sm:pl-8 sm:pr-8 lg:pl-0 lg:pr-0">
+          {/* Hero image — the ONLY fluid element. flex-1 + w-0 gives it a zero
+              flex-basis so it never influences the text column's size; it simply
+              absorbs ALL remaining viewport width. object-cover reveals more of
+              the image as the browser widens — text/preview never move. */}
+          <div className="w-full lg:flex-1 lg:w-0 lg:min-w-0 pl-5 pr-5 sm:pl-8 sm:pr-8 lg:pl-0 lg:pr-0">
             {featured && (
               <div
                 className="relative aspect-[4/3] lg:aspect-auto lg:h-[720px] overflow-hidden"
