@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useReveal } from "@/hooks/useReveal";
-import { useParallax } from "@/hooks/useParallax";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SupportCTA from "@/components/SupportCTA";
@@ -27,7 +26,6 @@ const FORM_TABS: { value: "all" | Film["credits"]["form"]; label: string }[] = [
 export default function FilmsListing({ films }: { films: Film[] }) {
   const heroRef = useReveal();
   const sectionRef = useReveal();
-  const { ref: heroBgRef, offset: heroBgOffset } = useParallax<HTMLDivElement>(0.15);
   const featuredFilms = useMemo(() => films.filter((f) => f.isFeatured), [films]);
   const [featuredIndex, setFeaturedIndex] = useState(0);
   const featured = featuredFilms[featuredIndex] ?? null;
@@ -48,51 +46,56 @@ export default function FilmsListing({ films }: { films: Film[] }) {
   });
 
   return (
-    <main className="min-h-screen bg-[#0D0D0D] text-white">
+    <main className="min-h-screen bg-[#090909] text-white">
       <Navbar />
 
-      {/* Hero — one continuous full-bleed background image (with a slow parallax
-          drift on scroll) dimmed under a gradient, text overlaid on top. No hard
-          column seam — the image reads as one atmospheric backdrop, not a split panel. */}
-      <section className="relative pt-14 overflow-hidden" ref={heroRef}>
-        <div ref={heroBgRef} className="absolute inset-0 overflow-hidden">
-          {featured && (
-            <img
-              src={featured.posterUrl || featured.thumbnailUrl}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover grayscale"
-              style={{ transform: `translateY(${heroBgOffset}px) scale(1.15)` }}
-            />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0D0D0D] via-[#0D0D0D]/85 to-[#0D0D0D]/40" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0D] via-transparent to-[#0D0D0D]/30" />
-        </div>
+      {/* Hero — contained two-column editorial layout. Image sits within the
+          site's max-width container as a large right-column element, not a
+          full-bleed/full-screen background. No parallax/motion in this pass. */}
+      <section className="relative" ref={heroRef}>
+        <div className="reveal-left relative max-w-[1400px] mx-auto px-5 sm:px-8 pt-24 sm:pt-28 lg:pt-32 pb-16 sm:pb-20 lg:pb-24">
+          <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
+            {/* Left — label, headline, description, buttons */}
+            <div className="w-full lg:w-1/2">
+              <p className="text-[10px] tracking-[0.3em] text-white/30 uppercase mb-6">Films</p>
+              <h1 className="text-3xl sm:text-4xl md:text-[2.6rem] font-semibold leading-[1.2] tracking-tight max-w-xl">
+                Documentary and fiction that stay close and
+                <br className="hidden sm:block" />
+                <span className="gradient-text">refuse erasure.</span>
+              </h1>
+              <p className="text-white/40 mt-7 max-w-sm leading-relaxed text-sm">
+                From development to distribution — films made with
+                rigour, context, and care for the people they carry.
+              </p>
+              <div className="flex items-center gap-3 mt-10">
+                <button
+                  onClick={() => setFormFilter("documentary")}
+                  className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white/80 bg-transparent hover:border-white/30 hover:text-white transition-colors"
+                >
+                  Explore documentaries
+                </button>
+                <button
+                  onClick={() => setFormFilter("fiction")}
+                  className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white/80 bg-transparent hover:border-white/30 hover:text-white transition-colors"
+                >
+                  Explore fiction
+                </button>
+              </div>
+            </div>
 
-        <div className="reveal-left relative max-w-[1400px] mx-auto px-5 sm:px-8 pt-16 sm:pt-20 pb-16 sm:pb-24">
-          <p className="text-[10px] tracking-[0.3em] text-gray-500 uppercase mb-4">Films & Studio</p>
-          <h1 className="text-3xl sm:text-4xl md:text-[2.6rem] font-bold leading-[1.15] tracking-tight max-w-2xl">
-            Documentary and fiction that stay close
-            <span className="gradient-text"> and refuse erasure.</span>
-          </h1>
-          <p className="text-gray-400 mt-5 max-w-lg leading-relaxed">
-            DSH makes documentary and fiction — from development and production to
-            festivals and distribution. Films are not streamed here. This section
-            presents the work with rigour and context, and opens paths to
-            screenings and press.
-          </p>
-          <div className="flex items-center gap-3 mt-8">
-            <button
-              onClick={() => setFormFilter("documentary")}
-              className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white hover:bg-white/5 transition-colors"
-            >
-              Explore documentaries
-            </button>
-            <button
-              onClick={() => setFormFilter("fiction")}
-              className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white hover:bg-white/5 transition-colors"
-            >
-              Explore fiction
-            </button>
+            {/* Right — large cinematic image, confined to this column, not full-bleed */}
+            <div className="w-full lg:w-1/2">
+              {featured && (
+                <div className="relative aspect-[4/3] rounded-[2px] overflow-hidden">
+                  <img
+                    src={featured.posterUrl || featured.thumbnailUrl}
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover"
+                    style={{ filter: "brightness(0.9) contrast(0.92) saturate(0.85)" }}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </section>

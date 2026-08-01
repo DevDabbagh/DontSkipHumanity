@@ -1,18 +1,33 @@
 "use client";
 
+import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { useCurtainReveal } from "@/hooks/useParallax";
 import ScrollColorImage from "./ScrollColorImage";
 import CurtainReveal from "./CurtainReveal";
 
-/* ── Section header — simple fade via its own scroll tracker ── */
+/* ── Section header — one-time fade-in ── */
 function SectionHeader() {
-  const { ref, textOpacity } = useCurtainReveal();
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { threshold: 0.15 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   return (
     <div ref={ref} className="max-w-[1400px] mx-auto px-5 sm:px-8">
-      <motion.div style={{ opacity: textOpacity }} className="mb-16 sm:mb-20 lg:mb-24">
+      <div
+        className={`mb-16 sm:mb-20 lg:mb-24 transition-opacity duration-700 ease-out ${
+          visible ? "opacity-100" : "opacity-0"
+        }`}
+      >
         <p className="text-xs tracking-[0.25em] text-dsh-label uppercase mb-4">
           The work, in its forms
         </p>
@@ -21,7 +36,7 @@ function SectionHeader() {
           <br className="hidden sm:block" />
           that name power and refuse erasure.
         </h2>
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -31,7 +46,7 @@ export default function TheWork() {
     <section id="films" className="py-10 sm:py-12 lg:py-16">
       <SectionHeader />
 
-      {/* ── Films: image bleeds left, curtain reveals text on right ── */}
+      {/* Films: image left → slides to reveal text right */}
       <CurtainReveal
         className="mb-20 sm:mb-24 lg:mb-28"
         image={
@@ -59,7 +74,7 @@ export default function TheWork() {
         </Link>
       </CurtainReveal>
 
-      {/* ── Studio: mirrored — image bleeds right, curtain reveals text on left ── */}
+      {/* Studio: mirrored — image right → slides to reveal text left */}
       <CurtainReveal
         mirrored
         image={
