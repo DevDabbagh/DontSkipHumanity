@@ -61,10 +61,105 @@ export default function FilmsListing({ films }: { films: Film[] }) {
       <Navbar />
 
       {/* ═══════════════════════════════════════
+          HERO  (exact Figma spec — DSH – Films Landing)
+          · Heading: Inter SemiBold 50/52, -2% tracking, block 362px
+          · Description: 16/24, block 408px
+          · Gaps: label→heading 14, heading→desc 60, desc→buttons 60
+          · Image: starts at 50%, H 646, 1.5px #F0F0F0/10 border, bleeds right
+          · Left preview strip: same image, another crop, fixed 80px
+          · Text column fixed width (aligned to page container); image is the
+            only fluid element — it absorbs all extra viewport width.
+         ═══════════════════════════════════════ */}
+      <section className="relative overflow-hidden pt-[96px] lg:pt-[104px]">
+        {/* Far-left preview strip — SAME image, another crop, fixed 80px */}
+        {featured && (
+          <div className="hidden lg:block absolute top-[104px] left-0 w-[80px] h-[646px] overflow-hidden pointer-events-none select-none">
+            <img
+              src={featured.posterUrl || featured.thumbnailUrl}
+              alt=""
+              className="absolute top-0 left-0 h-full max-w-none"
+              style={{
+                width: "460px",
+                objectFit: "cover",
+                objectPosition: "18% 42%",
+                filter: "grayscale(1) brightness(0.5) contrast(0.92)",
+              }}
+            />
+            <div className="absolute inset-0 bg-black/45" />
+          </div>
+        )}
+
+        <div className="flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-0">
+          {/* Text column — FIXED width, aligned to the page's 1200 container.
+              shrink-0 + grow-0 lock it; never scales or reflows. */}
+          <div className="shrink-0 grow-0 w-full px-5 sm:px-8 lg:px-0 lg:pl-[max(2rem,calc((100vw-1200px)/2+2rem))] lg:pr-[64px]">
+            <div className="lg:w-[408px]">
+              <p className="text-[11px] leading-[24px] tracking-[0.28em] text-white/30 uppercase mb-[14px]">
+                Films
+              </p>
+              <h1
+                className="font-semibold text-[40px] leading-[42px] sm:text-[50px] sm:leading-[52px] lg:w-[362px]"
+                style={{ letterSpacing: "-0.02em" }}
+              >
+                Documentary
+                <br />
+                and fiction that
+                <br />
+                stay close and
+                <br />
+                <span className="gradient-text">refuse erasure.</span>
+              </h1>
+              <p className="text-[16px] leading-[24px] text-white/40 mt-[60px] lg:w-[408px]">
+                DSH makes documentary and fiction — from development and
+                production to festivals and distribution. Films are not
+                streamed here. This section presents the work with rigour
+                and context, and opens paths to screenings, distribution,
+                and press.
+              </p>
+              <div className="flex items-center gap-3 mt-[60px]">
+                <button
+                  onClick={() => setFormFilter("documentary")}
+                  className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white/80 bg-transparent hover:border-white/30 hover:text-white transition-colors"
+                >
+                  Explore documentaries
+                </button>
+                <button
+                  onClick={() => setFormFilter("fiction")}
+                  className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white/80 bg-transparent hover:border-white/30 hover:text-white transition-colors"
+                >
+                  Explore fiction
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Hero image — the ONLY fluid element. flex-1 + w-0 absorbs all
+              remaining viewport width; object-cover reveals more as it widens. */}
+          <div className="w-full lg:flex-1 lg:w-0 lg:min-w-0 px-5 sm:px-8 lg:px-0">
+            {featured && (
+              <div className="relative aspect-[4/3] lg:aspect-auto lg:h-[646px] overflow-hidden rounded-[6px] lg:rounded-l-[6px] lg:rounded-r-none border-[1.5px] border-[#F0F0F0]/10">
+                <img
+                  src={featured.posterUrl || featured.thumbnailUrl}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{
+                    objectPosition: "68% 42%",
+                    filter: "grayscale(1) brightness(0.5) contrast(0.92)",
+                  }}
+                />
+                {/* Dark cinematic overlay so text dominates */}
+                <div className="absolute inset-0 bg-black/45" />
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════
           FEATURED SECTION
          ═══════════════════════════════════════ */}
       {featured && (
-        <section className="max-w-[1200px] mx-auto px-5 sm:px-8 pt-28 sm:pt-32 lg:pt-36 pb-16 sm:pb-20">
+        <section className="max-w-[1200px] mx-auto px-5 sm:px-8 pt-20 sm:pt-24 lg:pt-28 pb-16 sm:pb-20">
           {/* Label */}
           <p className="text-[10px] tracking-[0.3em] text-white/25 uppercase mb-6">
             Featured
