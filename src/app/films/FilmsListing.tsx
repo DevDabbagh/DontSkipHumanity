@@ -75,9 +75,13 @@ export default function FilmsListing({ films }: { films: Film[] }) {
           </div>
         )}
 
-        <div className="reveal-left relative flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-0 pt-24 sm:pt-28 lg:pt-16 pb-16 sm:pb-20 lg:pb-0">
+        {/* Grid, not a flex 50/50 split — the text column is a fixed/clamped
+            width so it doesn't grow with the viewport; the image column is
+            1fr, so all extra width on large monitors is consumed by the
+            image, never by empty background. */}
+        <div className="reveal-left relative grid grid-cols-1 lg:grid-cols-[minmax(420px,38vw)_1fr] lg:items-center gap-10 lg:gap-0 pt-24 sm:pt-28 lg:pt-16 pb-16 sm:pb-20 lg:pb-0">
           {/* Text — aligned to the site's content grid */}
-          <div className="w-full lg:w-1/2 px-5 sm:px-8 lg:pl-[max(1.25rem,calc((100vw-1400px)/2+1.25rem))] lg:pr-10">
+          <div className="w-full px-5 sm:px-8 lg:pl-[max(1.25rem,calc((100vw-1400px)/2+1.25rem))] lg:pr-10">
             <p className="text-[10px] tracking-[0.3em] text-white/30 uppercase mb-6">Films</p>
             <h1 className="text-3xl sm:text-4xl md:text-[2.6rem] font-semibold leading-[1.2] tracking-tight max-w-xl">
               Documentary and fiction that stay close and
@@ -104,8 +108,9 @@ export default function FilmsListing({ films }: { films: Film[] }) {
             </div>
           </div>
 
-          {/* Hero image — breaks out of the content grid, bleeds to the right edge */}
-          <div className="w-full lg:w-1/2 pl-5 pr-5 sm:pl-8 sm:pr-8 lg:pl-0 lg:pr-0">
+          {/* Hero image — this column is 1fr, so it absorbs all extra viewport
+              width and bleeds to the right browser edge, on every screen size */}
+          <div className="w-full pl-5 pr-5 sm:pl-8 sm:pr-8 lg:pl-0 lg:pr-0">
             {featured && (
               <div
                 className="relative aspect-[4/3] lg:aspect-auto lg:h-[620px] rounded-[2px] overflow-hidden"
