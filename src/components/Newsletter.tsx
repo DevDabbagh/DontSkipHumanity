@@ -8,20 +8,22 @@ export default function Newsletter() {
   const sectionRef = useReveal();
 
   return (
-    <section className="relative py-10 sm:py-12 lg:py-16 overflow-hidden" ref={sectionRef}>
-      {/* Background image */}
+    <section className="relative py-16 sm:py-20 lg:py-24 overflow-hidden" ref={sectionRef}>
+      {/* Background image — cinematic, heavily darkened */}
       <img
         src="/images/impact_metrics_background.jpg"
         alt=""
-        className="absolute inset-0 w-full h-full object-cover opacity-[0.06]"
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ filter: "grayscale(0.6) brightness(0.25) contrast(0.9)", opacity: 0.45 }}
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0D0D0D] via-[#0D0D0D]/85 to-[#0D0D0D]" />
+      {/* Black overlay */}
+      <div className="absolute inset-0 bg-black/65" />
 
       <div className="relative max-w-xl mx-auto px-5 sm:px-8 text-center">
-        <h2 className="reveal text-2xl sm:text-3xl md:text-4xl font-bold text-dsh-text-primary">
+        <h2 className="reveal text-2xl sm:text-3xl md:text-4xl font-bold text-[#FFFFFF]">
           Don&apos;t look away.
         </h2>
-        <p className="reveal stagger-1 text-sm text-dsh-desc mt-4 leading-relaxed">
+        <p className="reveal stagger-1 text-sm text-[#595C5C] mt-4 leading-relaxed">
           One email when something matters — a new film, a piece, a screening, an open call.
           <br />
           Work that names what power tries to hide. No noise.
@@ -34,8 +36,18 @@ export default function Newsletter() {
             placeholder="Email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-5 py-3.5 rounded-[3px] bg-[#1A1A1A] border border-white/10 text-white placeholder-dsh-desc text-sm focus:outline-none focus:border-white/20 transition-colors"
+            className="w-full px-5 py-3.5 rounded-[3px] border text-white text-sm focus:outline-none focus:border-[#F0F0F0]/30 transition-colors"
+            style={{
+              backgroundColor: "rgba(54, 54, 54, 0.30)",
+              borderColor: "rgba(240, 240, 240, 0.20)",
+              color: "#FFFFFF",
+            }}
           />
+          <style jsx>{`
+            input::placeholder {
+              color: #595C5C;
+            }
+          `}</style>
           <button className="w-full py-3.5 rounded-[3px] gradient-fill-btn text-sm text-white font-medium flex items-center justify-center gap-2">
             Subscribe our newsletter
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -44,7 +56,7 @@ export default function Newsletter() {
           </button>
         </div>
 
-        <p className="reveal stagger-3 text-xs text-dsh-label mt-4">
+        <p className="reveal stagger-3 text-xs text-[#595C5C] mt-4">
           I agree to receive emails from DSH. We don&apos;t share your data.
         </p>
       </div>
