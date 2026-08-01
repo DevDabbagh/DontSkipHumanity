@@ -59,8 +59,8 @@ export default function FilmsListing({ films }: { films: Film[] }) {
         {/* Far-left sliver — same image/source as the Hero, mostly off-screen */}
         {featured && (
           <div
-            className="hidden lg:block absolute top-20 bottom-20 w-[220px] pointer-events-none select-none"
-            style={{ left: "-198px" }}
+            className="hidden lg:block absolute top-20 bottom-20 pointer-events-none select-none"
+            style={{ left: "-14vw", width: "16vw" }}
           >
             <img
               src={featured.posterUrl || featured.thumbnailUrl}
