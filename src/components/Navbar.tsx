@@ -86,10 +86,8 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className={`nav-animate fixed top-0 left-0 right-0 z-40 transition-all duration-500 ease-in-out ${
-        scrolled
-          ? "bg-[#0D0D0D]/85 backdrop-blur-xl border-b border-white/10 shadow-2xl py-1"
-          : "bg-gradient-to-b from-black/80 via-black/40 to-transparent border-b border-transparent py-3"
+      <nav className={`nav-animate fixed top-0 left-0 right-0 z-40 transition-all duration-500 ease-in-out bg-[#0D0D0D] border-b border-white/10 ${
+        scrolled ? "shadow-2xl py-1" : "py-3"
       }`}>
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 grid grid-cols-[auto_1fr_auto] items-center">
           {/* Logo */}

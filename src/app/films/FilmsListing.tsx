@@ -100,7 +100,10 @@ export default function FilmsListing({ films }: { films: Film[] }) {
           {/* Hero image — breaks out of the content grid, bleeds to the right edge */}
           <div className="w-full lg:w-1/2 pl-5 pr-5 sm:pl-8 sm:pr-8 lg:pl-0 lg:pr-0">
             {featured && (
-              <div className="relative aspect-[4/3] lg:aspect-auto lg:h-[620px] rounded-[2px] overflow-hidden">
+              <div
+                className="relative aspect-[4/3] lg:aspect-auto lg:h-[620px] rounded-[2px] overflow-hidden"
+                style={{ boxShadow: "inset 40px 0 60px -30px rgba(0,0,0,0.85), inset -40px 0 60px -30px rgba(0,0,0,0.85)" }}
+              >
                 <img
                   src={featured.posterUrl || featured.thumbnailUrl}
                   alt=""
