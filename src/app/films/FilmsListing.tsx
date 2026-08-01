@@ -51,23 +51,29 @@ export default function FilmsListing({ films }: { films: Film[] }) {
 
       {/* Hero — editorial breakout composition. Text stays inside the site's
           content grid; the hero image breaks out of that grid and bleeds to
-          the right browser edge; a narrow, mostly off-screen image sliver
-          sits on the far left as pure decorative composition. No parallax
-          or motion in this pass. */}
+          the right browser edge. The far-left sliver is the SAME image,
+          just a different crop of it — not a separate photo — so both
+          pieces read as one continuous cinematic canvas. No parallax or
+          motion in this pass. */}
       <section className="relative overflow-hidden" ref={heroRef}>
-        {/* Far-left cropped sliver — mostly outside the viewport */}
-        <div
-          className="hidden lg:block absolute top-20 bottom-20 w-[220px] pointer-events-none select-none"
-          style={{ left: "-160px" }}
-        >
-          <img
-            src="/images/political-education.jpg"
-            alt=""
-            className="w-full h-full object-cover"
-            style={{ filter: "grayscale(1) brightness(0.22)" }}
-          />
-          <div className="absolute inset-0 bg-black/55" />
-        </div>
+        {/* Far-left sliver — same image/source as the Hero, mostly off-screen */}
+        {featured && (
+          <div
+            className="hidden lg:block absolute top-20 bottom-20 w-[220px] pointer-events-none select-none"
+            style={{ left: "-185px" }}
+          >
+            <img
+              src={featured.posterUrl || featured.thumbnailUrl}
+              alt=""
+              className="w-full h-full object-cover"
+              style={{
+                objectPosition: "20% 42%",
+                filter: "grayscale(1) brightness(0.5) contrast(0.92)",
+              }}
+            />
+            <div className="absolute inset-0 bg-black/45" />
+          </div>
+        )}
 
         <div className="reveal-left relative flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-0 pt-24 sm:pt-28 lg:pt-16 pb-16 sm:pb-20 lg:pb-0">
           {/* Text — aligned to the site's content grid */}
@@ -111,10 +117,10 @@ export default function FilmsListing({ films }: { films: Film[] }) {
                   className="absolute inset-0 w-full h-full object-cover"
                   style={{
                     objectPosition: "68% 42%",
-                    filter: "brightness(0.85) contrast(1) saturate(1)",
+                    filter: "grayscale(1) brightness(0.5) contrast(0.92)",
                   }}
                 />
-                {/* Cinematic overlay — darkens without crushing detail */}
+                {/* Cinematic overlay — darkens without crushing detail, same grading as the left sliver */}
                 <div className="absolute inset-0 bg-black/45" />
               </div>
             )}
