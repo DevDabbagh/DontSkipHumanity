@@ -249,11 +249,11 @@ export default function Navbar() {
                   key={link.label}
                   href={link.href}
                   onClick={() => setMenuOpen(false)}
-                  className={`font-bold leading-none hover:text-[#1ABC9C] transition-colors duration-300 ${
+                  className={`font-bold leading-none hover:text-[#B23495] transition-colors duration-300 ${
                     active ? "" : "text-dsh-nav-hover"
                   } ${menuOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
                   style={{
-                    fontSize: "clamp(2rem, 5vw, 3.5rem)",
+                    fontSize: "clamp(1.5rem, 3.2vw, 2.75rem)",
                     transitionDelay: menuOpen ? `${i * 60}ms` : "0ms",
                     paddingTop: "0.4em",
                     paddingBottom: "0.4em",
@@ -271,14 +271,14 @@ export default function Navbar() {
                   setMenuOpen(false);
                   setIsLoginModalOpen(true);
                 }}
-                className={`text-left text-dsh-nav-hover font-bold leading-none hover:text-[#1ABC9C] transition-colors duration-300 ${
+                className={`text-left text-dsh-nav-hover font-bold leading-none hover:text-[#B23495] transition-colors duration-300 ${
                   menuOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
                 }`}
                 style={{
-                  fontSize: "clamp(2rem, 5vw, 3.5rem)",
+                  fontSize: "clamp(1.5rem, 3.2vw, 2.75rem)",
                   transitionDelay: menuOpen ? `${MENU_LINKS.length * 60}ms` : "0ms",
-                  paddingTop: "0.4em",
-                  paddingBottom: "0.4em",
+                  paddingTop: "0.3em",
+                  paddingBottom: "0.3em",
                 }}
               >
                 Login
