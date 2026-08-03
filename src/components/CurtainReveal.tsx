@@ -44,7 +44,7 @@ export default function CurtainReveal({
   }, []);
 
   return (
-    <div ref={ref} className={`relative overflow-hidden ${className}`}>
+    <div ref={ref} className={`relative overflow-x-hidden ${className}`}>
       {/* ── Text layer: positioned in the half that gets revealed ── */}
       <div
         className={`absolute top-0 bottom-0 w-1/2 flex items-center ${
