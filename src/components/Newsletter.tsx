@@ -19,14 +19,13 @@ export default function Newsletter() {
       {/* Dark overlay for depth */}
       <div className="absolute inset-0 bg-black/40" />
 
-      <div className="relative max-w-xl mx-auto px-5 sm:px-8 text-center">
+      <div className="relative max-w-2xl mx-auto px-5 sm:px-8 text-center">
         <h2 className="reveal text-2xl sm:text-3xl md:text-4xl font-bold text-white">
           Don&apos;t look away.
         </h2>
 
-        <p className="reveal stagger-1 text-xs sm:text-sm text-[#595C5C] mt-4 sm:mt-5 leading-relaxed">
+        <p className="reveal stagger-1 text-xs sm:text-sm text-[#595C5C] mt-4 sm:mt-5 leading-relaxed max-w-2xl mx-auto">
           One email when something matters — a new film, a piece, a screening, an open call.
-          <br />
           Work that names what power tries to hide. No noise.
         </p>
 
@@ -50,9 +49,7 @@ export default function Newsletter() {
           `}</style>
           <button className="w-full py-3.5 rounded-[3px] gradient-fill-btn text-sm text-white font-medium flex items-center justify-center gap-2">
             Subscribe our newsletter
-            <svg width="16" height="12" viewBox="0 0 16 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 0.5H12C12.9569 0.5 13.6244 0.500662 14.1279 0.568359C14.6171 0.634128 14.876 0.754944 15.0605 0.939453C15.2451 1.12396 15.3659 1.38289 15.4316 1.87207C15.4993 2.37563 15.5 3.04308 15.5 4V8C15.5 8.95692 15.4993 9.62437 15.4316 10.1279C15.3659 10.6171 15.2451 10.876 15.0605 11.0605C14.876 11.2451 14.6171 11.3659 14.1279 11.4316C13.6244 11.4993 12.9569 11.5 12 11.5H4C3.04308 11.5 2.37563 11.4993 1.87207 11.4316C1.38289 11.3659 1.12396 11.2451 0.939453 11.0605C0.754944 10.876 0.634128 10.6171 0.568359 10.1279C0.500662 9.62437 0.5 8.95692 0.5 8V4C0.5 3.04308 0.500662 2.37563 0.568359 1.87207C0.634128 1.38289 0.754944 1.12396 0.939453 0.939453C1.12396 0.754944 1.38289 0.634128 1.87207 0.568359C2.37563 0.500662 3.04308 0.5 4 0.5Z" stroke="#F0F0F0"/>
-            </svg>
+            <img src="/images/ic_newsletter_btn.png" alt="" className="w-4 h-4 object-contain" />
           </button>
         </div>
 
