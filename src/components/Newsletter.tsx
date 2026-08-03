@@ -37,7 +37,7 @@ export default function Newsletter() {
             placeholder="Email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 rounded-[3px] text-white text-sm focus:outline-none transition-colors"
+            className="w-full h-[44px] px-4 rounded-[3px] text-white text-sm focus:outline-none transition-colors"
             style={{
               backgroundColor: "rgba(54, 54, 54, 0.30)",
               border: "1px solid rgba(240, 240, 240, 0.20)",
@@ -48,7 +48,7 @@ export default function Newsletter() {
               color: #595C5C;
             }
           `}</style>
-          <button className="w-full py-3 rounded-[3px] gradient-fill-btn text-sm text-white font-medium flex items-center justify-center gap-2">
+          <button className="w-full h-[44px] rounded-[3px] gradient-fill-btn text-sm text-white font-medium flex items-center justify-center gap-2">
             Subscribe our newsletter
             <img src="/images/ic_newsletter_btn.png" alt="" className="w-4 h-4 object-contain" />
           </button>
