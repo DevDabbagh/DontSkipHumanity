@@ -270,23 +270,22 @@ export default function FilmsListing({ films }: { films: Film[] }) {
           CINEMATIC EDITORIAL BANNER
          ═══════════════════════════════════════ */}
       <section className="relative overflow-hidden h-[260px] sm:h-[320px] lg:h-[380px] flex items-center">
-        {/* Layer 1: background photograph — barely visible, cinematic texture */}
+        {/* Layer 1: full-width background photograph — visible, edge to edge */}
         <img
           src="/images/studio.jpg"
           alt=""
           className="absolute inset-0 w-full h-full object-cover object-center"
           style={{
-            filter: "grayscale(0.8) brightness(0.15) contrast(1.1)",
-            opacity: 0.12,
+            filter: "brightness(0.4) contrast(1.05) saturate(0.7)",
           }}
         />
-        {/* Layer 2: dark overlay */}
-        <div className="absolute inset-0 bg-black/75" />
-        {/* Layer 3: very subtle purple accent from right — almost invisible */}
+        {/* Layer 2: dark overlay — keeps it cinematic but image is recognizable */}
+        <div className="absolute inset-0 bg-black/35" />
+        {/* Layer 3: purple wash from the right — visible but not dominant */}
         <div
           className="absolute inset-0"
           style={{
-            background: "linear-gradient(270deg, rgba(134,101,167,0.08) 0%, rgba(178,52,149,0.02) 30%, transparent 55%)",
+            background: "linear-gradient(270deg, rgba(178,52,149,0.25) 0%, rgba(134,101,167,0.12) 40%, transparent 70%)",
           }}
         />
 
