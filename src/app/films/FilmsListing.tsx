@@ -169,32 +169,43 @@ export default function FilmsListing({ films }: { films: Film[] }) {
       {featured && (
         <section className="max-w-[1200px] mx-auto px-5 sm:px-8 pt-20 sm:pt-24 lg:pt-28 pb-16 sm:pb-20">
           {/* Label */}
-          <p className="text-[10px] tracking-[0.3em] text-white/25 uppercase mb-6">
+          <p className="text-[10px] tracking-[0.3em] text-[#363636] uppercase mb-8">
             Featured
           </p>
 
-          <div className="flex flex-col md:flex-row gap-8 md:gap-12">
-            {/* Poster — left */}
-            <div className="relative w-full md:w-[48%] shrink-0">
+          <div className="flex flex-col md:flex-row gap-10 md:gap-14">
+            {/* Poster — premium editorial card, 444×612 ratio */}
+            <div className="relative shrink-0 w-full md:w-[444px]">
               <Link href={`/film/${featured.slug}`} className="block group">
-                <div className="relative aspect-[4/5] rounded-[6px] overflow-hidden border border-white/[0.06] shadow-lg shadow-black/40">
+                <div
+                  className="relative overflow-hidden rounded-[8px] border border-white/[0.08]"
+                  style={{
+                    aspectRatio: "444 / 612",
+                    boxShadow: "0 20px 60px -12px rgba(0,0,0,0.6), 0 8px 24px -4px rgba(0,0,0,0.4)",
+                  }}
+                >
                   <img
                     src={featured.posterUrl || featured.thumbnailUrl}
                     alt={featured.title}
                     className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
+                    style={{
+                      filter: "saturate(0.25) brightness(0.75) contrast(1.1)",
+                    }}
                   />
+                  {/* Soft dark overlay for blending into dark page */}
+                  <div className="absolute inset-0 bg-black/10" />
                 </div>
               </Link>
-              {/* Navigation arrow — centered vertically on the poster */}
+              {/* Navigation arrow */}
               {featuredFilms.length > 1 && (
                 <button
                   onClick={() =>
                     setFeaturedIdx((i) => (i + 1) % featuredFilms.length)
                   }
                   aria-label="Next featured film"
-                  className="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 border border-white/15 flex items-center justify-center text-white/50 hover:text-white hover:bg-black/60 transition-colors backdrop-blur-sm"
+                  className="absolute right-5 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/35 border border-white/10 flex items-center justify-center text-white/45 hover:text-white hover:bg-black/55 transition-colors backdrop-blur-sm"
                 >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
@@ -202,35 +213,35 @@ export default function FilmsListing({ films }: { films: Film[] }) {
             </div>
 
             {/* Info — right */}
-            <div className="flex-1 md:pt-4">
-              {/* Category + year */}
-              <div className="flex items-center gap-3 mb-4">
+            <div className="flex-1 md:pt-2">
+              {/* Category + year — #B23495 */}
+              <div className="flex items-center gap-3 mb-5">
                 <span className="text-[#B23495] text-[15px]">
                   {featured.credits.form === "documentary" ? "Documentary" : "Fiction"}
                 </span>
-                <span className="text-white/35 text-[15px]">{featured.credits.year}</span>
+                <span className="text-[#B23495]/60 text-[15px]">{featured.credits.year}</span>
               </div>
 
-              {/* Title */}
-              <h2 className="text-3xl sm:text-[38px] font-bold leading-[1.1]">
+              {/* Title — #F0F0F0 */}
+              <h2 className="text-3xl sm:text-[38px] font-bold leading-[1.1] text-[#F0F0F0]">
                 {featured.title}
               </h2>
 
-              {/* Short description */}
-              <p className="text-[15px] text-white/50 mt-6 leading-[1.7] max-w-lg">
+              {/* Short description — #595C5C */}
+              <p className="text-[15px] text-[#595C5C] mt-8 leading-[1.7] max-w-lg">
                 {featured.synopsisShort || featured.logline}
               </p>
 
-              {/* Directed by */}
-              <p className="text-[10px] tracking-[0.25em] text-white/30 uppercase mt-10 mb-1.5">
+              {/* Directed by — label #363636, name #F0F0F0 */}
+              <p className="text-[10px] tracking-[0.25em] text-[#363636] uppercase mt-10 mb-1.5">
                 Directed by
               </p>
-              <p className="text-[15px] text-white/80">
+              <p className="text-[15px] text-[#F0F0F0]">
                 {featured.credits.direction}
               </p>
 
-              {/* Longer description */}
-              <p className="text-[15px] text-white/40 mt-8 leading-[1.7] max-w-lg">
+              {/* Editorial context — #595C5C */}
+              <p className="text-[15px] text-[#595C5C] mt-8 leading-[1.7] max-w-lg">
                 {featured.editorialContext || featured.logline}
               </p>
 
@@ -241,14 +252,14 @@ export default function FilmsListing({ films }: { films: Film[] }) {
                     href={featured.trailerUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white/80 hover:text-white hover:border-white/25 transition-colors inline-flex items-center gap-2"
+                    className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-[#F0F0F0]/40 hover:text-[#F0F0F0]/70 hover:border-white/25 transition-colors inline-flex items-center gap-2"
                   >
                     Watch trailer <span className="text-[#B23495]">▶</span>
                   </a>
                 )}
                 <Link
                   href={`/film/${featured.slug}`}
-                  className="text-sm text-white/40 hover:text-white/65 transition-colors"
+                  className="text-sm text-[#F0F0F0]/30 hover:text-[#F0F0F0]/55 transition-colors"
                 >
                   Know more
                 </Link>
@@ -261,23 +272,24 @@ export default function FilmsListing({ films }: { films: Film[] }) {
       {/* ═══════════════════════════════════════
           CINEMATIC EDITORIAL BANNER
          ═══════════════════════════════════════ */}
-      <section className="relative overflow-hidden h-[280px] sm:h-[340px] lg:h-[400px] flex items-center">
-        {/* Layer 1: full-width background photograph — clearly visible */}
+      <section className="relative overflow-hidden h-[260px] sm:h-[320px] lg:h-[380px] flex items-center">
+        {/* Layer 1: background photograph — barely visible, cinematic texture */}
         <img
           src="/images/studio.jpg"
           alt=""
           className="absolute inset-0 w-full h-full object-cover object-center"
           style={{
-            filter: "grayscale(0.6) brightness(0.35) contrast(1.05)",
+            filter: "grayscale(0.8) brightness(0.15) contrast(1.1)",
+            opacity: 0.12,
           }}
         />
-        {/* Layer 2: dark cinematic overlay — darkens but image stays visible */}
-        <div className="absolute inset-0 bg-black/40" />
-        {/* Layer 3: very subtle purple accent from right */}
+        {/* Layer 2: dark overlay */}
+        <div className="absolute inset-0 bg-black/75" />
+        {/* Layer 3: very subtle purple accent from right — almost invisible */}
         <div
           className="absolute inset-0"
           style={{
-            background: "linear-gradient(270deg, rgba(134,101,167,0.12) 0%, rgba(178,52,149,0.04) 35%, transparent 60%)",
+            background: "linear-gradient(270deg, rgba(134,101,167,0.08) 0%, rgba(178,52,149,0.02) 30%, transparent 55%)",
           }}
         />
 
@@ -286,7 +298,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
           <h3 className="text-2xl sm:text-3xl md:text-[36px] font-semibold leading-[1.25] text-white max-w-2xl">
             Development, Production, Post-production
           </h3>
-          <p className="text-lg sm:text-xl md:text-[24px] font-medium leading-[1.3] text-white/90 mt-2">
+          <p className="text-lg sm:text-xl md:text-[24px] font-medium leading-[1.3] text-white/85 mt-2">
             choose whatever feels right to you
           </p>
         </div>
