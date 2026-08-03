@@ -24,7 +24,7 @@ export default function Academy() {
             <path d="M6.5 12.5V16.5L12 18.5L17.5 16.5V12.5C17.5 12.5 17 10.5 12 10.5C7 10.5 6.5 12.5 6.5 12.5Z" stroke="#32C6CC" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </h3>
-        <p className="text-sm text-dsh-desc mt-4 leading-relaxed max-w-lg">
+        <p className="text-sm text-dsh-desc mt-4 leading-relaxed max-w-lg line-clamp-3">
           Political education built as infrastructure — a digital school, a
           living archive, and a space for collective learning. We share
           frameworks, tools, and resources to turn ideas into organised
