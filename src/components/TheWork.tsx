@@ -69,7 +69,7 @@ export default function TheWork() {
           through which violence is made acceptable. Festivals, screenings,
           distribution, and the political context around each film.
         </p>
-        <Link href="/film/free-fish" className="mt-3 sm:mt-4 md:mt-6 inline-block text-xs sm:text-sm border border-white/15 rounded-[3px] px-4 sm:px-6 py-2 sm:py-2.5 text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 hover:border-white/25 transition-colors">
+        <Link href="/film/free-fish" className="mt-3 sm:mt-4 md:mt-6 inline-block self-start text-xs sm:text-sm border border-white/15 rounded-[3px] px-4 sm:px-6 py-2 sm:py-2.5 text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 hover:border-white/25 transition-colors">
           Explore Films <span className="text-[#B23495]">+</span>
         </Link>
       </CurtainReveal>
@@ -85,7 +85,7 @@ export default function TheWork() {
           />
         }
       >
-        <div id="studio" />
+        <div id="studio" className="absolute" />
         <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold flex items-center gap-2 text-dsh-text-primary">
           Studio
           <svg className="w-4 h-4 md:w-5 md:h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -99,7 +99,7 @@ export default function TheWork() {
           and co-production capacity behind them. Bold, independent media
           that strengthens movements, made with the same politics and care.
         </p>
-        <Link href="/film/beneath-the-canopy" className="mt-3 sm:mt-4 md:mt-6 inline-block text-xs sm:text-sm border border-white/15 rounded-[3px] px-4 sm:px-6 py-2 sm:py-2.5 text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 hover:border-white/25 transition-colors">
+        <Link href="/film/beneath-the-canopy" className="mt-3 sm:mt-4 md:mt-6 inline-block self-start text-xs sm:text-sm border border-white/15 rounded-[3px] px-4 sm:px-6 py-2 sm:py-2.5 text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 hover:border-white/25 transition-colors">
           Explore Studio <span className="text-[#8665A7]">+</span>
         </Link>
       </CurtainReveal>

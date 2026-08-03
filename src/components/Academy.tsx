@@ -30,7 +30,7 @@ export default function Academy() {
           frameworks, tools, and resources to turn ideas into organised
           action. Free by principle.
         </p>
-        <Link href="/academy" className="mt-3 sm:mt-4 md:mt-6 inline-block text-xs sm:text-sm border border-white/15 rounded-[3px] px-4 sm:px-6 py-2 sm:py-2.5 text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 hover:border-white/25 transition-colors">
+        <Link href="/academy" className="mt-3 sm:mt-4 md:mt-6 inline-block self-start text-xs sm:text-sm border border-white/15 rounded-[3px] px-4 sm:px-6 py-2 sm:py-2.5 text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 hover:border-white/25 transition-colors">
           Explore Academy <span className="text-[#32C6CC]">+</span>
         </Link>
       </CurtainReveal>

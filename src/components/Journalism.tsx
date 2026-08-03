@@ -35,7 +35,7 @@ export default function Journalism() {
         </p>
         <Link
           href="/read"
-          className="mt-3 sm:mt-4 md:mt-6 inline-block text-xs sm:text-sm border border-white/15 rounded-[3px] px-4 sm:px-6 py-2 sm:py-2.5 text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 hover:border-white/25 transition-colors"
+          className="mt-3 sm:mt-4 md:mt-6 inline-block self-start text-xs sm:text-sm border border-white/15 rounded-[3px] px-4 sm:px-6 py-2 sm:py-2.5 text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 hover:border-white/25 transition-colors"
         >
           Explore Read <span className="text-[#5D94B9]">+</span>
         </Link>
