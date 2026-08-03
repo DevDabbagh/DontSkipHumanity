@@ -49,7 +49,7 @@ export default function CurtainReveal({
   return (
     <div
       ref={ref}
-      className={`relative overflow-hidden h-[300px] sm:h-[260px] md:h-[280px] ${className}`}
+      className={`relative overflow-hidden h-[270px] sm:h-[235px] md:h-[248px] ${className}`}
     >
       {/* ── Text layer: full height. Title pins to the TOP, button to the
              BOTTOM (aligned with the image edges), description centered
