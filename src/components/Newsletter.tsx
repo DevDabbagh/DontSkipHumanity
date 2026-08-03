@@ -19,27 +19,28 @@ export default function Newsletter() {
       {/* Dark overlay for depth */}
       <div className="absolute inset-0 bg-black/40" />
 
-      <div className="relative max-w-2xl mx-auto px-5 sm:px-8 text-center">
+      <div className="relative max-w-[500px] mx-auto px-5 sm:px-8 text-center">
         <h2 className="reveal text-2xl sm:text-3xl md:text-4xl font-bold text-white">
           Don&apos;t look away.
         </h2>
 
-        <p className="reveal stagger-1 text-xs sm:text-sm text-[#595C5C] mt-4 sm:mt-5 leading-relaxed max-w-2xl mx-auto">
+        <p className="reveal stagger-1 text-xs sm:text-sm text-[#595C5C] mt-4 sm:mt-5 leading-relaxed">
           One email when something matters — a new film, a piece, a screening, an open call.
+          <br />
           Work that names what power tries to hide. No noise.
         </p>
 
         {/* Email input */}
-        <div className="reveal stagger-2 mt-8 sm:mt-10 space-y-3">
+        <div className="reveal stagger-2 mt-8 space-y-3">
           <input
             type="email"
             placeholder="Email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-5 py-3.5 rounded-[3px] border text-white text-sm focus:outline-none focus:border-[#F0F0F0]/30 transition-colors"
+            className="w-full px-4 py-3 rounded-[3px] text-white text-sm focus:outline-none transition-colors"
             style={{
               backgroundColor: "rgba(54, 54, 54, 0.30)",
-              borderColor: "rgba(240, 240, 240, 0.20)",
+              border: "1px solid rgba(240, 240, 240, 0.20)",
             }}
           />
           <style jsx>{`
@@ -47,7 +48,7 @@ export default function Newsletter() {
               color: #595C5C;
             }
           `}</style>
-          <button className="w-full py-3.5 rounded-[3px] gradient-fill-btn text-sm text-white font-medium flex items-center justify-center gap-2">
+          <button className="w-full py-3 rounded-[3px] gradient-fill-btn text-sm text-white font-medium flex items-center justify-center gap-2">
             Subscribe our newsletter
             <img src="/images/ic_newsletter_btn.png" alt="" className="w-4 h-4 object-contain" />
           </button>
