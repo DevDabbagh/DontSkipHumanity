@@ -27,7 +27,7 @@ const BTN_ACTIVE =
 const FILTER_BTN =
   "text-xs rounded-[3px] px-4 py-2 bg-[#1B1B1B]/40 border border-transparent text-white/60 hover:text-white/80 transition-colors";
 const FILTER_BTN_ACTIVE =
-  "text-xs rounded-[3px] px-4 py-2 bg-[#3D0F2F] border border-[#3D0F2F] text-white";
+  "text-xs rounded-[3px] px-4 py-2 bg-[#3D0F2F] border border-[#F0F0F0] text-white";
 
 /* ── Component ── */
 
@@ -326,13 +326,12 @@ export default function FilmsListing({ films }: { films: Film[] }) {
           {/* Right — form filters */}
           <div className="flex items-center gap-2">
             {[
-              { value: "all" as const, label: "All" },
               { value: "documentary" as const, label: "Documentary" },
               { value: "fiction" as const, label: "Fiction" },
             ].map((tab) => (
               <button
                 key={tab.value}
-                onClick={() => setFormFilter(tab.value)}
+                onClick={() => setFormFilter(formFilter === tab.value ? "all" : tab.value)}
                 className={formFilter === tab.value ? FILTER_BTN_ACTIVE : FILTER_BTN}
               >
                 {tab.label}
