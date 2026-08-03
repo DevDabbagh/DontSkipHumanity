@@ -19,7 +19,7 @@ const SUPPORT_PILLARS = [
     num: "03",
     title: "Redistribution",
     desc: "Direct support to the communities the work comes from.",
-    color: "#8665A7",
+    color: "#595C5C",
   },
 ];
 
@@ -46,12 +46,12 @@ export default function SupportCTA() {
             <p className="text-xs tracking-[0.25em] text-dsh-label uppercase mb-4">
               Support
             </p>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight text-dsh-text-primary">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight text-[#FFFFFF]">
               Not pity — solidarity.
               <br />
-              <span className="text-dsh-desc">Lorem ipsum new line please.</span>
+              Lorem ipsum new line please.
             </h2>
-            <p className="text-sm text-dsh-desc mt-6 leading-relaxed max-w-lg">
+            <p className="text-sm text-[#595C5C] mt-6 leading-relaxed max-w-lg">
               Independent political film, journalism, and education don&apos;t pay for
               themselves, and we don&apos;t want them owned by those who could.
               Support keeps the work free of editorial strings: it funds production,
@@ -66,8 +66,8 @@ export default function SupportCTA() {
               <div key={p.num} className={`reveal stagger-${i + 1} flex gap-6 items-start`}>
                 <span className="text-xs font-mono mt-1" style={{ color: p.color }}>{p.num}</span>
                 <div>
-                  <h4 className="text-dsh-text-primary font-medium">{p.title}</h4>
-                  <p className="text-sm text-dsh-desc mt-1">{p.desc}</p>
+                  <h4 className="text-[#FFFFFF] font-medium">{p.title}</h4>
+                  <p className="text-sm text-[#595C5C] mt-1">{p.desc}</p>
                 </div>
               </div>
             ))}
@@ -78,29 +78,29 @@ export default function SupportCTA() {
         <div className="grid md:grid-cols-2 gap-6">
           {/* Give monthly */}
           <div className="reveal-scale stagger-1 rounded-[6px] bg-[#1A1A1A]/80 backdrop-blur-sm border border-white/5 p-8">
-            <p className="text-xs tracking-[0.2em] text-dsh-label uppercase mb-2">
+            <p className="text-xs tracking-[0.2em] text-[#FFFFFF59] uppercase mb-2">
               Recurring
             </p>
-            <h3 className="text-2xl font-semibold text-dsh-text-primary">Give monthly</h3>
-            <p className="text-sm text-dsh-desc mt-2">
+            <h3 className="text-2xl font-semibold text-[#FFFFFF]">Give monthly</h3>
+            <p className="text-sm text-[#FFFFFF73] mt-2">
               Ongoing solidarity. The most useful kind.
             </p>
-            <button className="mt-6 w-full py-3 rounded-[3px] gradient-fill-btn text-sm text-white font-medium flex items-center justify-center gap-2">
-              Give Monthly ♡
+            <button className="mt-6 w-full py-3 rounded-[3px] gradient-fill-btn text-sm text-[#F0F0F0] font-medium flex items-center justify-center gap-2">
+              Give monthly ♡
             </button>
           </div>
 
           {/* Support the work */}
           <div className="reveal-scale stagger-2 rounded-[6px] bg-[#1A1A1A]/80 backdrop-blur-sm border border-white/5 p-8">
-            <p className="text-xs tracking-[0.2em] text-dsh-label uppercase mb-2">
+            <p className="text-xs tracking-[0.2em] text-[#FFFFFF40] uppercase mb-2">
               One-time
             </p>
-            <h3 className="text-2xl font-semibold text-dsh-text-primary">Support the work</h3>
-            <p className="text-sm text-dsh-desc mt-2">
+            <h3 className="text-2xl font-semibold text-[#FFFFFF]">Support the work</h3>
+            <p className="text-sm text-[#595C5C] mt-2">
               A single contribution, any amount.
             </p>
-            <button className="mt-6 w-full py-3 rounded-[3px] border border-dsh-text-primary/20 text-sm text-dsh-text-primary/60 font-medium flex items-center justify-center gap-2 hover:bg-dsh-btn-bg/20 transition-colors">
-              Support Our Work ♡
+            <button className="mt-6 w-full py-3 rounded-[3px] border border-dsh-text-primary/20 text-sm text-[#F0F0F0] font-medium flex items-center justify-center gap-2 hover:bg-dsh-btn-bg/20 transition-colors">
+              Support our work ♡
             </button>
           </div>
         </div>
