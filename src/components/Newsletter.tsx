@@ -9,15 +9,15 @@ export default function Newsletter() {
 
   return (
     <section className="relative py-16 sm:py-20 lg:py-24 overflow-hidden" ref={sectionRef}>
-      {/* Background image — ic_newsletter */}
+      {/* Background image — ic_newsletter, B&W with shadow */}
       <img
         src="/images/newsletter-bg.jpg"
         alt=""
         className="absolute inset-0 w-full h-full object-cover"
-        style={{ filter: "brightness(0.3) contrast(1.05) saturate(0.6)" }}
+        style={{ filter: "grayscale(1) brightness(0.25) contrast(1.1)" }}
       />
-      {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/50" />
+      {/* Dark overlay for depth */}
+      <div className="absolute inset-0 bg-black/40" />
 
       <div className="relative max-w-xl mx-auto px-5 sm:px-8 text-center">
         <h2 className="reveal text-2xl sm:text-3xl md:text-4xl font-bold text-white">
@@ -30,17 +30,8 @@ export default function Newsletter() {
           Work that names what power tries to hide. No noise.
         </p>
 
-        {/* Decorative scissor line */}
-        <div className="reveal stagger-2 flex items-center justify-center gap-2 my-6 sm:my-8">
-          <div className="flex-1 border-t border-dashed border-[#32C6CC]/30" />
-          <svg className="w-4 h-4 text-[#32C6CC]/40 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-          <div className="flex-1 border-t border-dashed border-[#32C6CC]/30" />
-        </div>
-
         {/* Email input */}
-        <div className="reveal stagger-3 space-y-3">
+        <div className="reveal stagger-2 mt-8 sm:mt-10 space-y-3">
           <input
             type="email"
             placeholder="Email address"
@@ -65,7 +56,7 @@ export default function Newsletter() {
           </button>
         </div>
 
-        <p className="reveal stagger-4 text-xs text-[#595C5C] mt-4">
+        <p className="reveal stagger-3 text-xs text-[#595C5C] mt-4">
           I agree to receive emails from DSH. We don&apos;t share your data.
         </p>
       </div>
