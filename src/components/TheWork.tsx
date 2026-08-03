@@ -63,13 +63,13 @@ export default function TheWork() {
             <path d="M16.2111 11.1056L9.73666 7.86833C8.93878 7.46939 8 8.04958 8 8.94164V15.0584C8 15.9504 8.93878 16.5306 9.73666 16.1317L16.2111 12.8944C16.9482 12.5259 16.9482 11.4741 16.2111 11.1056Z" stroke="#B23495" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </h3>
-        <p className="text-xs sm:text-sm text-dsh-desc mt-2 sm:mt-3 md:mt-4 leading-relaxed max-w-lg line-clamp-4 min-h-[4.9rem] sm:min-h-[5.7rem]">
+        <p className="text-xs sm:text-sm md:text-base text-dsh-desc leading-relaxed max-w-lg line-clamp-4">
           Documentary and fiction that stay close — to siege, displacement,
           and the daily labour of remaining human — and refuse the distance
           through which violence is made acceptable. Festivals, screenings,
           distribution, and the political context around each film.
         </p>
-        <Link href="/film/free-fish" className="mt-3 sm:mt-4 md:mt-6 inline-block text-xs sm:text-sm border border-white/15 rounded-[3px] px-4 sm:px-6 py-2 sm:py-2.5 text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 hover:border-white/25 transition-colors">
+        <Link href="/film/free-fish" className="inline-block text-xs sm:text-sm border border-white/15 rounded-[3px] px-4 sm:px-6 py-2 sm:py-2.5 text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 hover:border-white/25 transition-colors">
           Explore Films <span className="text-[#B23495]">+</span>
         </Link>
       </CurtainReveal>
@@ -85,7 +85,7 @@ export default function TheWork() {
           />
         }
       >
-        <div id="studio" />
+        <div id="studio" className="absolute" />
         <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold flex items-center gap-2 text-dsh-text-primary">
           Studio
           <svg className="w-4 h-4 md:w-5 md:h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -94,12 +94,12 @@ export default function TheWork() {
             <path d="M12 21V19" stroke="#8665A7" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </h3>
-        <p className="text-xs sm:text-sm text-dsh-desc mt-2 sm:mt-3 md:mt-4 leading-relaxed max-w-lg line-clamp-4 min-h-[4.9rem] sm:min-h-[5.7rem]">
+        <p className="text-xs sm:text-sm md:text-base text-dsh-desc leading-relaxed max-w-lg line-clamp-4">
           Docuseries, videocasts, podcasts, and series — and the production
           and co-production capacity behind them. Bold, independent media
           that strengthens movements, made with the same politics and care.
         </p>
-        <Link href="/film/beneath-the-canopy" className="mt-3 sm:mt-4 md:mt-6 inline-block text-xs sm:text-sm border border-white/15 rounded-[3px] px-4 sm:px-6 py-2 sm:py-2.5 text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 hover:border-white/25 transition-colors">
+        <Link href="/film/beneath-the-canopy" className="inline-block text-xs sm:text-sm border border-white/15 rounded-[3px] px-4 sm:px-6 py-2 sm:py-2.5 text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 hover:border-white/25 transition-colors">
           Explore Studio <span className="text-[#8665A7]">+</span>
         </Link>
       </CurtainReveal>

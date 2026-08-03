@@ -51,14 +51,14 @@ export default function CurtainReveal({
       ref={ref}
       className={`relative overflow-hidden h-[300px] sm:h-[260px] md:h-[280px] ${className}`}
     >
-      {/* ── Text layer: fixed height (same as the section), fits its content ── */}
+      {/* ── Text layer: title top, desc center, button bottom ── */}
       <div
-        className={`absolute top-0 bottom-0 w-1/2 flex items-center ${
+        className={`absolute top-0 bottom-0 w-1/2 ${
           mirrored ? "left-0" : "right-0"
         }`}
       >
         <div
-          className={`w-full transition-opacity duration-[900ms] ease-out ${
+          className={`h-full flex flex-col justify-between py-6 sm:py-8 md:py-10 transition-opacity duration-[900ms] ease-out ${
             revealed ? "opacity-100" : "opacity-0"
           } ${
             mirrored
