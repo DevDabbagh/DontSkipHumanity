@@ -76,8 +76,18 @@ export default function SupportCTA() {
 
         {/* Two CTA cards */}
         <div className="grid md:grid-cols-2 gap-6">
-          {/* Give monthly */}
-          <div className="reveal-scale stagger-1 rounded-[6px] bg-[#1A1A1A]/80 backdrop-blur-sm border border-white/5 p-8">
+          {/* Give monthly — highlighted card with teal→pink gradient wash */}
+          <div
+            className="reveal-scale stagger-1 rounded-[6px] p-8"
+            style={{
+              background:
+                "linear-gradient(110deg, #32C6CC14 0%, #B2349533 100%), rgba(16,16,20,0.55)",
+              border: "1px solid #F0F0F01A",
+              boxShadow: "0 6px 20px 2px rgba(0,0,0,0.30)",
+              backdropFilter: "blur(6px)",
+              WebkitBackdropFilter: "blur(6px)",
+            }}
+          >
             <p className="text-xs tracking-[0.2em] text-[#FFFFFF59] uppercase mb-2">
               Recurring
             </p>
@@ -90,8 +100,17 @@ export default function SupportCTA() {
             </button>
           </div>
 
-          {/* Support the work */}
-          <div className="reveal-scale stagger-2 rounded-[6px] bg-[#1A1A1A]/80 backdrop-blur-sm border border-white/5 p-8">
+          {/* Support the work — plain dark card, same border + shadow */}
+          <div
+            className="reveal-scale stagger-2 rounded-[6px] p-8"
+            style={{
+              background: "rgba(16,16,20,0.45)",
+              border: "1px solid #F0F0F01A",
+              boxShadow: "0 6px 20px 2px rgba(0,0,0,0.30)",
+              backdropFilter: "blur(6px)",
+              WebkitBackdropFilter: "blur(6px)",
+            }}
+          >
             <p className="text-xs tracking-[0.2em] text-[#FFFFFF40] uppercase mb-2">
               One-time
             </p>
