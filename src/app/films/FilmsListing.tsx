@@ -25,9 +25,9 @@ const BTN_ACTIVE =
 
 /* Filter bar buttons */
 const FILTER_BTN =
-  "text-xs rounded-[3px] px-4 py-2 bg-[#1B1B1B]/40 border border-transparent text-white/60 hover:text-white/80 transition-colors";
+  "text-xs rounded-[3px] px-4 py-2 bg-[#1B1B1B] border border-transparent text-white/60 hover:text-white/80 transition-colors";
 const FILTER_BTN_ACTIVE =
-  "text-xs rounded-[3px] px-4 py-2 bg-[#3D0F2F] border border-[#F0F0F0] text-white";
+  "text-xs rounded-[3px] px-4 py-2 bg-[#3D0F2F] border border-[#F0F0F0]/20 text-white";
 
 /* ── Component ── */
 
