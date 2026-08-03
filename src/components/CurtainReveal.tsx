@@ -60,7 +60,7 @@ export default function CurtainReveal({
         }`}
       >
         <div
-          className={`w-full h-full flex flex-col justify-between py-8 sm:py-9 md:py-10 transition-opacity duration-[900ms] ease-out ${
+          className={`w-full h-full flex flex-col justify-between transition-opacity duration-[900ms] ease-out ${
             revealed ? "opacity-100" : "opacity-0"
           } ${
             mirrored
