@@ -16,7 +16,7 @@ export default function Journalism() {
           <ScrollColorImage
             src="/images/journalism.jpg"
             alt="Read — editorial and long-form"
-            className="h-full md:rounded-tl-[6px] md:rounded-bl-[6px]"
+            className="aspect-[9/2] md:rounded-tl-[6px] md:rounded-bl-[6px]"
           />
         }
       >

@@ -66,6 +66,10 @@ function MoreIcon({ color }: { color: string }) {
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
+        d="M8 11.5V7.5H7.5C7.22386 7.5 7 7.27614 7 7C7 6.72386 7.22386 6.5 7.5 6.5H8C8.55228 6.5 9 6.94772 9 7.5V11.5H9.5C9.77614 11.5 10 11.7239 10 12C10 12.2761 9.77614 12.5 9.5 12.5H9C8.44772 12.5 8 12.0523 8 11.5ZM8.50977 4.5C8.78591 4.5 9.00977 4.72386 9.00977 5C9.00977 5.27614 8.78591 5.5 8.50977 5.5H8.5C8.22386 5.49999 8 5.27614 8 5C8 4.72386 8.22386 4.50001 8.5 4.5H8.50977Z"
+        fill={color}
+      />
+      <path
         d="M10.3401 0.201388C9.25049 -0.040176 8.12382 -0.0646233 7.02469 0.129123C5.92541 0.322955 4.87431 0.731518 3.93289 1.33127C2.99154 1.93101 2.17759 2.71091 1.53738 3.62522C0.897259 4.5395 0.443016 5.57073 0.201443 6.66037C-0.0401211 7.75 -0.0645695 8.87667 0.129177 9.9758C0.323009 11.0751 0.731573 12.1262 1.33133 13.0676C1.93106 14.0089 2.71096 14.8229 3.62527 15.4631C4.53955 16.1032 5.57079 16.5575 6.66043 16.799C7.75005 17.0406 8.87672 17.0651 9.97586 16.8713C11.0751 16.6775 12.1262 16.2689 13.0677 15.6692C14.009 15.0694 14.823 14.2895 15.4632 13.3752C16.1033 12.4609 16.5575 11.4297 16.7991 10.3401C17.0407 9.25043 17.0651 8.12377 16.8714 7.02463C16.6775 5.92535 16.269 4.87426 15.6692 3.93283C15.0695 2.99149 14.2896 2.17753 13.3753 1.53733C12.461 0.897203 11.4298 0.442961 10.3401 0.201388ZM7.19754 1.11447C8.16741 0.94346 9.16183 0.964828 10.1233 1.17795C11.0849 1.39112 11.9952 1.79174 12.802 2.35666C13.6088 2.92159 14.2963 3.64025 14.8255 4.47092C15.3545 5.30141 15.715 6.22776 15.886 7.19748C16.057 8.16735 16.0357 9.16177 15.8225 10.1233C15.6094 11.0848 15.2087 11.9952 14.6438 12.802C14.0789 13.6088 13.3602 14.2962 12.5296 14.8254C11.6991 15.3545 10.7727 15.7149 9.80301 15.886C8.83314 16.057 7.83872 16.0356 6.87722 15.8225C5.91566 15.6093 5.00531 15.2087 4.19851 14.6438C3.39172 14.0788 2.70427 13.3602 2.17508 12.5295C1.64603 11.699 1.28557 10.7727 1.11453 9.80295C0.943516 8.83308 0.964884 7.83866 1.17801 6.87717C1.39118 5.9156 1.79179 5.00525 2.35672 4.19846C2.92164 3.39166 3.64031 2.70422 4.47097 2.17502C5.30147 1.64598 6.22782 1.28552 7.19754 1.11447Z"
         fill={color}
       />
@@ -82,15 +86,15 @@ export default function Agenda() {
       ref={sectionRef}
     >
       {/* ── Header row ── */}
-      <div className="reveal flex items-start justify-between mb-10 sm:mb-12">
+      <div className="reveal flex items-end justify-between mb-10 sm:mb-12">
         <div>
           <p className="text-xs tracking-[0.25em] uppercase mb-4 text-[#363636]">
             Agenda
           </p>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold leading-tight max-w-2xl text-[#F0F0F0]">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold leading-tight max-w-2xl text-[#F0F0F0]">
             DSH makes documentary and fiction
-            <br className="hidden md:block" />
-            {" "}– from development and production to festivals.
+            <br />
+            – from development and production to festivals.
           </h2>
         </div>
 
@@ -180,7 +184,7 @@ export default function Agenda() {
                 {/* More button */}
                 <div className="shrink-0">
                   <span
-                    className="inline-flex items-center gap-2 text-xs sm:text-sm rounded-full px-3 sm:px-4 py-1.5 sm:py-2 transition-opacity group-hover:opacity-80"
+                    className="inline-flex items-center gap-2 text-xs sm:text-sm rounded-[3px] px-3 sm:px-4 py-1.5 sm:py-2 transition-opacity group-hover:opacity-80"
                     style={{
                       background: colors.moreBg,
                       color: colors.text,

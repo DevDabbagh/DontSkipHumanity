@@ -12,7 +12,7 @@ export default function Academy() {
           <ScrollColorImage
             src="/images/political-education.jpg"
             alt="Academy — political education"
-            className="h-full md:rounded-tr-[6px] md:rounded-br-[6px]"
+            className="aspect-[9/2] md:rounded-tr-[6px] md:rounded-br-[6px]"
           />
         }
       >

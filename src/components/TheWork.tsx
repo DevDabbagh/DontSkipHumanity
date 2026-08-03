@@ -53,7 +53,7 @@ export default function TheWork() {
           <ScrollColorImage
             src="/images/slider1.jpg"
             alt="Elderly hands clasped together"
-            className="h-full md:rounded-tr-[6px] md:rounded-br-[6px]"
+            className="aspect-[9/2] md:rounded-tr-[6px] md:rounded-br-[6px]"
           />
         }
       >
@@ -81,7 +81,7 @@ export default function TheWork() {
           <ScrollColorImage
             src="/images/studio.jpg"
             alt="Studio portrait"
-            className="h-full md:rounded-tl-[6px] md:rounded-bl-[6px]"
+            className="aspect-[9/2] md:rounded-tl-[6px] md:rounded-bl-[6px]"
           />
         }
       >
