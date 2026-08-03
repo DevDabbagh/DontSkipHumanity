@@ -5,11 +5,14 @@ import { type ReactNode, useRef, useState, useEffect } from "react";
 /**
  * One-time curtain-reveal editorial section.
  *
- * Initial state: image covers ~100% width, text hidden behind it.
- * When the section first enters the viewport, the image slides to 50%,
- * uncovering the text. This happens ONCE — after the transition completes
- * the layout is permanently locked at 50/50. Scrolling back up does NOT
- * reverse the animation.
+ * The section has a FIXED height (equal to the image strip) that never
+ * changes — before, during, or after the reveal. Only the image WIDTH
+ * animates 100% → 50% (sliding to uncover the text); its height stays
+ * constant, so the section never grows/shrinks vertically.
+ *
+ * Both halves are exactly this fixed height, so the text (heading +
+ * up-to-4-line description + button) always fits inside without any
+ * internal scroll or overflow. The reveal happens ONCE and does not reverse.
  */
 export default function CurtainReveal({
   image,
@@ -44,15 +47,18 @@ export default function CurtainReveal({
   }, []);
 
   return (
-    <div ref={ref} className={`relative overflow-x-hidden ${className}`}>
-      {/* ── Text layer: positioned in the half that gets revealed ── */}
+    <div
+      ref={ref}
+      className={`relative overflow-hidden h-[300px] sm:h-[260px] md:h-[280px] ${className}`}
+    >
+      {/* ── Text layer: fixed height (same as the section), fits its content ── */}
       <div
         className={`absolute top-0 bottom-0 w-1/2 flex items-center ${
           mirrored ? "left-0" : "right-0"
         }`}
       >
         <div
-          className={`w-full py-4 transition-opacity duration-[900ms] ease-out ${
+          className={`w-full transition-opacity duration-[900ms] ease-out ${
             revealed ? "opacity-100" : "opacity-0"
           } ${
             mirrored
@@ -65,9 +71,9 @@ export default function CurtainReveal({
         </div>
       </div>
 
-      {/* ── Image curtain: starts at 100%, transitions once to 50% ── */}
+      {/* ── Image curtain: full height always; only WIDTH animates 100% → 50% ── */}
       <div
-        className={`relative z-10 transition-[width] duration-[900ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] ${
+        className={`relative z-10 h-full transition-[width] duration-[900ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] ${
           mirrored ? "ml-auto" : ""
         }`}
         style={{ width: revealed ? "50%" : "100%" }}
