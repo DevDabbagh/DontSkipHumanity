@@ -173,7 +173,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
             Featured
           </p>
 
-          <div className="flex flex-col md:flex-row gap-10 md:gap-14">
+          <div className="flex flex-col md:flex-row md:items-center gap-10 md:gap-14">
             {/* Poster — premium editorial card, 444×612 ratio */}
             <div className="relative shrink-0 w-full md:w-[444px]">
               <Link href={`/film/${featured.slug}`} className="block group">
@@ -188,12 +188,9 @@ export default function FilmsListing({ films }: { films: Film[] }) {
                     src={featured.posterUrl || featured.thumbnailUrl}
                     alt={featured.title}
                     className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
-                    style={{
-                      filter: "saturate(0.25) brightness(0.75) contrast(1.1)",
-                    }}
                   />
                   {/* Soft dark overlay for blending into dark page */}
-                  <div className="absolute inset-0 bg-black/10" />
+                  <div className="absolute inset-0 bg-black/5" />
                 </div>
               </Link>
               {/* Navigation arrow */}
@@ -213,7 +210,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
             </div>
 
             {/* Info — right */}
-            <div className="flex-1 md:pt-2">
+            <div className="flex-1">
               {/* Category + year — #B23495 */}
               <div className="flex items-center gap-3 mb-5">
                 <span className="text-[#B23495] text-[15px]">

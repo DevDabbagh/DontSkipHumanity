@@ -9,7 +9,8 @@ import type { Film } from "@/lib/types";
 
 /* ── Shared bits ── */
 
-const LABEL = "text-[11px] tracking-[0.28em] text-white/30 uppercase";
+/* Section labels — Figma spec: #363636 */
+const LABEL = "text-[11px] tracking-[0.28em] text-[#363636] uppercase";
 /* Outline button — Figma spec: text F0F0F0/40, stroke F0F0F0/20, bg 1B1B1B/20, radius 3 */
 const BTN =
   "text-sm rounded-[3px] px-5 py-2.5 border border-[#F0F0F0]/20 bg-[#1B1B1B]/20 text-[#F0F0F0]/40 hover:text-[#F0F0F0]/70 hover:border-[#F0F0F0]/30 transition-colors inline-flex items-center gap-2";
