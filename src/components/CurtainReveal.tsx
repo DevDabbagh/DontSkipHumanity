@@ -47,17 +47,17 @@ export default function CurtainReveal({
     <div ref={ref} className={`relative overflow-x-hidden ${className}`}>
       {/* ── Text layer: positioned in the half that gets revealed ── */}
       <div
-        className={`absolute top-0 bottom-0 w-1/2 flex items-center overflow-hidden ${
+        className={`absolute top-0 bottom-0 w-1/2 flex items-center ${
           mirrored ? "left-0" : "right-0"
         }`}
       >
         <div
-          className={`w-full transition-opacity duration-[900ms] ease-out ${
+          className={`w-full py-4 transition-opacity duration-[900ms] ease-out ${
             revealed ? "opacity-100" : "opacity-0"
           } ${
             mirrored
-              ? "pr-14 pl-[max(2rem,calc((100vw-1400px)/2+2rem))]"
-              : "pl-14 pr-[max(2rem,calc((100vw-1400px)/2+2rem))]"
+              ? "pr-6 md:pr-14 pl-[max(1.5rem,calc((100vw-1400px)/2+2rem))]"
+              : "pl-6 md:pl-14 pr-[max(1.5rem,calc((100vw-1400px)/2+2rem))]"
           }`}
           style={{ transitionDelay: "300ms" }}
         >
