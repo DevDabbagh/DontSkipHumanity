@@ -173,16 +173,15 @@ export default function FilmsListing({ films }: { films: Film[] }) {
             Featured
           </p>
 
-          <div className="flex flex-col md:flex-row gap-8 md:gap-10">
+          <div className="flex flex-col md:flex-row gap-8 md:gap-12">
             {/* Poster — left */}
-            <div className="relative w-full md:w-[42%] shrink-0">
+            <div className="relative w-full md:w-[48%] shrink-0">
               <Link href={`/film/${featured.slug}`} className="block group">
-                <div className="relative aspect-[4/3] rounded-[6px] overflow-hidden border border-white/[0.06] shadow-lg shadow-black/40">
+                <div className="relative aspect-[4/5] rounded-[6px] overflow-hidden border border-white/[0.06] shadow-lg shadow-black/40">
                   <img
                     src={featured.posterUrl || featured.thumbnailUrl}
                     alt={featured.title}
                     className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
-                    style={{ filter: "grayscale(0.15) brightness(0.85) contrast(1.05)" }}
                   />
                 </div>
               </Link>
@@ -193,9 +192,9 @@ export default function FilmsListing({ films }: { films: Film[] }) {
                     setFeaturedIdx((i) => (i + 1) % featuredFilms.length)
                   }
                   aria-label="Next featured film"
-                  className="absolute right-4 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 border border-white/20 flex items-center justify-center text-white/70 hover:text-white hover:bg-black/70 transition-colors backdrop-blur-sm"
+                  className="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 border border-white/15 flex items-center justify-center text-white/50 hover:text-white hover:bg-black/60 transition-colors backdrop-blur-sm"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
@@ -203,53 +202,53 @@ export default function FilmsListing({ films }: { films: Film[] }) {
             </div>
 
             {/* Info — right */}
-            <div className="flex-1 md:pt-2">
+            <div className="flex-1 md:pt-4">
               {/* Category + year */}
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-[#B23495] text-sm">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-[#B23495] text-[15px]">
                   {featured.credits.form === "documentary" ? "Documentary" : "Fiction"}
                 </span>
-                <span className="text-white/30 text-sm">{featured.credits.year}</span>
+                <span className="text-white/35 text-[15px]">{featured.credits.year}</span>
               </div>
 
               {/* Title */}
-              <h2 className="text-2xl sm:text-[28px] font-bold leading-tight">
+              <h2 className="text-3xl sm:text-[38px] font-bold leading-[1.1]">
                 {featured.title}
               </h2>
 
               {/* Short description */}
-              <p className="text-[13px] text-white/40 mt-4 leading-relaxed max-w-md">
+              <p className="text-[15px] text-white/50 mt-6 leading-[1.7] max-w-lg">
                 {featured.synopsisShort || featured.logline}
               </p>
 
               {/* Directed by */}
-              <p className="text-[10px] tracking-[0.2em] text-white/20 uppercase mt-6 mb-1">
+              <p className="text-[10px] tracking-[0.25em] text-white/30 uppercase mt-10 mb-1.5">
                 Directed by
               </p>
-              <p className="text-[13px] text-white/60">
+              <p className="text-[15px] text-white/80">
                 {featured.credits.direction}
               </p>
 
               {/* Longer description */}
-              <p className="text-[13px] text-white/35 mt-6 leading-relaxed max-w-lg">
+              <p className="text-[15px] text-white/40 mt-8 leading-[1.7] max-w-lg">
                 {featured.editorialContext || featured.logline}
               </p>
 
               {/* Buttons */}
-              <div className="flex items-center gap-4 mt-8">
+              <div className="flex items-center gap-6 mt-10">
                 {featured.trailerUrl && (
                   <a
                     href={featured.trailerUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={BTN}
+                    className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white/80 hover:text-white hover:border-white/25 transition-colors inline-flex items-center gap-2"
                   >
                     Watch trailer <span className="text-[#B23495]">▶</span>
                   </a>
                 )}
                 <Link
                   href={`/film/${featured.slug}`}
-                  className="text-xs text-white/35 hover:text-white/60 transition-colors"
+                  className="text-sm text-white/40 hover:text-white/65 transition-colors"
                 >
                   Know more
                 </Link>
@@ -340,7 +339,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
             No films match these filters yet.
           </p>
         ) : (
-          <div className="space-y-14 sm:space-y-16 pb-20 sm:pb-24">
+          <div className="space-y-16 sm:space-y-20 pb-20 sm:pb-24">
             {rows.map((row, ri) => (
               <div
                 key={ri}
@@ -366,74 +365,76 @@ function FilmRow({ film }: { film: Film }) {
   const stage = STAGE_LABELS[film.stage] ?? film.stage;
 
   return (
-    <div className="flex gap-5">
-      {/* Poster — B&W, cinematic */}
-      <Link
-        href={`/film/${film.slug}`}
-        className="shrink-0 w-[160px] sm:w-[180px] group"
-      >
-        <div className="relative aspect-[3/4] rounded-[4px] overflow-hidden border border-white/[0.06]">
-          <img
-            src={film.posterUrl || film.thumbnailUrl}
-            alt={film.title}
-            className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
-            style={{
-              filter: "grayscale(1) brightness(0.55) contrast(1.1)",
-            }}
-          />
-        </div>
-      </Link>
-
-      {/* Info */}
-      <div className="flex-1 min-w-0 pt-1">
-        {/* Category chips + year */}
-        <div className="flex flex-wrap items-center gap-2 mb-2">
-          <span className="text-[10px] px-2 py-0.5 rounded-[3px] bg-[#B23495] text-white font-medium">
-            {film.credits.form === "documentary" ? "Documentary" : "Fiction"}
-          </span>
-          <span className="text-[10px] px-2 py-0.5 rounded-[3px] border border-white/10 text-white/50">
-            {stage}
-          </span>
-          <span className="text-[10px] text-white/30">{film.credits.year}</span>
-        </div>
-
-        {/* Title */}
-        <Link href={`/film/${film.slug}`}>
-          <h3 className="text-base sm:text-lg font-bold text-white leading-snug hover:text-white/80 transition-colors">
-            {film.title}
-          </h3>
+    <div className="flex flex-col">
+      <div className="flex gap-6">
+        {/* Poster — B&W, cinematic */}
+        <Link
+          href={`/film/${film.slug}`}
+          className="shrink-0 w-[180px] sm:w-[210px] group"
+        >
+          <div className="relative aspect-[4/5] rounded-[4px] overflow-hidden border border-white/[0.06]">
+            <img
+              src={film.posterUrl || film.thumbnailUrl}
+              alt={film.title}
+              className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+              style={{
+                filter: "grayscale(1) brightness(0.55) contrast(1.1)",
+              }}
+            />
+          </div>
         </Link>
 
-        {/* Description */}
-        <p className="text-[12px] text-white/35 mt-2 leading-relaxed line-clamp-3">
-          {film.logline}
-        </p>
+        {/* Info */}
+        <div className="flex-1 min-w-0 pt-1">
+          {/* Category chips + year */}
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            <span className="text-[11px] px-2.5 py-1 rounded-[3px] bg-[#B23495] text-white font-medium">
+              {film.credits.form === "documentary" ? "Documentary" : "Fiction"}
+            </span>
+            <span className="text-[11px] px-2.5 py-1 rounded-[3px] border border-white/10 text-white/50">
+              {stage}
+            </span>
+            <span className="text-[11px] text-white/30">{film.credits.year}</span>
+          </div>
 
-        {/* Directed by */}
-        <p className="text-[9px] tracking-[0.2em] text-white/15 uppercase mt-4 mb-0.5">
-          Directed by
-        </p>
-        <p className="text-[12px] text-white/45">{film.credits.direction}</p>
-
-        {/* Buttons */}
-        <div className="flex items-center gap-3 mt-4">
-          {film.trailerUrl && (
-            <a
-              href={film.trailerUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={BTN}
-            >
-              Watch trailer <span className="text-[#B23495]">▶</span>
-            </a>
-          )}
-          <Link
-            href={`/film/${film.slug}`}
-            className="text-xs text-white/30 hover:text-white/55 transition-colors"
-          >
-            Know more
+          {/* Title */}
+          <Link href={`/film/${film.slug}`}>
+            <h3 className="text-lg sm:text-[22px] font-bold text-white leading-snug hover:text-white/80 transition-colors">
+              {film.title}
+            </h3>
           </Link>
+
+          {/* Description */}
+          <p className="text-[14px] text-white/40 mt-3 leading-[1.7] line-clamp-3">
+            {film.logline}
+          </p>
+
+          {/* Directed by */}
+          <p className="text-[10px] tracking-[0.25em] text-white/25 uppercase mt-6 mb-1">
+            Directed by
+          </p>
+          <p className="text-[14px] text-white/60">{film.credits.direction}</p>
         </div>
+      </div>
+
+      {/* Buttons — below the card */}
+      <div className="flex items-center gap-4 mt-6 pl-0">
+        {film.trailerUrl && (
+          <a
+            href={film.trailerUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white/80 hover:text-white hover:border-white/25 transition-colors inline-flex items-center gap-2"
+          >
+            Watch trailer <span className="text-[#B23495]">▶</span>
+          </a>
+        )}
+        <Link
+          href={`/film/${film.slug}`}
+          className="text-sm text-white/35 hover:text-white/60 transition-colors"
+        >
+          Know more
+        </Link>
       </div>
     </div>
   );
