@@ -259,36 +259,36 @@ export default function FilmsListing({ films }: { films: Film[] }) {
       )}
 
       {/* ═══════════════════════════════════════
-          GRADIENT BANNER
+          CINEMATIC EDITORIAL BANNER
          ═══════════════════════════════════════ */}
-      <section className="relative overflow-hidden py-14 sm:py-16 lg:py-20">
-        {/* Layer 1: cinematic B&W image, very dark */}
+      <section className="relative overflow-hidden h-[280px] sm:h-[340px] lg:h-[400px] flex items-center">
+        {/* Layer 1: full-width background photograph — clearly visible */}
         <img
           src="/images/studio.jpg"
           alt=""
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover object-center"
           style={{
-            filter: "grayscale(1) brightness(0.12) contrast(0.9)",
-            opacity: 0.35,
+            filter: "grayscale(0.6) brightness(0.35) contrast(1.05)",
           }}
         />
-        {/* Layer 2: black overlay */}
-        <div className="absolute inset-0 bg-black/70" />
-        {/* Layer 3: purple gradient from right */}
+        {/* Layer 2: dark cinematic overlay — darkens but image stays visible */}
+        <div className="absolute inset-0 bg-black/40" />
+        {/* Layer 3: very subtle purple accent from right */}
         <div
           className="absolute inset-0"
           style={{
-            background: "linear-gradient(270deg, rgba(178,52,149,0.18) 0%, rgba(134,101,167,0.08) 40%, transparent 70%)",
+            background: "linear-gradient(270deg, rgba(134,101,167,0.12) 0%, rgba(178,52,149,0.04) 35%, transparent 60%)",
           }}
         />
 
-        {/* Text */}
-        <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8">
-          <h3 className="text-xl sm:text-2xl md:text-[28px] font-semibold leading-snug max-w-2xl text-white">
+        {/* Text — left-aligned, vertically centered */}
+        <div className="relative max-w-[1200px] w-full mx-auto px-5 sm:px-8">
+          <h3 className="text-2xl sm:text-3xl md:text-[36px] font-semibold leading-[1.25] text-white max-w-2xl">
             Development, Production, Post-production
-            <br className="hidden sm:block" />
-            choose whatever feels right to you
           </h3>
+          <p className="text-lg sm:text-xl md:text-[24px] font-medium leading-[1.3] text-white/90 mt-2">
+            choose whatever feels right to you
+          </p>
         </div>
       </section>
 
