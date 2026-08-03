@@ -68,7 +68,7 @@ export default function FilmContent({
       {/* ═══════════════════════════════════════
           HERO
          ═══════════════════════════════════════ */}
-      <section className="relative overflow-hidden pt-[96px] lg:pt-[104px] min-h-[62vh] lg:min-h-[70vh] flex flex-col justify-end">
+      <section className="relative overflow-hidden pt-[96px] lg:pt-[104px] min-h-[62vh] lg:min-h-[70vh] flex flex-col justify-end border-b border-[#161616]">
         {/* Background image — right-anchored, purple-tinted */}
         <div className="absolute inset-0">
           <img
@@ -110,14 +110,14 @@ export default function FilmContent({
 
           {/* Title */}
           <h1
-            className="font-semibold text-[34px] leading-[38px] sm:text-[44px] sm:leading-[48px] max-w-3xl"
+            className="font-semibold text-[34px] leading-[38px] sm:text-[44px] sm:leading-[48px] max-w-3xl text-[#F0F0F0]"
             style={{ letterSpacing: "-0.02em" }}
           >
             {film.title}
           </h1>
 
           {/* Short description */}
-          <p className="text-[16px] leading-[24px] text-white/45 mt-5 max-w-xl">
+          <p className="text-[16px] leading-[24px] text-[#595C5C] mt-5 max-w-xl">
             {film.synopsisShort}
           </p>
 
@@ -158,16 +158,20 @@ export default function FilmContent({
             {/* Synopsis + editorial */}
             <div className="reveal-right flex-1">
               <p className={LABEL}>Synopsis</p>
+              {/* short synopsis — 595C5C, long synopsis — 363636 */}
+              <p className="mt-5 text-[16px] leading-[26px] text-[#595C5C]">
+                {film.synopsisShort}
+              </p>
               <div className="mt-5 space-y-5">
                 {synopsisParas.map((p, i) => (
-                  <p key={i} className="text-[16px] leading-[26px] text-white/60">
+                  <p key={i} className="text-[16px] leading-[26px] text-[#363636]">
                     {p}
                   </p>
                 ))}
               </div>
 
               <p className={`${LABEL} mt-12`}>Editorial context</p>
-              <p className="mt-5 text-[16px] leading-[26px] text-white/45">
+              <p className="mt-5 text-[16px] leading-[26px] text-[#595C5C]">
                 {film.editorialContext}
               </p>
 
@@ -192,11 +196,11 @@ export default function FilmContent({
            ═══════════════════════════════════════ */}
         <section className="max-w-[1200px] mx-auto px-5 sm:px-8 pb-16 sm:pb-20">
           <p className={`${LABEL} mb-8`}>Credits</p>
-          <div className="border-t border-white/[0.08]">
+          <div className="border-t border-[#161616]">
             {credits.map((c) => (
               <div
                 key={c.label}
-                className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-8 py-4 border-b border-white/[0.08]"
+                className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-8 py-4 border-b border-[#161616]"
               >
                 <span className="text-[11px] tracking-[0.2em] text-white/30 uppercase w-full sm:w-56 shrink-0">
                   {c.label}
@@ -229,11 +233,11 @@ export default function FilmContent({
         {film.festivals.length > 0 && (
           <section className="max-w-[1200px] mx-auto px-5 sm:px-8 py-16 sm:py-20">
             <p className={`${LABEL} mb-8`}>Festivals &amp; Awards</p>
-            <div className="border-t border-white/[0.08]">
+            <div className="border-t border-[#161616]">
               {film.festivals.map((f, i) => (
                 <div
                   key={i}
-                  className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-8 py-4 border-b border-white/[0.08]"
+                  className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-8 py-4 border-b border-[#161616]"
                 >
                   <span className="text-[13px] text-white/30 w-16 shrink-0">{f.year}</span>
                   <span className="text-[15px] text-white/80 flex-1">{f.name}</span>
@@ -250,11 +254,11 @@ export default function FilmContent({
         {film.screenings.length > 0 && (
           <section className="max-w-[1200px] mx-auto px-5 sm:px-8 pb-16 sm:pb-20">
             <p className={`${LABEL} mb-8`}>Where to watch</p>
-            <div className="border-t border-white/[0.08]">
+            <div className="border-t border-[#161616]">
               {film.screenings.map((s, i) => (
                 <div
                   key={i}
-                  className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-8 py-4 border-b border-white/[0.08]"
+                  className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-8 py-4 border-b border-[#161616]"
                 >
                   <span className="text-[13px] text-white/30 w-28 shrink-0">{formatDate(s.date)}</span>
                   <span className="text-[15px] text-white/80 flex-1">{s.event}</span>
@@ -293,7 +297,7 @@ export default function FilmContent({
         )}
 
         {/* Distribution actions */}
-        <section className="max-w-[1200px] mx-auto px-5 sm:px-8 pb-20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b border-white/[0.08]">
+        <section className="max-w-[1200px] mx-auto px-5 sm:px-8 pb-20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b border-[#161616]">
           <button className={BTN}>share this project</button>
           <div className="flex flex-wrap items-center gap-x-8 gap-y-2">
             <Link href="/#support" className={BTN_LINK}>Request a screener</Link>
@@ -323,7 +327,7 @@ export default function FilmContent({
             work free of editorial strings.
           </p>
 
-          <div className="mt-10 max-w-md mx-auto rounded-[6px] border border-white/[0.08] bg-white/[0.02] p-6 text-left">
+          <div className="mt-10 max-w-md mx-auto rounded-[6px] border border-[#161616] bg-white/[0.02] p-6 text-left">
             <p className={LABEL}>Support</p>
             <h3 className="text-xl font-semibold mt-3">Support our work</h3>
             <p className="text-[14px] text-white/40 mt-2 leading-relaxed">
