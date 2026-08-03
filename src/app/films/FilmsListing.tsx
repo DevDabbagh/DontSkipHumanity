@@ -21,7 +21,13 @@ const STAGE_LABELS: Record<string, string> = {
 const BTN =
   "text-xs border border-white/15 rounded-[3px] px-4 py-2 text-white/80 hover:text-white hover:border-white/25 transition-colors inline-flex items-center gap-1.5";
 const BTN_ACTIVE =
-  "text-xs rounded-[3px] px-4 py-2 bg-[#B23495] border border-[#B23495] text-white";
+  "text-xs rounded-[3px] px-4 py-2 bg-[#3D0F2F] border border-[#3D0F2F] text-white";
+
+/* Filter bar buttons */
+const FILTER_BTN =
+  "text-xs rounded-[3px] px-4 py-2 bg-[#1B1B1B]/40 border border-transparent text-white/60 hover:text-white/80 transition-colors";
+const FILTER_BTN_ACTIVE =
+  "text-xs rounded-[3px] px-4 py-2 bg-[#3D0F2F] border border-[#3D0F2F] text-white";
 
 /* ── Component ── */
 
@@ -311,7 +317,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
               <button
                 key={tab.value}
                 onClick={() => setStageFilter(tab.value)}
-                className={stageFilter === tab.value ? BTN_ACTIVE : BTN}
+                className={stageFilter === tab.value ? FILTER_BTN_ACTIVE : FILTER_BTN}
               >
                 {tab.label}
               </button>
@@ -327,11 +333,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
               <button
                 key={tab.value}
                 onClick={() => setFormFilter(tab.value)}
-                className={
-                  formFilter === tab.value
-                    ? "text-xs rounded-[3px] px-4 py-2 bg-white/10 border border-white/25 text-white"
-                    : BTN
-                }
+                className={formFilter === tab.value ? FILTER_BTN_ACTIVE : FILTER_BTN}
               >
                 {tab.label}
               </button>
