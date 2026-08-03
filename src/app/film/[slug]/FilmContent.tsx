@@ -10,10 +10,12 @@ import type { Film } from "@/lib/types";
 /* ── Shared bits ── */
 
 const LABEL = "text-[11px] tracking-[0.28em] text-white/30 uppercase";
+/* Outline button — Figma spec: text F0F0F0/40, stroke F0F0F0/20, bg 1B1B1B/20, radius 3 */
 const BTN =
-  "text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white/80 bg-transparent hover:border-white/30 hover:text-white transition-colors inline-flex items-center gap-2";
+  "text-sm rounded-[3px] px-5 py-2.5 border border-[#F0F0F0]/20 bg-[#1B1B1B]/20 text-[#F0F0F0]/40 hover:text-[#F0F0F0]/70 hover:border-[#F0F0F0]/30 transition-colors inline-flex items-center gap-2";
+/* Text link — Figma spec: F0F0F0/30 */
 const BTN_LINK =
-  "text-sm text-white/45 hover:text-white transition-colors";
+  "text-sm text-[#F0F0F0]/30 hover:text-[#F0F0F0]/60 transition-colors";
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", {
@@ -102,7 +104,7 @@ export default function FilmContent({
           {/* Category + year */}
           <div className="flex items-center gap-3 mb-4">
             <span className="text-[#B23495] text-sm">{formLabel}</span>
-            <span className="text-white/35 text-sm">{film.credits.year}</span>
+            <span className="text-[#595C5C] text-sm">{film.credits.year}</span>
           </div>
 
           {/* Title */}
@@ -118,16 +120,16 @@ export default function FilmContent({
             {film.synopsisShort}
           </p>
 
-          {/* Actions */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-8 mt-9">
+          {/* Actions — Watch trailer far left, distribution links far right */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 sm:gap-8 mt-10">
             {film.trailerUrl && (
               <a href={film.trailerUrl} target="_blank" rel="noopener noreferrer" className={BTN}>
                 Watch trailer <span className="text-[#B23495]">▶</span>
               </a>
             )}
-            <div className="flex flex-wrap items-center gap-x-7 gap-y-2">
-              <Link href="/#support" className={BTN_LINK}>Request screener</Link>
-              <Link href="/#support" className={BTN_LINK}>Attend a screening</Link>
+            <div className="flex flex-wrap items-center gap-x-8 gap-y-2">
+              <Link href="/#support" className={BTN_LINK}>Request a screener</Link>
+              <Link href="/#support" className={BTN_LINK}>Request a screening</Link>
               <Link href="/#support" className={BTN_LINK}>Contact for distribution</Link>
             </div>
           </div>
@@ -292,9 +294,9 @@ export default function FilmContent({
         {/* Distribution actions */}
         <section className="max-w-[1200px] mx-auto px-5 sm:px-8 pb-20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b border-white/[0.08]">
           <button className={BTN}>share this project</button>
-          <div className="flex flex-wrap items-center gap-x-7 gap-y-2">
-            <Link href="/#support" className={BTN_LINK}>Request screener</Link>
-            <Link href="/#support" className={BTN_LINK}>Attend a screening</Link>
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-2">
+            <Link href="/#support" className={BTN_LINK}>Request a screener</Link>
+            <Link href="/#support" className={BTN_LINK}>Request a screening</Link>
             <Link href="/#support" className={BTN_LINK}>Contact for distribution</Link>
           </div>
         </section>
