@@ -63,7 +63,7 @@ export default function TheWork() {
             <path d="M16.2111 11.1056L9.73666 7.86833C8.93878 7.46939 8 8.04958 8 8.94164V15.0584C8 15.9504 8.93878 16.5306 9.73666 16.1317L16.2111 12.8944C16.9482 12.5259 16.9482 11.4741 16.2111 11.1056Z" stroke="#B23495" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </h3>
-        <p className="text-xs sm:text-sm text-dsh-desc mt-2 sm:mt-3 md:mt-4 leading-relaxed max-w-lg line-clamp-3">
+        <p className="text-xs sm:text-sm text-dsh-desc mt-2 sm:mt-3 md:mt-4 leading-relaxed max-w-lg line-clamp-4 min-h-[4.9rem] sm:min-h-[5.7rem]">
           Documentary and fiction that stay close — to siege, displacement,
           and the daily labour of remaining human — and refuse the distance
           through which violence is made acceptable. Festivals, screenings,
@@ -94,7 +94,7 @@ export default function TheWork() {
             <path d="M12 21V19" stroke="#8665A7" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </h3>
-        <p className="text-xs sm:text-sm text-dsh-desc mt-2 sm:mt-3 md:mt-4 leading-relaxed max-w-lg line-clamp-3">
+        <p className="text-xs sm:text-sm text-dsh-desc mt-2 sm:mt-3 md:mt-4 leading-relaxed max-w-lg line-clamp-4 min-h-[4.9rem] sm:min-h-[5.7rem]">
           Docuseries, videocasts, podcasts, and series — and the production
           and co-production capacity behind them. Bold, independent media
           that strengthens movements, made with the same politics and care.
