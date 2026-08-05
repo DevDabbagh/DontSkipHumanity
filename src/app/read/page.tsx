@@ -1,4 +1,6 @@
 import { getArticles } from "@/lib/api";
+
+export const dynamic = "force-dynamic";
 import ReadListing from "./ReadListing";
 
 export const metadata = {

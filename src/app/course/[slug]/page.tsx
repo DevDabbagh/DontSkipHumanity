@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 import { getProgramBySlug, getPrograms } from "@/lib/api";
 import CourseContent from "./CourseContent";
 

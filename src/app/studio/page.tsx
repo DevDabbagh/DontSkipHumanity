@@ -1,4 +1,6 @@
 import { getStudioProjects } from "@/lib/api";
+
+export const dynamic = "force-dynamic";
 import StudioListing from "./StudioListing";
 
 export const metadata = {

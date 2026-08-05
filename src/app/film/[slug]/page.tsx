@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 import { getFilmBySlug, getAllFilms } from "@/lib/api";
 import FilmContent from "./FilmContent";
 

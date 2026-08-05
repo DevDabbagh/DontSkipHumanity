@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 import { getEventBySlug, getEvents } from "@/lib/api";
 import EventContent from "./EventContent";
 

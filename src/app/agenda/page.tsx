@@ -1,4 +1,6 @@
 import { getEvents } from "@/lib/api";
+
+export const dynamic = "force-dynamic";
 import AgendaListing from "./AgendaListing";
 
 export const metadata = {

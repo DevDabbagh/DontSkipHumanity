@@ -1,4 +1,6 @@
 import { getPrograms } from "@/lib/api";
+
+export const dynamic = "force-dynamic";
 import AcademyListing from "./AcademyListing";
 
 export const metadata = {
