@@ -10,9 +10,31 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Don't Skip Humanity — Stories That Change How You See The World",
+  title: {
+    default: "Don't Skip Humanity — Stories That Change How You See The World",
+    template: "%s — Don't Skip Humanity",
+  },
   description:
     "Independent media platform for impact storytelling, documentary films, courses, and collective liberation.",
+  metadataBase: new URL("https://dont-skip-humanity.vercel.app"),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName: "Don't Skip Humanity",
+    title: "Don't Skip Humanity — Stories That Change How You See The World",
+    description:
+      "Independent media platform for impact storytelling, documentary films, courses, and collective liberation.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Don't Skip Humanity",
+    description:
+      "Independent media platform for impact storytelling, documentary films, courses, and collective liberation.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
