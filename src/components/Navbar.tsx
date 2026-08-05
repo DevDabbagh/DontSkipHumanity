@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import LoginModal from "./LoginModal";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
 
 const NAV_ACTIVE_COLOR = "#B23495";
 
@@ -30,11 +31,19 @@ const MENU_LINKS = [
   { label: "Membership", href: "/#support" },
 ];
 
-const SOCIAL_LINKS = [
+const DEFAULT_SOCIAL_LINKS = [
   { label: "Instagram", href: "https://instagram.com/dontskiphumanity" },
-  { label: "Vimeo", href: "https://vimeo.com/dontskiphumanity" },
+  { label: "YouTube", href: "https://youtube.com/@dontskiphumanity" },
   { label: "Newsletter", href: "/#newsletter" },
 ];
+
+const SOCIAL_KEY_TO_LABEL: Record<string, string> = {
+  instagram: "Instagram",
+  facebook: "Facebook",
+  youtube: "YouTube",
+  linkedin: "LinkedIn",
+  x: "X",
+};
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -47,6 +56,35 @@ export default function Navbar() {
   const isLoggedIn = !!user;
 
   const [scrolled, setScrolled] = useState(false);
+  const [socialLinks, setSocialLinks] = useState(DEFAULT_SOCIAL_LINKS);
+
+  // Fetch social links from Supabase
+  useEffect(() => {
+    supabase
+      .from("site_settings")
+      .select("value")
+      .eq("key", "social_links")
+      .single()
+      .then(({ data }) => {
+        if (data?.value) {
+          try {
+            const parsed: Record<string, string> =
+              typeof data.value === "string" ? JSON.parse(data.value) : data.value;
+            const links = Object.entries(parsed)
+              .filter(([, url]) => url && url.trim() !== "")
+              .map(([key, url]) => ({
+                label: SOCIAL_KEY_TO_LABEL[key] ?? key,
+                href: url,
+              }));
+            // Always keep Newsletter link at the end
+            links.push({ label: "Newsletter", href: "/#newsletter" });
+            if (links.length > 1) setSocialLinks(links);
+          } catch {
+            // keep defaults
+          }
+        }
+      });
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -288,7 +326,7 @@ export default function Navbar() {
 
           {/* Bottom: social links */}
           <div className="pb-8 sm:pb-12 flex items-center gap-6">
-            {SOCIAL_LINKS.map((link) => (
+            {socialLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}

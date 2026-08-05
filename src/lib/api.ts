@@ -1,12 +1,14 @@
 /**
  * API Service Layer
  * ─────────────────
- * Reads the data_source setting from Supabase (set via dashboard Settings toggle).
+ * Reads per-module data_source settings from Supabase (set via dashboard Settings → Data Switcher).
  *
- * "mock" → always return mock data
- * "live" → try Supabase for published content, fallback to mock if empty/error
+ * Each module (films, studio, academy, articles, events, impact) can independently be:
+ *   "mock" → return mock data
+ *   "live" → try Supabase for published content, fallback to mock if empty/error
  *
- * The setting is cached per request cycle so we only read it once.
+ * Falls back to the legacy global "data_source" key if per-module settings don't exist.
+ * Settings are cached for 10 seconds to avoid hammering Supabase.
  */
 
 import type { Film, AcademyProgram, Article, DSHEvent, StudioProject } from "./types";
@@ -24,47 +26,91 @@ import {
   getEventBySlug as mockGetEvent,
 } from "./mock-data";
 
-// ─── Data Source Check ──────────────────────────────────────────
+// ─── Data Source Check (per-module) ─────────────────────────────
 
-let _cachedSource: "mock" | "live" | null = null;
+type ContentModule = "films" | "studio" | "academy" | "articles" | "events" | "impact";
+type ModuleSources = Record<ContentModule, "mock" | "live">;
+
+let _cachedModuleSources: ModuleSources | null = null;
 let _cacheTime = 0;
-const CACHE_TTL = 10_000; // 10 seconds — keeps it fresh without hammering Supabase
+const CACHE_TTL = 10_000; // 10 seconds
 
-async function getDataSource(): Promise<"mock" | "live"> {
+const DEFAULT_SOURCES: ModuleSources = {
+  films: "mock", studio: "mock", academy: "mock",
+  articles: "mock", events: "mock", impact: "mock",
+};
+
+/**
+ * Safely parse a JSONB value from Supabase.
+ * The value column is JSONB, so supabase-js may return:
+ *  - a JS string (for JSONB string values like "live")
+ *  - a JS object (for JSONB objects)
+ *  - a JSON-encoded string that needs parsing (if stored via JSON.stringify)
+ */
+function parseJsonb(val: unknown): unknown {
+  if (typeof val === "string") {
+    try { return JSON.parse(val); } catch { return val; }
+  }
+  return val;
+}
+
+async function loadDataSources(): Promise<void> {
   const now = Date.now();
-  if (_cachedSource && now - _cacheTime < CACHE_TTL) return _cachedSource;
+  if (_cachedModuleSources && now - _cacheTime < CACHE_TTL) return;
 
   try {
     const { data, error } = await supabase
       .from("site_settings")
-      .select("value")
-      .eq("key", "data_source")
-      .single();
+      .select("key, value")
+      .in("key", ["data_source_modules", "data_source"]);
 
     if (!error && data) {
-      // value is stored as JSON string: '"mock"' or '"live"'
-      const raw = typeof data.value === "string" ? data.value : JSON.stringify(data.value);
-      const parsed = JSON.parse(raw);
-      if (parsed === "mock" || parsed === "live") {
-        _cachedSource = parsed;
-        _cacheTime = now;
-        return parsed;
+      // Try per-module settings first
+      const modulesRow = data.find((r: any) => r.key === "data_source_modules");
+      if (modulesRow) {
+        const raw = parseJsonb(modulesRow.value);
+        if (raw && typeof raw === "object") {
+          const merged = { ...DEFAULT_SOURCES };
+          for (const key of Object.keys(merged) as ContentModule[]) {
+            if ((raw as any)[key] === "mock" || (raw as any)[key] === "live") {
+              merged[key] = (raw as any)[key];
+            }
+          }
+          _cachedModuleSources = merged;
+          _cacheTime = now;
+          return;
+        }
+      }
+
+      // Fallback: legacy global data_source
+      const globalRow = data.find((r: any) => r.key === "data_source");
+      if (globalRow) {
+        const parsed = parseJsonb(globalRow.value);
+        if (parsed === "mock" || parsed === "live") {
+          _cachedModuleSources = Object.fromEntries(
+            Object.keys(DEFAULT_SOURCES).map((k) => [k, parsed])
+          ) as ModuleSources;
+          _cacheTime = now;
+          return;
+        }
       }
     }
   } catch {}
 
-  // Default to mock if we can't read the setting
-  return "mock";
+  // Default to all mock
+  _cachedModuleSources = { ...DEFAULT_SOURCES };
+  _cacheTime = now;
 }
 
-async function isLive(): Promise<boolean> {
-  return (await getDataSource()) === "live";
+async function isModuleLive(module: ContentModule): Promise<boolean> {
+  await loadDataSources();
+  return _cachedModuleSources?.[module] === "live";
 }
 
 // ─── Films ──────────────────────────────────────────────────────
 
 export async function getFilms(): Promise<Film[]> {
-  if (await isLive()) {
+  if (await isModuleLive("films")) {
     try {
       const { data, error } = await supabase
         .from("films")
@@ -80,7 +126,7 @@ export async function getFilms(): Promise<Film[]> {
 }
 
 export async function getFeaturedFilms(): Promise<Film[]> {
-  if (await isLive()) {
+  if (await isModuleLive("films")) {
     try {
       const { data, error } = await supabase
         .from("films")
@@ -96,7 +142,7 @@ export async function getFeaturedFilms(): Promise<Film[]> {
 }
 
 export async function getFilmBySlug(slug: string): Promise<Film | null> {
-  if (await isLive()) {
+  if (await isModuleLive("films")) {
     try {
       const { data, error } = await supabase
         .from("films")
@@ -118,7 +164,7 @@ export async function getAllFilms(): Promise<Film[]> {
 // ─── Studio ─────────────────────────────────────────────────────
 
 export async function getStudioProjects(): Promise<StudioProject[]> {
-  if (await isLive()) {
+  if (await isModuleLive("studio")) {
     try {
       const { data, error } = await supabase
         .from("studio_items")
@@ -135,7 +181,7 @@ export async function getStudioProjects(): Promise<StudioProject[]> {
 // ─── Academy Programs ───────────────────────────────────────────
 
 export async function getPrograms(): Promise<AcademyProgram[]> {
-  if (await isLive()) {
+  if (await isModuleLive("academy")) {
     try {
       const { data, error } = await supabase
         .from("academy_programs")
@@ -150,7 +196,7 @@ export async function getPrograms(): Promise<AcademyProgram[]> {
 }
 
 export async function getProgramBySlug(slug: string): Promise<AcademyProgram | null> {
-  if (await isLive()) {
+  if (await isModuleLive("academy")) {
     try {
       const { data, error } = await supabase
         .from("academy_programs")
@@ -168,7 +214,7 @@ export async function getProgramBySlug(slug: string): Promise<AcademyProgram | n
 // ─── Articles ───────────────────────────────────────────────────
 
 export async function getArticles(): Promise<Article[]> {
-  if (await isLive()) {
+  if (await isModuleLive("articles")) {
     try {
       const { data, error } = await supabase
         .from("articles")
@@ -183,7 +229,7 @@ export async function getArticles(): Promise<Article[]> {
 }
 
 export async function getArticleBySlug(slug: string): Promise<Article | null> {
-  if (await isLive()) {
+  if (await isModuleLive("articles")) {
     try {
       const { data, error } = await supabase
         .from("articles")
@@ -201,7 +247,7 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
 // ─── Events ─────────────────────────────────────────────────────
 
 export async function getEvents(): Promise<DSHEvent[]> {
-  if (await isLive()) {
+  if (await isModuleLive("events")) {
     try {
       const { data, error } = await supabase
         .from("events")
@@ -215,7 +261,7 @@ export async function getEvents(): Promise<DSHEvent[]> {
 }
 
 export async function getUpcomingEvents(): Promise<DSHEvent[]> {
-  if (await isLive()) {
+  if (await isModuleLive("events")) {
     try {
       const { data, error } = await supabase
         .from("events")
@@ -230,7 +276,7 @@ export async function getUpcomingEvents(): Promise<DSHEvent[]> {
 }
 
 export async function getEventBySlug(slug: string): Promise<DSHEvent | null> {
-  if (await isLive()) {
+  if (await isModuleLive("events")) {
     try {
       const { data, error } = await supabase
         .from("events")
@@ -247,7 +293,7 @@ export async function getEventBySlug(slug: string): Promise<DSHEvent | null> {
 // ─── Dashboard Stats (for impact section) ───────────────────────
 
 export async function getDashboardStats() {
-  if (await isLive()) {
+  if (await isModuleLive("impact")) {
     try {
       const { data, error } = await supabase
         .from("impact_stats")
