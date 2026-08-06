@@ -190,23 +190,21 @@ export default function FilmsListing({ films }: { films: Film[] }) {
           </p>
 
           <div className="flex flex-col md:flex-row md:items-center gap-10 md:gap-14">
-            {/* Poster — premium editorial card, 444×612 ratio */}
-            <div className="relative shrink-0 w-full md:w-[444px]">
+            {/* Poster — premium editorial card, 612×444 ratio */}
+            <div className="relative shrink-0 w-full md:w-[55%]">
               <Link href={`/film/${featured.slug}`} className="block group">
                 <div
-                  className="relative overflow-hidden rounded-[8px] border border-white/[0.08]"
+                  className="relative overflow-hidden"
                   style={{
                     aspectRatio: "612 / 444",
-                    boxShadow: "0 20px 60px -12px rgba(0,0,0,0.6), 0 8px 24px -4px rgba(0,0,0,0.4)",
                   }}
                 >
                   <img
                     src={featured.posterUrl || featured.thumbnailUrl}
                     alt={featured.title}
                     className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
+                    style={{ opacity: 0.8 }}
                   />
-                  {/* Soft dark overlay for blending into dark page */}
-                  <div className="absolute inset-0 bg-black/5" />
                 </div>
               </Link>
               {/* Navigation arrow */}
