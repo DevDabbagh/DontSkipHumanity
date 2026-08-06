@@ -42,18 +42,38 @@ export default function FilmContent({
       ? "Short"
       : "Series";
 
-  /* Credits list — label / value pairs from the data model */
-  const credits: { label: string; value: string }[] = [
-    { label: "Directed by", value: film.credits.direction },
-    { label: "Production", value: film.credits.production },
-    ...(film.credits.coProduction
-      ? [{ label: "Co-production", value: film.credits.coProduction }]
-      : []),
-    { label: "Year", value: film.credits.year },
-    { label: "Runtime", value: film.credits.duration },
-    { label: "Genre", value: `${formLabel} · ${formatLabel}` },
-    { label: "Language", value: film.credits.language },
-    { label: "Country", value: film.credits.country },
+  const STAGE_LABEL: Record<string, string> = {
+    development: "Development",
+    production: "Production",
+    post_production: "Post-production",
+    festivals: "Festivals",
+    distribution: "Distribution",
+    impact: "Impact",
+  };
+
+  /* Credits — grouped. Value colors per spec:
+     group 1 (people) → #F0F0F0, group 2 (facts) → #595C5C,
+     Stage / Status → #771D5C. Labels are always #363636. */
+  type Credit = { label: string; value: string; color: string };
+  const creditGroups: Credit[][] = [
+    [
+      { label: "Directed by", value: film.credits.direction, color: "#F0F0F0" },
+      { label: "Produced by", value: film.credits.production, color: "#F0F0F0" },
+      ...(film.credits.coProduction
+        ? [{ label: "Co-production", value: film.credits.coProduction, color: "#F0F0F0" }]
+        : []),
+    ],
+    [
+      { label: "Year", value: film.credits.year, color: "#595C5C" },
+      { label: "Duration", value: film.credits.duration, color: "#595C5C" },
+      { label: "Form", value: formLabel, color: "#595C5C" },
+      { label: "Format", value: formatLabel, color: "#595C5C" },
+      { label: "Language", value: film.credits.language, color: "#595C5C" },
+      { label: "Country", value: film.credits.country, color: "#595C5C" },
+    ],
+    [
+      { label: "Stage / Status", value: STAGE_LABEL[film.stage] ?? film.stage, color: "#771D5C" },
+    ],
   ];
 
   /* Split the long synopsis into paragraphs on sentence groups */
@@ -161,8 +181,9 @@ export default function FilmContent({
               </div>
             </div>
 
-            {/* Synopsis + editorial */}
+            {/* Synopsis + Editorial + Credits — dividers (#161616) between each */}
             <div className="reveal-right flex-1">
+              {/* Synopsis */}
               <p className={LABEL}>Synopsis</p>
               {/* short synopsis — 595C5C, long synopsis — 363636 */}
               <p className="mt-5 text-[16px] leading-[26px] text-[#595C5C]">
@@ -176,11 +197,14 @@ export default function FilmContent({
                 ))}
               </div>
 
-              <p className={`${LABEL} mt-12`}>Editorial context</p>
+              {/* divider */}
+              <div className="border-t border-[#161616] my-10" />
+
+              {/* Editorial context */}
+              <p className={LABEL}>Editorial context</p>
               <p className="mt-5 text-[16px] leading-[26px] text-[#595C5C]">
                 {film.editorialContext}
               </p>
-
               {film.themes.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-8">
                   {film.themes.map((t) => (
@@ -193,30 +217,28 @@ export default function FilmContent({
                   ))}
                 </div>
               )}
-            </div>
-          </div>
-        </section>
 
-        {/* ═══════════════════════════════════════
-            CREDITS
-           ═══════════════════════════════════════ */}
-        <section className="max-w-[1200px] mx-auto px-5 sm:px-8 pb-16 sm:pb-20">
-          {/* Spacer matches the poster column so Credits aligns left with
-              the Synopsis / Editorial context text above it */}
-          <div className="flex flex-col md:flex-row gap-10 md:gap-16">
-            <div className="hidden md:block shrink-0 w-[320px]" aria-hidden />
-            <div className="flex-1">
-              <p className={`${LABEL} mb-8`}>Credits</p>
-              <div className="border-t border-[#161616]">
-                {credits.map((c) => (
-                  <div
-                    key={c.label}
-                    className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-8 py-4 border-b border-[#161616]"
-                  >
-                    <span className="text-[11px] tracking-[0.2em] text-white/30 uppercase w-full sm:w-56 shrink-0">
-                      {c.label}
-                    </span>
-                    <span className="text-[15px] text-white/75">{c.value}</span>
+              {/* divider */}
+              <div className="border-t border-[#161616] my-10" />
+
+              {/* Credits */}
+              <p className={LABEL}>Credits</p>
+              <div className="mt-6 space-y-8">
+                {creditGroups.map((group, gi) => (
+                  <div key={gi} className="space-y-3">
+                    {group.map((c) => (
+                      <div
+                        key={c.label}
+                        className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-8"
+                      >
+                        <span className="text-[11px] tracking-[0.2em] text-[#363636] uppercase w-full sm:w-56 shrink-0">
+                          {c.label}
+                        </span>
+                        <span className="text-[15px]" style={{ color: c.color }}>
+                          {c.value}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 ))}
               </div>
