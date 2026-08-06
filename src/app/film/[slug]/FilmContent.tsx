@@ -69,23 +69,29 @@ export default function FilmContent({
           HERO
          ═══════════════════════════════════════ */}
       <section className="relative overflow-hidden pt-[96px] lg:pt-[104px] min-h-[62vh] lg:min-h-[70vh] flex flex-col justify-end border-b border-[#161616]">
-        {/* Background image — right-anchored, purple-tinted */}
-        <div className="absolute inset-0">
+        {/* Background — dark base + photo @30% + purple diagonal @20% + vertical blend */}
+        <div className="absolute inset-0 bg-[#0D0D0D]">
+          {/* Photograph — 30% opacity */}
           <img
             src={film.posterUrl || film.thumbnailUrl}
             alt=""
             className="absolute inset-0 w-full h-full object-cover"
-            style={{ objectPosition: "70% 30%" }}
+            style={{ objectPosition: "70% 30%", opacity: 0.3, filter: "grayscale(1)" }}
           />
-          {/* left → right darkening so text reads on the left */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0A0A0A] via-[#0A0A0A]/85 to-[#0A0A0A]/30" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/20 to-transparent" />
-          {/* purple wash from the right */}
+          {/* Linear 2 — diagonal #0D0D0D → #B23495, whole layer 20% */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background: "linear-gradient(135deg, #0D0D0D 0%, #B23495 100%)",
+              opacity: 0.2,
+            }}
+          />
+          {/* Linear 1 — vertical #0D0D0D top & bottom (readability + blend) */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(270deg, rgba(134,101,167,0.35) 0%, rgba(178,52,149,0.10) 35%, transparent 65%)",
+                "linear-gradient(180deg, #0D0D0D 0%, rgba(13,13,13,0) 35%, rgba(13,13,13,0) 62%, #0D0D0D 100%)",
             }}
           />
         </div>
@@ -150,7 +156,7 @@ export default function FilmContent({
                   src={film.posterUrl || film.thumbnailUrl}
                   alt={film.title}
                   className="w-full h-full object-cover"
-                  style={{ filter: "brightness(0.95) contrast(1)" }}
+                  style={{ opacity: 0.8 }}
                 />
               </div>
             </div>
@@ -195,19 +201,26 @@ export default function FilmContent({
             CREDITS
            ═══════════════════════════════════════ */}
         <section className="max-w-[1200px] mx-auto px-5 sm:px-8 pb-16 sm:pb-20">
-          <p className={`${LABEL} mb-8`}>Credits</p>
-          <div className="border-t border-[#161616]">
-            {credits.map((c) => (
-              <div
-                key={c.label}
-                className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-8 py-4 border-b border-[#161616]"
-              >
-                <span className="text-[11px] tracking-[0.2em] text-white/30 uppercase w-full sm:w-56 shrink-0">
-                  {c.label}
-                </span>
-                <span className="text-[15px] text-white/75">{c.value}</span>
+          {/* Spacer matches the poster column so Credits aligns left with
+              the Synopsis / Editorial context text above it */}
+          <div className="flex flex-col md:flex-row gap-10 md:gap-16">
+            <div className="hidden md:block shrink-0 w-[320px]" aria-hidden />
+            <div className="flex-1">
+              <p className={`${LABEL} mb-8`}>Credits</p>
+              <div className="border-t border-[#161616]">
+                {credits.map((c) => (
+                  <div
+                    key={c.label}
+                    className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-8 py-4 border-b border-[#161616]"
+                  >
+                    <span className="text-[11px] tracking-[0.2em] text-white/30 uppercase w-full sm:w-56 shrink-0">
+                      {c.label}
+                    </span>
+                    <span className="text-[15px] text-white/75">{c.value}</span>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </section>
       </div>
