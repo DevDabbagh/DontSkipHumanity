@@ -1,19 +1,18 @@
 /**
- * Environment variable validation — fail fast at build/startup, not at runtime.
+ * Environment variable validation.
+ * NEXT_PUBLIC_* vars are inlined at build time, so we warn instead of throwing
+ * to avoid crashing the entire app if something goes wrong during SSR.
  */
 
-function requireEnv(name: string): string {
+function getEnv(name: string, fallback = ""): string {
   const value = process.env[name];
-  if (!value) {
-    throw new Error(
-      `Missing required environment variable: ${name}. ` +
-      `Add it to .env.local or your Vercel project settings.`
-    );
+  if (!value && typeof window !== "undefined") {
+    console.warn(`[env] Missing ${name} — some features may not work.`);
   }
-  return value;
+  return value || fallback;
 }
 
 export const env = {
-  supabaseUrl: requireEnv("NEXT_PUBLIC_SUPABASE_URL"),
-  supabaseAnonKey: requireEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
+  supabaseUrl: getEnv("NEXT_PUBLIC_SUPABASE_URL"),
+  supabaseAnonKey: getEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
 } as const;
