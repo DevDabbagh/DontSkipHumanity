@@ -196,7 +196,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
                 <div
                   className="relative overflow-hidden rounded-[8px] border border-white/[0.08]"
                   style={{
-                    aspectRatio: "444 / 612",
+                    aspectRatio: "612 / 444",
                     boxShadow: "0 20px 60px -12px rgba(0,0,0,0.6), 0 8px 24px -4px rgba(0,0,0,0.4)",
                   }}
                 >
@@ -386,7 +386,7 @@ function FilmRow({ film }: { film: Film }) {
           href={`/film/${film.slug}`}
           className="shrink-0 w-[180px] sm:w-[210px] group"
         >
-          <div className="relative aspect-[4/5] rounded-[4px] overflow-hidden border border-white/[0.06]">
+          <div className="relative aspect-[612/444] rounded-[4px] overflow-hidden border border-white/[0.06]">
             <img
               src={film.posterUrl || film.thumbnailUrl}
               alt={film.title}
