@@ -1,12 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import type { Film, FilmStage } from "@/lib/types";
 
 /* ── Constants ── */
+
+/* Hero image — intentionally SEPARATE from the featured film poster below */
+const HERO_IMAGE = "/images/journalism.jpg";
 
 const STAGE_LABELS: Record<string, string> = {
   development: "Development",
@@ -49,6 +52,13 @@ export default function FilmsListing({ films }: { films: Film[] }) {
   const [stageFilter, setStageFilter] = useState<"all" | FilmStage>("all");
   const [formFilter, setFormFilter] = useState<"all" | Film["credits"]["form"]>("all");
 
+  /* Explore buttons — apply the form filter and scroll down to the list */
+  const listRef = useRef<HTMLDivElement>(null);
+  const exploreForm = (form: "documentary" | "fiction") => {
+    setFormFilter(form);
+    listRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   const rest = films.filter((f) => f.id !== featured?.id);
   const filtered = rest.filter((f) => {
     const stageOk = stageFilter === "all" || f.stage === stageFilter;
@@ -84,7 +94,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
             style={{ width: "max(64px, calc((100vw - 1264px) / 2))" }}
           >
             <img
-              src={featured.posterUrl || featured.thumbnailUrl}
+              src={HERO_IMAGE}
               alt=""
               className="absolute inset-0 w-full h-full object-cover"
               style={{
@@ -125,13 +135,13 @@ export default function FilmsListing({ films }: { films: Film[] }) {
               </p>
               <div className="flex items-center gap-3 mt-[60px]">
                 <button
-                  onClick={() => setFormFilter("documentary")}
+                  onClick={() => exploreForm("documentary")}
                   className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white/80 bg-transparent hover:border-white/30 hover:text-white transition-colors"
                 >
                   Explore documentaries
                 </button>
                 <button
-                  onClick={() => setFormFilter("fiction")}
+                  onClick={() => exploreForm("fiction")}
                   className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white/80 bg-transparent hover:border-white/30 hover:text-white transition-colors"
                 >
                   Explore fiction
@@ -149,7 +159,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
                 style={{ boxShadow: "0 24px 70px -20px rgba(0,0,0,0.7)" }}
               >
                 <img
-                  src={featured.posterUrl || featured.thumbnailUrl}
+                  src={HERO_IMAGE}
                   alt=""
                   className="absolute inset-0 w-full h-full object-cover"
                   style={{
@@ -276,40 +286,35 @@ export default function FilmsListing({ films }: { films: Film[] }) {
           CINEMATIC EDITORIAL BANNER
          ═══════════════════════════════════════ */}
       <section className="relative overflow-hidden h-[260px] sm:h-[320px] lg:h-[380px] flex items-center">
-        {/* Layer 1: full-width background photograph — visible, edge to edge */}
+        {/* Background photograph — very faint (5% opacity) */}
         <img
           src="/images/studio.jpg"
           alt=""
           className="absolute inset-0 w-full h-full object-cover object-center"
-          style={{
-            filter: "brightness(0.4) contrast(1.05) saturate(0.7)",
-          }}
+          style={{ filter: "grayscale(1)", opacity: 0.05 }}
         />
-        {/* Layer 2: dark overlay — keeps it cinematic but image is recognizable */}
-        <div className="absolute inset-0 bg-black/35" />
-        {/* Layer 3: purple wash from the right — visible but not dominant */}
+        {/* Purple wash from the right — subtle */}
         <div
           className="absolute inset-0"
           style={{
-            background: "linear-gradient(270deg, rgba(178,52,149,0.25) 0%, rgba(134,101,167,0.12) 40%, transparent 70%)",
+            background: "linear-gradient(270deg, rgba(178,52,149,0.12) 0%, rgba(134,101,167,0.06) 40%, transparent 70%)",
           }}
         />
 
-        {/* Text — left-aligned, vertically centered */}
+        {/* Text — both lines same size, same order */}
         <div className="relative max-w-[1200px] w-full mx-auto px-5 sm:px-8">
           <h3 className="text-2xl sm:text-3xl md:text-[36px] font-semibold leading-[1.25] text-white max-w-2xl">
             Development, Production, Post-production
-          </h3>
-          <p className="text-lg sm:text-xl md:text-[24px] font-medium leading-[1.3] text-white/85 mt-2">
+            <br />
             choose whatever feels right to you
-          </p>
+          </h3>
         </div>
       </section>
 
       {/* ═══════════════════════════════════════
           FILTER BAR
          ═══════════════════════════════════════ */}
-      <div className="max-w-[1200px] mx-auto px-5 sm:px-8 pt-12 sm:pt-14">
+      <div ref={listRef} className="max-w-[1200px] mx-auto px-5 sm:px-8 pt-12 sm:pt-14 scroll-mt-[100px]">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-12 sm:mb-14">
           {/* Left — stage filters */}
           <div className="flex flex-wrap items-center gap-2">
