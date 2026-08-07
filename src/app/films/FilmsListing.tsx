@@ -389,7 +389,7 @@ function FilmRow({ film }: { film: Film }) {
           href={`/film/${film.slug}`}
           className="shrink-0 w-[180px] sm:w-[210px] group"
         >
-          <div className="relative aspect-[612/444] rounded-[4px] overflow-hidden border border-white/[0.06]">
+          <div className="relative aspect-[4/5] rounded-[4px] overflow-hidden border border-white/[0.06]">
             <img
               src={film.posterUrl || film.thumbnailUrl}
               alt={film.title}
