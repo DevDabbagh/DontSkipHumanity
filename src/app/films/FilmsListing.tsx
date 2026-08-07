@@ -38,7 +38,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
   /* Featured */
   const featuredFilms = useMemo(() => films.filter((f) => f.isFeatured), [films]);
   const [featuredIdx, setFeaturedIdx] = useState(0);
-  const featured = featuredFilms[featuredIdx] ?? films[0] ?? null;
+  const featured = featuredFilms[featuredIdx] ?? null;
 
   /* Filters */
   const stageTabs = useMemo(() => {
@@ -59,7 +59,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
     listRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const rest = films.filter((f) => f.id !== featured?.id);
+  const rest = featured ? films.filter((f) => f.id !== featured.id) : films;
   const filtered = rest.filter((f) => {
     const stageOk = stageFilter === "all" || f.stage === stageFilter;
     const formOk = formFilter === "all" || f.credits.form === formFilter;

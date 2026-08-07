@@ -50,6 +50,7 @@ export function mapFilm(row: any): Film {
     trailerUrl: row.trailer_url || "",
     thumbnailUrl: row.thumbnail_url || "",
     posterUrl: row.poster_url || "",
+    detailsSliders: Array.isArray(row.details_sliders) ? row.details_sliders : [],
     festivals: Array.isArray(row.film_festivals)
       ? row.film_festivals.map((f: any): FilmFestival => ({
           name: f.name || "",

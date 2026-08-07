@@ -249,9 +249,9 @@ export default function FilmContent({
       </div>
 
       {/* ═══════════════════════════════════════
-          SCROLL GALLERY — horizontal strip, scroll-driven B&W reveal
+          SCROLL GALLERY — pinned horizontal, colour-on-focus
          ═══════════════════════════════════════ */}
-      <ScrollGallery />
+      <ScrollGallery images={film.detailsSliders} />
 
       <div>
         {/* ═══════════════════════════════════════

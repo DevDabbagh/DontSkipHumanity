@@ -49,6 +49,8 @@ export interface Film {
   trailerUrl: string;
   thumbnailUrl: string;
   posterUrl: string;
+  /* Detail-page horizontal gallery — up to 6 images (min 3 recommended) */
+  detailsSliders?: string[];
   festivals: FilmFestival[];
   pressQuotes: { source: string; quote: string }[];
   screenings: FilmScreening[];
