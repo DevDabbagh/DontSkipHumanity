@@ -225,12 +225,17 @@ export default function FilmsListing({ films }: { films: Film[] }) {
 
             {/* Info — right */}
             <div className="flex-1">
-              {/* Category + year — #B23495 */}
+              {/* Category + year */}
               <div className="flex items-center gap-3 mb-5">
-                <span className="text-[#B23495] text-[15px]">
+                <span
+                  className="text-[15px]"
+                  style={{ color: featured.credits.form === "documentary" ? "#B23495" : "#771D5C" }}
+                >
                   {featured.credits.form === "documentary" ? "Documentary" : "Fiction"}
                 </span>
-                <span className="text-[#B23495]/60 text-[15px]">{featured.credits.year}</span>
+                <span className="text-[15px]" style={{ color: featured.credits.form === "documentary" ? "rgba(178,52,149,0.6)" : "rgba(119,29,92,0.6)" }}>
+                  {featured.credits.year}
+                </span>
               </div>
 
               {/* Title — #F0F0F0 */}
@@ -400,7 +405,12 @@ function FilmRow({ film }: { film: Film }) {
         <div className="flex-1 min-w-0 pt-1">
           {/* Category chips + year */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span className="text-[11px] px-2.5 py-1 rounded-[3px] bg-[#B23495] text-white font-medium">
+            <span
+              className="text-[11px] px-2.5 py-1 rounded-[3px] text-white font-medium"
+              style={{
+                backgroundColor: film.credits.form === "documentary" ? "#B23495" : "rgba(119,29,92,0.7)",
+              }}
+            >
               {film.credits.form === "documentary" ? "Documentary" : "Fiction"}
             </span>
             <span className="text-[11px] px-2.5 py-1 rounded-[3px] border border-white/10 text-white/50">
