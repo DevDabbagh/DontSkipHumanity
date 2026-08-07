@@ -34,8 +34,8 @@ const FOOTER_LINKS = {
     { label: "Workshops", href: "/agenda" },
   ],
   Support: [
-    { label: "Support the work", href: "/#support" },
-    { label: "About DSH", href: "/#about" },
+    { label: "Support the work", href: "/support" },
+    { label: "About DSH", href: "/about" },
   ],
 };
 

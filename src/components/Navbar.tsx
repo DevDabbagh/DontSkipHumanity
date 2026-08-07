@@ -19,16 +19,16 @@ function isNavLinkActive(pathname: string, href: string) {
 const NAV_LINKS = [
   { label: "Films", href: "/films" },
   { label: "Academy", href: "/academy" },
-  { label: "About", href: "/#about" },
-  { label: "Support", href: "/#support" },
+  { label: "About", href: "/about" },
+  { label: "Support", href: "/support" },
 ];
 
 const MENU_LINKS = [
   { label: "Films", href: "/films" },
   { label: "Academy", href: "/academy" },
-  { label: "About", href: "/#about" },
-  { label: "Support", href: "/#support" },
-  { label: "Membership", href: "/#support" },
+  { label: "About", href: "/about" },
+  { label: "Support", href: "/support" },
+  { label: "Membership", href: "/support" },
 ];
 
 const DEFAULT_SOCIAL_LINKS = [

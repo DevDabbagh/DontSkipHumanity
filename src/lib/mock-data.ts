@@ -77,6 +77,13 @@ export const MOCK_FILMS: Film[] = [
     trailerUrl: "https://vimeo.com/example/beneathcanopy",
     thumbnailUrl: "/images/slider1.jpg",
     posterUrl: "/images/slider1.jpg",
+    detailsSliders: [
+      "/images/political-education.jpg",
+      "/images/journalism.jpg",
+      "/images/slider2.jpg",
+      "/images/studio.jpg",
+      "/images/slidere3.jpg",
+    ],
     festivals: [
       { name: "IDFA", year: "2025", selection: "Official Competition" },
       { name: "Rio International Film Festival", year: "2025", award: "Audience Award" },

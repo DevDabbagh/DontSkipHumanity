@@ -88,23 +88,21 @@ export default function FilmsListing({ films }: { films: Film[] }) {
          ═══════════════════════════════════════ */}
       <section className="relative overflow-hidden pt-[96px] lg:pt-[104px]">
         {/* Far-left preview strip — SAME image, another crop, fixed 80px */}
-        {featured && (
-          <div
-            className="hidden xl:block absolute top-[104px] left-0 h-[clamp(560px,42vw,780px)] overflow-hidden pointer-events-none select-none"
-            style={{ width: "max(64px, calc((100vw - 1264px) / 2))" }}
-          >
-            <img
-              src={HERO_IMAGE}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{
-                objectPosition: "20% 42%",
-                filter: "grayscale(1) brightness(0.5) contrast(0.92)",
-              }}
-            />
-            <div className="absolute inset-0 bg-black/45" />
-          </div>
-        )}
+        <div
+          className="hidden xl:block absolute top-[104px] left-0 h-[clamp(560px,42vw,780px)] overflow-hidden pointer-events-none select-none"
+          style={{ width: "max(64px, calc((100vw - 1264px) / 2))" }}
+        >
+          <img
+            src={HERO_IMAGE}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{
+              objectPosition: "20% 42%",
+              filter: "grayscale(1) brightness(0.5) contrast(0.92)",
+            }}
+          />
+          <div className="absolute inset-0 bg-black/45" />
+        </div>
 
         <div className="flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-0">
           {/* Text column — FIXED width, aligned to the page's 1200 container.
@@ -153,7 +151,6 @@ export default function FilmsListing({ films }: { films: Film[] }) {
           {/* Hero image — the ONLY fluid element. flex-1 + w-0 absorbs all
               remaining viewport width; object-cover reveals more as it widens. */}
           <div className="w-full lg:flex-1 lg:w-0 lg:min-w-0 px-5 sm:px-8 lg:px-0">
-            {featured && (
               <div
                 className="relative aspect-[4/3] lg:aspect-auto lg:h-[clamp(560px,42vw,780px)] overflow-hidden"
                 style={{ boxShadow: "0 24px 70px -20px rgba(0,0,0,0.7)" }}
@@ -174,7 +171,6 @@ export default function FilmsListing({ films }: { films: Film[] }) {
                 {/* Bottom shadow — the image fades into darkness at the bottom */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
               </div>
-            )}
           </div>
         </div>
       </section>
@@ -351,9 +347,19 @@ export default function FilmsListing({ films }: { films: Film[] }) {
         {/* ═══════════════════════════════════════
             FILM GRID — 2-column editorial rows
            ═══════════════════════════════════════ */}
-        {filtered.length === 0 ? (
+        {films.length === 0 ? (
+          <div className="py-24 text-center">
+            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-white/[0.03] border border-white/[0.06] flex items-center justify-center">
+              <svg className="w-7 h-7 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 01-1.125-1.125M3.375 19.5h1.5C5.496 19.5 6 18.996 6 18.375m-2.625 0V5.625m0 0A1.125 1.125 0 014.5 4.5h15a1.125 1.125 0 011.125 1.125v12.75M3.375 5.625h17.25m0 0v12.75m0 0a1.125 1.125 0 01-1.125 1.125m1.125-1.125H6m0 0l3-3m-3 3l3 3" />
+              </svg>
+            </div>
+            <p className="text-white/40 text-[15px] mb-2">No films available yet</p>
+            <p className="text-white/20 text-sm">Films will appear here once they are published.</p>
+          </div>
+        ) : filtered.length === 0 ? (
           <p className="text-white/30 text-sm py-16 text-center">
-            No films match these filters yet.
+            No films match these filters.
           </p>
         ) : (
           <div className="space-y-16 sm:space-y-20 pb-20 sm:pb-24">

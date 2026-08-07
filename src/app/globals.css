@@ -178,6 +178,37 @@
   100% { width: 100%; opacity: 1; }
 }
 
+/* Drifting image grid — About/Support hero backgrounds */
+@keyframes driftA {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-50%); }
+}
+@keyframes driftB {
+  from { transform: translateY(-50%); }
+  to   { transform: translateY(0); }
+}
+
+/* Hero line reveal used on About/Support pages */
+@keyframes heroLine {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Shimmering gradient headline text (Support hero) */
+@keyframes shimmerText {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+.shimmer-text {
+  background: linear-gradient(90deg, #9B59B6, #1ABC9C, #9B59B6, #1ABC9C);
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmerText 4s linear infinite;
+  animation-delay: 2s;
+}
+
 /* ═══════════════════════════════════════
    ANIMATION CLASSES
    ═══════════════════════════════════════ */
