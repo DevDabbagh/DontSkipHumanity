@@ -5,6 +5,7 @@ import { useReveal } from "@/hooks/useReveal";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Newsletter from "@/components/Newsletter";
+import ScrollGallery from "@/components/ScrollGallery";
 import type { Film } from "@/lib/types";
 
 /* ── Shared bits ── */
@@ -248,18 +249,9 @@ export default function FilmContent({
       </div>
 
       {/* ═══════════════════════════════════════
-          FULL-BLEED CINEMATIC STRIP
+          SCROLL GALLERY — horizontal strip, scroll-driven B&W reveal
          ═══════════════════════════════════════ */}
-      <section className="relative h-[280px] sm:h-[360px] lg:h-[440px] overflow-hidden">
-        <img
-          src="/images/political-education.jpg"
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ filter: "grayscale(1) brightness(0.6) contrast(0.95)", objectPosition: "center 40%" }}
-        />
-        <div className="absolute inset-0 bg-black/25" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-transparent to-[#0A0A0A]/40" />
-      </section>
+      <ScrollGallery />
 
       <div>
         {/* ═══════════════════════════════════════
