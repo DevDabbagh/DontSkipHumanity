@@ -3,16 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 
 /**
- * Pinned horizontal gallery (after the Credits on the film-detail page).
+ * Horizontal film-still strip (after the Credits on the film-detail page).
  *
- * The section is taller than the viewport; while it is on screen the inner
- * band pins (sticky) and the row of images slides horizontally as you scroll,
- * moving through every image one by one. When the last image is reached the
- * pin releases and the page continues scrolling normally.
- *
- * The image currently in focus (nearest the viewport centre) scales up and
- * turns from black & white into full colour; as it moves away it eases back
- * to black & white. Focus sweeps across the images with the scroll.
+ * A normal-height band — NOT a full-screen pinned section. Several images
+ * are visible at once; as the page scrolls past, the row drifts sideways
+ * (parallax) so a "focus" sweeps across the images one by one. The focused
+ * image grows and turns from black & white into colour; the others stay
+ * smaller and B&W.
  */
 
 const FALLBACK = [
@@ -23,28 +20,28 @@ const FALLBACK = [
   "/images/slidere3.jpg",
 ];
 
+const GAP = 16; // px, matches gap-4
+
 export default function ScrollGallery({ images }: { images?: string[] }) {
   const imgs = images && images.length >= 1 ? images : FALLBACK;
   const N = imgs.length;
 
-  const outerRef = useRef<HTMLDivElement>(null);
-  const rowRef = useRef<HTMLDivElement>(null);
-  const [{ progress, translateX }, setState] = useState({ progress: 0, translateX: 0 });
+  const ref = useRef<HTMLDivElement>(null);
+  const [{ focus, translateX }, setState] = useState({ focus: 0, translateX: 0 });
 
   useEffect(() => {
     let raf = 0;
     const update = () => {
-      const outer = outerRef.current;
-      const row = rowRef.current;
-      if (!outer || !row) return;
-      const rect = outer.getBoundingClientRect();
+      const el = ref.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
       const vh = window.innerHeight || 1;
       const vw = window.innerWidth || 1;
-      const total = outer.offsetHeight - vh; // pin duration in px
-      const scrolled = Math.max(0, Math.min(total, -rect.top));
-      const p = total > 0 ? scrolled / total : 0;
-      const maxTranslate = Math.max(0, row.scrollWidth - vw);
-      setState({ progress: p, translateX: -p * maxTranslate });
+      // progress of the band passing through the viewport: 0 entering → 1 leaving
+      const p = Math.max(0, Math.min(1, (vh - rect.top) / (vh + rect.height)));
+      const f = p * (N - 1);
+      const boxW = vw * (vw < 640 ? 0.6 : vw < 1024 ? 0.34 : 0.24);
+      setState({ focus: f, translateX: -f * (boxW + GAP) });
     };
     const onScroll = () => {
       cancelAnimationFrame(raf);
@@ -60,45 +57,36 @@ export default function ScrollGallery({ images }: { images?: string[] }) {
     };
   }, [N]);
 
-  const focus = progress * (N - 1); // moving focal index
-
   return (
     <section
-      ref={outerRef}
-      className="relative"
-      style={{ height: `calc(100vh + ${(N - 1) * 55}vh)` }}
+      ref={ref}
+      className="relative overflow-hidden bg-[#0A0A0A] h-[40vh] sm:h-[46vh] lg:h-[52vh] flex items-center"
     >
-      <div className="sticky top-0 h-screen flex items-center overflow-hidden bg-[#0A0A0A]">
-        <div
-          ref={rowRef}
-          className="flex items-center gap-3 sm:gap-4 px-[25vw] will-change-transform"
-          style={{ transform: `translateX(${translateX}px)` }}
-        >
-          {imgs.map((src, i) => {
-            const prox = Math.max(0, 1 - Math.abs(i - focus)); // 1 when focused
-            const grayscale = 1 - prox; // 1 = B&W, 0 = colour
-            const opacity = 0.18 + 0.72 * prox; // faint → full
-            const scale = 1 + 0.16 * prox; // focused image grows
-            return (
-              <div
-                key={i}
-                className="relative shrink-0 h-[46vh] sm:h-[56vh] lg:h-[62vh] overflow-hidden rounded-[4px]"
-                style={{ width: "50vw" }}
-              >
-                <img
-                  src={src}
-                  alt=""
-                  className="absolute inset-0 w-full h-full object-cover will-change-transform"
-                  style={{
-                    filter: `grayscale(${grayscale}) contrast(1.02)`,
-                    opacity,
-                    transform: `scale(${scale})`,
-                  }}
-                />
-              </div>
-            );
-          })}
-        </div>
+      {/* leading/trailing padding centres the first & last image */}
+      <div
+        className="flex items-center gap-4 px-[20vw] sm:px-[33vw] lg:px-[38vw] will-change-transform"
+        style={{ transform: `translateX(${translateX}px)` }}
+      >
+        {imgs.map((src, i) => {
+          const prox = Math.max(0, 1 - Math.abs(i - focus)); // 1 when centred
+          const grayscale = 1 - prox; // B&W → colour
+          const opacity = 0.22 + 0.78 * prox;
+          const scale = 0.9 + 0.34 * prox; // focused card grows
+          return (
+            <div
+              key={i}
+              className="relative shrink-0 w-[60vw] sm:w-[34vw] lg:w-[24vw] h-[74%] overflow-hidden rounded-[4px] will-change-transform"
+              style={{ transform: `scale(${scale})`, transformOrigin: "center", opacity }}
+            >
+              <img
+                src={src}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ filter: `grayscale(${grayscale}) contrast(1.02)` }}
+              />
+            </div>
+          );
+        })}
       </div>
     </section>
   );

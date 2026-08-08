@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useReveal } from "@/hooks/useReveal";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import FeaturedSlider from "@/components/academy/FeaturedSlider";
 import type { AcademyProgram } from "@/lib/types";
 
 const TYPE_LABELS: Record<string, { label: string; color: string }> = {
@@ -16,25 +17,32 @@ const TYPE_LABELS: Record<string, { label: string; color: string }> = {
 
 export default function AcademyListing({ programs }: { programs: AcademyProgram[] }) {
   const sectionRef = useReveal();
+  const featured = programs.slice(0, 4);
 
   return (
     <main className="min-h-screen bg-[#0D0D0D] text-white">
       <Navbar />
 
-      <section className="pt-14">
-        <div className="max-w-[1400px] mx-auto px-5 sm:px-8 pt-16 sm:pt-20 pb-10">
-          <p className="text-[10px] tracking-[0.3em] text-gray-500 uppercase mb-4">Academy</p>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-[1.15] tracking-tight max-w-3xl">
-            Education that names power
-            <span className="gradient-text"> and builds capacity.</span>
-          </h1>
-          <p className="text-gray-400 mt-5 max-w-2xl leading-relaxed">
-            Courses, workshops, toolkits, and fellowships — all free by principle. Built for filmmakers, journalists, organisers, and anyone who believes storytelling should serve justice.
-          </p>
-        </div>
-      </section>
+      <div style={{ paddingTop: 64 }}>
+        <FeaturedSlider programs={featured} />
+      </div>
 
       <div className="max-w-[1400px] mx-auto px-5 sm:px-8 pb-20" ref={sectionRef}>
+        <div className="flex items-end justify-between mt-16 mb-6 gap-4">
+          <div>
+            <p className="text-[10px] tracking-[0.3em] text-gray-500 uppercase mb-3">All Programs</p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-[1.15] tracking-tight max-w-3xl">
+              Education that names power
+              <span className="gradient-text"> and builds capacity.</span>
+            </h2>
+          </div>
+          <p className="text-[13px] text-gray-500 pb-1 whitespace-nowrap">
+            {programs.length} program{programs.length !== 1 ? "s" : ""}
+          </p>
+        </div>
+        <p className="text-gray-400 mb-10 max-w-2xl leading-relaxed">
+          Courses, workshops, toolkits, and fellowships — all free by principle. Built for filmmakers, journalists, organisers, and anyone who believes storytelling should serve justice.
+        </p>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-7">
           {programs.map((program, i) => {
             const typeInfo = TYPE_LABELS[program.type];
