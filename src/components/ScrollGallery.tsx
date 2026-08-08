@@ -37,8 +37,13 @@ export default function ScrollGallery({ images }: { images?: string[] }) {
       const rect = el.getBoundingClientRect();
       const vh = window.innerHeight || 1;
       const vw = window.innerWidth || 1;
-      // progress of the band passing through the viewport: 0 entering → 1 leaving
-      const p = Math.max(0, Math.min(1, (vh - rect.top) / (vh + rect.height)));
+      // Sweep the focus while the band is ON SCREEN, so the first AND last
+      // images each get a centred moment. focus 0 when the band centre is
+      // low in the viewport, N-1 when it is high.
+      const center = rect.top + rect.height / 2;
+      const start = 0.9 * vh;
+      const end = 0.1 * vh;
+      const p = Math.max(0, Math.min(1, (start - center) / (start - end)));
       const f = p * (N - 1);
       const boxW = vw * (vw < 640 ? 0.6 : vw < 1024 ? 0.34 : 0.24);
       setState({ focus: f, translateX: -f * (boxW + GAP) });
