@@ -259,18 +259,23 @@ export default function FilmContent({
            ═══════════════════════════════════════ */}
         {film.festivals.length > 0 && (
           <section className="max-w-[1200px] mx-auto px-5 sm:px-8 py-16 sm:py-20">
-            <p className={`${LABEL} mb-8`}>Festivals &amp; Awards</p>
-            <div className="border-t border-[#161616]">
-              {film.festivals.map((f, i) => (
-                <div
-                  key={i}
-                  className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-8 py-4 border-b border-[#161616]"
-                >
-                  <span className="text-[13px] text-white/30 w-16 shrink-0">{f.year}</span>
-                  <span className="text-[15px] text-white/80 flex-1">{f.name}</span>
-                  <span className="text-[13px] text-[#8665A7]">{f.award || f.selection}</span>
+            <div className="flex flex-col md:flex-row gap-10 md:gap-16">
+              <div className="hidden md:block shrink-0 w-[320px]" aria-hidden />
+              <div className="flex-1">
+                <p className={`${LABEL} mb-8`}>Festivals &amp; Awards</p>
+                <div className="border-t border-[#161616]">
+                  {film.festivals.map((f, i) => (
+                    <div
+                      key={i}
+                      className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-8 py-4 border-b border-[#161616]"
+                    >
+                      <span className="text-[13px] text-[#363636] w-16 shrink-0">{f.year}</span>
+                      <span className="text-[15px] text-[#F0F0F0] flex-1">{f.name}</span>
+                      <span className="text-[13px] text-[#595C5C]">{f.award || f.selection}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
           </section>
         )}
@@ -280,24 +285,29 @@ export default function FilmContent({
            ═══════════════════════════════════════ */}
         {film.screenings.length > 0 && (
           <section className="max-w-[1200px] mx-auto px-5 sm:px-8 pb-16 sm:pb-20">
-            <p className={`${LABEL} mb-8`}>Where to watch</p>
-            <div className="border-t border-[#161616]">
-              {film.screenings.map((s, i) => (
-                <div
-                  key={i}
-                  className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-8 py-4 border-b border-[#161616]"
-                >
-                  <span className="text-[13px] text-white/30 w-28 shrink-0">{formatDate(s.date)}</span>
-                  <span className="text-[15px] text-white/80 flex-1">{s.event}</span>
-                  <span className="text-[13px] text-white/45 inline-flex items-center gap-1.5">
-                    {s.location}
-                    <svg className="w-3.5 h-3.5 text-[#32C6CC]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </span>
+            <div className="flex flex-col md:flex-row gap-10 md:gap-16">
+              <div className="hidden md:block shrink-0 w-[320px]" aria-hidden />
+              <div className="flex-1">
+                <p className={`${LABEL} mb-8`}>Where to watch</p>
+                <div className="border-t border-[#161616]">
+                  {film.screenings.map((s, i) => (
+                    <div
+                      key={i}
+                      className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-8 py-4 border-b border-[#161616]"
+                    >
+                      <span className="text-[13px] text-[#363636] w-28 shrink-0">{formatDate(s.date)}</span>
+                      <span className="text-[15px] text-[#F0F0F0] flex-1">{s.event}</span>
+                      <span className="text-[13px] text-[#595C5C] inline-flex items-center gap-1.5">
+                        {s.location}
+                        <svg className="w-3.5 h-3.5 text-[#32C6CC]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                      </span>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
           </section>
         )}
@@ -307,18 +317,23 @@ export default function FilmContent({
            ═══════════════════════════════════════ */}
         {film.pressQuotes.length > 0 && (
           <section className="max-w-[1200px] mx-auto px-5 sm:px-8 pb-16 sm:pb-20">
-            <p className={`${LABEL} mb-8`}>Press</p>
-            <div className="space-y-8 max-w-3xl">
-              {film.pressQuotes.map((pq, i) => (
-                <blockquote key={i}>
-                  <p className="text-[18px] leading-[28px] text-white/70 italic">
-                    &ldquo;{pq.quote}&rdquo;
-                  </p>
-                  <cite className="not-italic text-[13px] text-white/35 mt-2 block">
-                    — {pq.source}
-                  </cite>
-                </blockquote>
-              ))}
+            <div className="flex flex-col md:flex-row gap-10 md:gap-16">
+              <div className="hidden md:block shrink-0 w-[320px]" aria-hidden />
+              <div className="flex-1">
+                <p className={`${LABEL} mb-8`}>Press</p>
+                <div className="space-y-8 max-w-3xl">
+                  {film.pressQuotes.map((pq, i) => (
+                    <blockquote key={i}>
+                      <p className="text-[18px] leading-[28px] text-white/70 italic">
+                        &ldquo;{pq.quote}&rdquo;
+                      </p>
+                      <cite className="not-italic text-[13px] text-[#595C5C] mt-2 block">
+                        — {pq.source}
+                      </cite>
+                    </blockquote>
+                  ))}
+                </div>
+              </div>
             </div>
           </section>
         )}

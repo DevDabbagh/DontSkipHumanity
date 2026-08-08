@@ -73,14 +73,13 @@ export default function ScrollGallery({ images }: { images?: string[] }) {
         >
           {imgs.map((src, i) => {
             const prox = Math.max(0, 1 - Math.abs(i - focus)); // 1 when centred
-            const grayscale = 1 - prox; // B&W → colour
-            const opacity = 0.22 + 0.78 * prox;
-            const scale = 0.9 + 0.34 * prox; // focused card grows
+            const grayscale = 1 - prox; // B&W → colour, one by one
+            const opacity = 0.1 + 0.85 * prox; // base 10% → full when focused
             return (
               <div
                 key={i}
-                className="relative shrink-0 w-[62vw] sm:w-[36vw] lg:w-[26vw] h-[42vh] sm:h-[50vh] lg:h-[56vh] overflow-hidden rounded-[4px] will-change-transform"
-                style={{ transform: `scale(${scale})`, transformOrigin: "center", opacity }}
+                className="relative shrink-0 w-[62vw] sm:w-[36vw] lg:w-[26vw] h-[42vh] sm:h-[50vh] lg:h-[56vh] overflow-hidden rounded-[4px]"
+                style={{ opacity }}
               >
                 <img
                   src={src}
