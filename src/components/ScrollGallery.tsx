@@ -21,7 +21,7 @@ const FALLBACK = [
 ];
 
 const GAP = 16; // px, matches gap-4
-const PER_IMAGE_VH = 24; // scroll distance (vh) devoted to each extra image
+const PER_IMAGE_VH = 17; // scroll distance (vh) devoted to each extra image
 
 export default function ScrollGallery({ images }: { images?: string[] }) {
   const imgs = images && images.length >= 1 ? images : FALLBACK;
