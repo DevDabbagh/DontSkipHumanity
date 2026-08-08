@@ -321,14 +321,14 @@ export default function FilmContent({
               <div className="hidden md:block shrink-0 w-[320px]" aria-hidden />
               <div className="flex-1">
                 <p className={`${LABEL} mb-8`}>Press</p>
-                <div className="space-y-8 max-w-3xl">
+                <div className="space-y-10 max-w-3xl">
                   {film.pressQuotes.map((pq, i) => (
-                    <blockquote key={i}>
-                      <p className="text-[18px] leading-[28px] text-white/70 italic">
-                        &ldquo;{pq.quote}&rdquo;
+                    <blockquote key={i} className="border-l-2 border-[#3D0F2F] pl-6">
+                      <p className="text-[18px] leading-[28px] text-[#9D9C9C] italic">
+                        {pq.quote}
                       </p>
-                      <cite className="not-italic text-[13px] text-[#595C5C] mt-2 block">
-                        — {pq.source}
+                      <cite className="not-italic text-[11px] tracking-[0.2em] uppercase text-[#363636] mt-3 block">
+                        {pq.source}
                       </cite>
                     </blockquote>
                   ))}

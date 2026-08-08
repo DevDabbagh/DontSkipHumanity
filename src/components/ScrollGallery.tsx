@@ -78,7 +78,7 @@ export default function ScrollGallery({ images }: { images?: string[] }) {
             return (
               <div
                 key={i}
-                className="relative shrink-0 w-[62vw] sm:w-[36vw] lg:w-[26vw] h-[42vh] sm:h-[50vh] lg:h-[56vh] overflow-hidden rounded-[4px]"
+                className="relative shrink-0 w-[62vw] sm:w-[36vw] lg:w-[26vw] h-[240px] sm:h-[300px] lg:h-[340px] overflow-hidden rounded-[4px]"
                 style={{ opacity }}
               >
                 <img
