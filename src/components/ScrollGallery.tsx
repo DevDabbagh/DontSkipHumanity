@@ -42,7 +42,7 @@ export default function ScrollGallery({ images }: { images?: string[] }) {
       const scrolled = Math.max(0, Math.min(total, -rect.top));
       const p = total > 0 ? scrolled / total : 0;
       const f = p * (N - 1);
-      const boxW = vw * (vw < 640 ? 0.6 : vw < 1024 ? 0.34 : 0.24);
+      const boxW = vw * (vw < 640 ? 0.62 : vw < 1024 ? 0.36 : 0.26);
       setState({ focus: f, translateX: -f * (boxW + GAP) });
     };
     const onScroll = () => {
@@ -79,7 +79,7 @@ export default function ScrollGallery({ images }: { images?: string[] }) {
             return (
               <div
                 key={i}
-                className="relative shrink-0 w-[60vw] sm:w-[34vw] lg:w-[24vw] h-[30vh] sm:h-[34vh] lg:h-[38vh] overflow-hidden rounded-[4px] will-change-transform"
+                className="relative shrink-0 w-[62vw] sm:w-[36vw] lg:w-[26vw] h-[42vh] sm:h-[50vh] lg:h-[56vh] overflow-hidden rounded-[4px] will-change-transform"
                 style={{ transform: `scale(${scale})`, transformOrigin: "center", opacity }}
               >
                 <img
