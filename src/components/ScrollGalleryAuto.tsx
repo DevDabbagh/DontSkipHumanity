@@ -66,18 +66,21 @@ export default function ScrollGalleryAuto({
     return () => cancelAnimationFrame(raf);
   }, [speed, N]);
 
-  const doubled = [...imgs, ...imgs]; // duplicate for a seamless loop
+  // Repeat the set enough times to fill even wide screens without a visible
+  // seam — the loop resets after exactly one set width, so it runs infinitely.
+  const REPEAT = 4;
+  const looped = Array.from({ length: REPEAT }).flatMap(() => imgs);
 
   return (
     <section className="relative overflow-hidden bg-[#0A0A0A] py-1">
-      <div ref={trackRef} className="flex items-center gap-4 w-max will-change-transform">
-        {doubled.map((src, i) => (
+      <div ref={trackRef} className="flex items-center gap-px w-max will-change-transform">
+        {looped.map((src, i) => (
           <div
             key={i}
             ref={(el) => {
               itemRefs.current[i] = el;
             }}
-            className={`relative shrink-0 ${WIDTHS[i % WIDTHS.length]} h-[240px] sm:h-[300px] lg:h-[340px] overflow-hidden rounded-[4px]`}
+            className={`relative shrink-0 ${WIDTHS[(i % N) % WIDTHS.length]} h-[240px] sm:h-[300px] lg:h-[340px] overflow-hidden`}
             style={{ filter: "grayscale(1) contrast(1.02)", opacity: 0.1 }}
           >
             <img src={src} alt="" className="absolute inset-0 w-full h-full object-cover" />
