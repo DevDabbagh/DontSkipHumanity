@@ -168,7 +168,7 @@ export default function FilmContent({
         {/* ═══════════════════════════════════════
             POSTER + SYNOPSIS + EDITORIAL
            ═══════════════════════════════════════ */}
-        <section className="max-w-[1200px] mx-auto px-5 sm:px-8 py-16 sm:py-20 lg:py-24">
+        <section className="max-w-[1200px] mx-auto px-5 sm:px-8 pt-16 sm:pt-20 lg:pt-24 pb-10 sm:pb-12">
           <div className="flex flex-col md:flex-row gap-10 md:gap-16">
             {/* Poster */}
             <div className="reveal-left shrink-0 w-full md:w-[320px]">
@@ -258,7 +258,7 @@ export default function FilmContent({
             FESTIVALS & AWARDS
            ═══════════════════════════════════════ */}
         {film.festivals.length > 0 && (
-          <section className="max-w-[1200px] mx-auto px-5 sm:px-8 py-16 sm:py-20">
+          <section className="max-w-[1200px] mx-auto px-5 sm:px-8 pt-10 sm:pt-12 pb-16 sm:pb-20">
             <div className="flex flex-col md:flex-row gap-10 md:gap-16">
               <div className="hidden md:block shrink-0 w-[320px]" aria-hidden />
               <div className="flex-1">

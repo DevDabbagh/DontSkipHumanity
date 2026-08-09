@@ -5,11 +5,10 @@ import { useEffect, useRef, useState } from "react";
 /**
  * Horizontal film-still strip (after the Credits on the film-detail page).
  *
- * The section is a bit taller than the viewport, so while it is on screen the
- * strip PINS (sticky) for a moderate scroll distance and the focus sweeps
- * across every image — each one reaches the centre, grows and turns from
- * black & white into colour, one by one. Once the last image has had its
- * moment the pin releases and the next section follows.
+ * A compact band — the exact height of the images (no full-screen takeover,
+ * so there is no large empty space above or below). As the page scrolls past,
+ * the row drifts sideways and a "focus" sweeps across the images; the focused
+ * image turns from black & white into colour (base opacity 10%). No scaling.
  */
 
 const FALLBACK = [
@@ -21,26 +20,27 @@ const FALLBACK = [
 ];
 
 const GAP = 16; // px, matches gap-4
-const PER_IMAGE_VH = 17; // scroll distance (vh) devoted to each extra image
 
 export default function ScrollGallery({ images }: { images?: string[] }) {
   const imgs = images && images.length >= 1 ? images : FALLBACK;
   const N = imgs.length;
 
-  const outerRef = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
   const [{ focus, translateX }, setState] = useState({ focus: 0, translateX: 0 });
 
   useEffect(() => {
     let raf = 0;
     const update = () => {
-      const outer = outerRef.current;
-      if (!outer) return;
-      const rect = outer.getBoundingClientRect();
+      const el = ref.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
       const vh = window.innerHeight || 1;
       const vw = window.innerWidth || 1;
-      const total = outer.offsetHeight - vh; // pin duration in px
-      const scrolled = Math.max(0, Math.min(total, -rect.top));
-      const p = total > 0 ? scrolled / total : 0;
+      // Sweep the focus while the band is on screen (first & last both centre).
+      const center = rect.top + rect.height / 2;
+      const start = 0.9 * vh;
+      const end = 0.1 * vh;
+      const p = Math.max(0, Math.min(1, (start - center) / (start - end)));
       const f = p * (N - 1);
       const boxW = vw * (vw < 640 ? 0.62 : vw < 1024 ? 0.36 : 0.26);
       setState({ focus: f, translateX: -f * (boxW + GAP) });
@@ -61,36 +61,33 @@ export default function ScrollGallery({ images }: { images?: string[] }) {
 
   return (
     <section
-      ref={outerRef}
-      className="relative"
-      style={{ height: `calc(100vh + ${(N - 1) * PER_IMAGE_VH}vh)` }}
+      ref={ref}
+      className="relative overflow-hidden bg-[#0A0A0A] h-[240px] sm:h-[300px] lg:h-[340px] flex items-center"
     >
-      <div className="sticky top-0 h-screen flex items-center overflow-hidden bg-[#0A0A0A]">
-        {/* leading/trailing padding centres the first & last image */}
-        <div
-          className="flex items-center gap-4 px-[20vw] sm:px-[33vw] lg:px-[38vw] will-change-transform"
-          style={{ transform: `translateX(${translateX}px)` }}
-        >
-          {imgs.map((src, i) => {
-            const prox = Math.max(0, 1 - Math.abs(i - focus)); // 1 when centred
-            const grayscale = 1 - prox; // B&W → colour, one by one
-            const opacity = 0.1 + 0.85 * prox; // base 10% → full when focused
-            return (
-              <div
-                key={i}
-                className="relative shrink-0 w-[62vw] sm:w-[36vw] lg:w-[26vw] h-[240px] sm:h-[300px] lg:h-[340px] overflow-hidden rounded-[4px]"
-                style={{ opacity }}
-              >
-                <img
-                  src={src}
-                  alt=""
-                  className="absolute inset-0 w-full h-full object-cover"
-                  style={{ filter: `grayscale(${grayscale}) contrast(1.02)` }}
-                />
-              </div>
-            );
-          })}
-        </div>
+      {/* leading/trailing padding centres the first & last image */}
+      <div
+        className="flex items-center gap-4 px-[20vw] sm:px-[33vw] lg:px-[38vw] will-change-transform"
+        style={{ transform: `translateX(${translateX}px)` }}
+      >
+        {imgs.map((src, i) => {
+          const prox = Math.max(0, 1 - Math.abs(i - focus)); // 1 when centred
+          const grayscale = 1 - prox; // B&W → colour, one by one
+          const opacity = 0.1 + 0.85 * prox; // base 10% → full when focused
+          return (
+            <div
+              key={i}
+              className="relative shrink-0 w-[62vw] sm:w-[36vw] lg:w-[26vw] h-full overflow-hidden rounded-[4px]"
+              style={{ opacity }}
+            >
+              <img
+                src={src}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ filter: `grayscale(${grayscale}) contrast(1.02)` }}
+              />
+            </div>
+          );
+        })}
       </div>
     </section>
   );
