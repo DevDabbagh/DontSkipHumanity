@@ -6,7 +6,7 @@ import { useReveal } from "@/hooks/useReveal";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Newsletter from "@/components/Newsletter";
-import ScrollGallery from "@/components/ScrollGallery";
+import ScrollGalleryAuto from "@/components/ScrollGalleryAuto";
 import TrailerModal from "@/components/TrailerModal";
 import type { Film } from "@/lib/types";
 
@@ -254,7 +254,7 @@ export default function FilmContent({
       {/* ═══════════════════════════════════════
           SCROLL GALLERY — pinned horizontal, colour-on-focus
          ═══════════════════════════════════════ */}
-      <ScrollGallery images={film.detailsSliders} />
+      <ScrollGalleryAuto images={film.detailsSliders} />
 
       <div>
         {/* ═══════════════════════════════════════
