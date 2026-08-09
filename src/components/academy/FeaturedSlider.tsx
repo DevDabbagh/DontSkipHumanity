@@ -118,19 +118,36 @@ export default function FeaturedSlider({ programs }: { programs: AcademyProgram[
 
           <div className="flex items-center gap-5 mt-8">
             <div className="flex gap-2">
-              {programs.map((p, i) => (
-                <button
-                  key={p.id}
-                  onClick={() => goTo(i)}
-                  aria-label={`Go to slide ${i + 1}`}
-                  className="rounded-full transition-all duration-300"
-                  style={{
-                    width: i === current ? 24 : 6,
-                    height: 6,
-                    background: i === current ? "#B23495" : "rgba(255,255,255,0.18)",
-                  }}
-                />
-              ))}
+              {programs.map((p, i) => {
+                const active = i === current;
+                return (
+                  <button
+                    key={p.id}
+                    onClick={() => goTo(i)}
+                    aria-label={`Go to slide ${i + 1}`}
+                    className="rounded-full overflow-hidden transition-all duration-300"
+                    style={{
+                      width: active ? 28 : 6,
+                      height: 6,
+                      background: "rgba(255,255,255,0.18)",
+                    }}
+                  >
+                    {active && (
+                      <span
+                        key={progressKey}
+                        style={{
+                          display: "block",
+                          height: "100%",
+                          width: "0%",
+                          background: "linear-gradient(to right, #9B59B6, #1ABC9C)",
+                          animation: `sliderProgressBar ${SLIDE_DURATION}ms linear forwards`,
+                          animationPlayState: isPlaying ? "running" : "paused",
+                        }}
+                      />
+                    )}
+                  </button>
+                );
+              })}
             </div>
             <span className="text-[12px]" style={{ color: "#555" }}>
               {String(current + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
@@ -161,18 +178,17 @@ export default function FeaturedSlider({ programs }: { programs: AcademyProgram[
         </div>
       </div>
 
-      {isPlaying && (
-        <div className="absolute bottom-0 left-0 right-0" style={{ height: 2, background: "rgba(255,255,255,0.06)" }}>
-          <div
-            key={progressKey}
-            style={{
-              height: "100%",
-              background: "linear-gradient(to right, #9B59B6, #1ABC9C)",
-              animation: `sliderProgressBar ${SLIDE_DURATION}ms linear forwards`,
-            }}
-          />
-        </div>
-      )}
+      <div className="absolute bottom-0 left-0 right-0" style={{ height: 2, background: "rgba(255,255,255,0.06)" }}>
+        <div
+          key={progressKey}
+          style={{
+            height: "100%",
+            background: "linear-gradient(to right, #9B59B6, #1ABC9C)",
+            animation: `sliderProgressBar ${SLIDE_DURATION}ms linear forwards`,
+            animationPlayState: isPlaying ? "running" : "paused",
+          }}
+        />
+      </div>
     </div>
   );
 }

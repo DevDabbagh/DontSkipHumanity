@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useReveal } from "@/hooks/useReveal";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Newsletter from "@/components/Newsletter";
 import ScrollGallery from "@/components/ScrollGallery";
+import TrailerModal from "@/components/TrailerModal";
 import type { Film } from "@/lib/types";
 
 /* ── Shared bits ── */
@@ -35,6 +37,7 @@ export default function FilmContent({
   relatedFilms: Film[];
 }) {
   const sectionRef = useReveal();
+  const [trailerOpen, setTrailerOpen] = useState(false);
   const formLabel = film.credits.form === "documentary" ? "Documentary" : "Fiction";
   const formatLabel =
     film.credits.format === "feature"
@@ -151,9 +154,9 @@ export default function FilmContent({
           {/* Actions — Watch trailer far left, distribution links far right */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 sm:gap-8 mt-10">
             {film.trailerUrl && (
-              <a href={film.trailerUrl} target="_blank" rel="noopener noreferrer" className={BTN}>
+              <button onClick={() => setTrailerOpen(true)} className={BTN}>
                 Watch trailer <span className="text-[#B23495]">▶</span>
-              </a>
+              </button>
             )}
             <div className="flex flex-wrap items-center gap-x-8 gap-y-2">
               <Link href="/#support" className={BTN_LINK}>Request a screener</Link>
@@ -443,6 +446,17 @@ export default function FilmContent({
          ═══════════════════════════════════════ */}
       <Newsletter />
       <Footer />
+
+      {/* On-platform trailer player (no external redirect) */}
+      {film.trailerUrl && (
+        <TrailerModal
+          open={trailerOpen}
+          onClose={() => setTrailerOpen(false)}
+          src={film.trailerUrl}
+          poster={film.posterUrl || film.thumbnailUrl}
+          title={film.title}
+        />
+      )}
     </main>
   );
 }

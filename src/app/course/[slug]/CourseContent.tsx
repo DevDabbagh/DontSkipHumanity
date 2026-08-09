@@ -5,6 +5,7 @@ import { useReveal } from "@/hooks/useReveal";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import type { AcademyProgram } from "@/lib/types";
+import { slugifyName } from "@/lib/slug";
 
 const TYPE_LABELS: Record<string, { label: string; color: string }> = {
   course: { label: "Course", color: "bg-[#9B59B6]/20 text-[#c084fc]" },
@@ -65,14 +66,20 @@ export default function CourseContent({
         {/* Quick info bar */}
         <div className="reveal py-10 border-b border-white/5 grid grid-cols-2 sm:grid-cols-4 gap-8">
           {[
-            { label: "Led by", value: program.whoLeads },
+            { label: "Led by", value: program.whoLeads, href: `/academy/instructor/${slugifyName(program.whoLeads)}` },
             { label: "Duration", value: program.duration },
             { label: "Dates", value: program.dates },
             { label: "Enrolled", value: `${program.enrolledCount} participants` },
           ].map((item) => (
             <div key={item.label}>
               <p className="text-[10px] text-gray-500 uppercase tracking-[0.2em] mb-1.5">{item.label}</p>
-              <p className="text-sm text-white font-medium">{item.value}</p>
+              {item.href ? (
+                <Link href={item.href} className="text-sm text-white font-medium hover:text-[#1ABC9C] transition-colors">
+                  {item.value}
+                </Link>
+              ) : (
+                <p className="text-sm text-white font-medium">{item.value}</p>
+              )}
             </div>
           ))}
         </div>
@@ -155,9 +162,21 @@ export default function CourseContent({
                   ))}
                 </div>
 
-                <button className="w-full py-3.5 rounded-xl gradient-fill-btn text-sm font-medium shadow-lg shadow-purple-500/10">
-                  {program.type === "toolkit" || program.type === "resource" ? "Download" : "Enroll Now"}
-                </button>
+                {program.type === "toolkit" || program.type === "resource" ? (
+                  <a
+                    href={program.resources[0]?.url ?? "#"}
+                    className="block text-center w-full py-3.5 rounded-xl gradient-fill-btn text-sm font-medium shadow-lg shadow-purple-500/10"
+                  >
+                    Download
+                  </a>
+                ) : (
+                  <Link
+                    href={`/course/${program.slug}/learn`}
+                    className="block text-center w-full py-3.5 rounded-xl gradient-fill-btn text-sm font-medium shadow-lg shadow-purple-500/10"
+                  >
+                    Enroll Now
+                  </Link>
+                )}
 
                 <p className="text-xs text-gray-500 text-center leading-relaxed">{program.howToJoin}</p>
               </div>
