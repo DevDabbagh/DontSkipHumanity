@@ -139,7 +139,7 @@ export default function AboutSections() {
         </div>
       </div>
 
-      <div className="gradient-divider" />
+      <div style={{ height: 1, background: "#161616" }} />
 
       {/* S4 — Impact Pillars */}
       <div className="max-w-[1400px] mx-auto px-8" style={{ padding: "64px 32px" }}>
@@ -171,7 +171,7 @@ export default function AboutSections() {
         </div>
       </div>
 
-      <div className="gradient-divider" />
+      <div style={{ height: 1, background: "#161616" }} />
 
       {/* S5 — Team Grid */}
       <div className="max-w-[1400px] mx-auto px-8" style={{ padding: "64px 32px" }}>

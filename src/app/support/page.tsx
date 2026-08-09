@@ -315,7 +315,7 @@ export default function SupportPage() {
         </div>
       </div>
 
-      <div className="gradient-divider" />
+      <div style={{ height: 1, background: "#161616" }} />
 
       {/* S3 — The Work You Make Possible */}
       <div style={{ padding: "80px 32px" }}>
@@ -393,7 +393,7 @@ export default function SupportPage() {
         </div>
       </div>
 
-      <div className="gradient-divider" />
+      <div style={{ height: 1, background: "#161616" }} />
 
       {/* S4 — Quote */}
       <div className="relative flex items-center justify-center" style={{ height: 420, isolation: "isolate" }}>
@@ -420,7 +420,7 @@ export default function SupportPage() {
         </div>
       </div>
 
-      <div className="gradient-divider" />
+      <div style={{ height: 1, background: "#161616" }} />
 
       {/* S5 — Other Ways to Contribute */}
       <div style={{ padding: "80px 32px 96px" }}>

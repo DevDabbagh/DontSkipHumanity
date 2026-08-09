@@ -57,7 +57,7 @@ export default function AboutPage() {
             style={{
               width: 80,
               height: 1,
-              background: "linear-gradient(90deg, transparent, #9B59B6, #1ABC9C, transparent)",
+              background: "#161616",
               margin: "40px auto 0",
               animation: "heroLine 900ms cubic-bezier(0.16,1,0.3,1) 800ms both",
             }}
@@ -65,7 +65,7 @@ export default function AboutPage() {
         </div>
       </div>
 
-      <div className="gradient-divider" />
+      <div style={{ height: 1, background: "#161616" }} />
 
       {/* Client-rendered scroll-reveal sections */}
       <AboutSections />
