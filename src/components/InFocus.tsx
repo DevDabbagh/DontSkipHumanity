@@ -25,13 +25,14 @@ export default function InFocus() {
             right: "-2%",
             top: "-10%",
             objectFit: "cover",
-            objectPosition: "center 70%",
-            filter: "brightness(0.28) contrast(0.9) saturate(0.85) blur(2px)",
-            opacity: 0.16,
+            /* same portrait, cropped to its LOWER part (bottom of the thumbnail) */
+            objectPosition: "center bottom",
+            filter: "brightness(0.5) contrast(0.95) saturate(0.9) blur(2px)",
+            opacity: 0.32,
           }}
         />
-        {/* Black overlay above the portrait — lighter so the image reads */}
-        <div className="absolute inset-0 bg-[rgba(0,0,0,0.72)]" />
+        {/* Black overlay above the portrait — lighter so the image clearly reads */}
+        <div className="absolute inset-0 bg-[rgba(0,0,0,0.55)]" />
         {/* Subtle vignette */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_45%_50%,transparent_0%,transparent_55%,rgba(0,0,0,0.30)_100%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_40%_50%,rgba(255,255,255,0.015)_0%,transparent_65%)]" />
@@ -49,19 +50,19 @@ export default function InFocus() {
       {/* ── Layer 2: Content ── */}
       <div className="relative max-w-[1400px] mx-auto px-5 sm:px-8 py-8 sm:py-12 lg:py-16">
         <div className="flex flex-col md:flex-row items-start gap-10 md:gap-[4.5rem]">
-          {/* Portrait thumbnail card — the visible, sharp version */}
-          <div className="reveal-left w-full md:w-[39%] max-w-[396px]">
+          {/* Portrait thumbnail card — 360×470 ratio (matches design) */}
+          <div className="reveal-left w-full md:w-[360px] shrink-0">
             <div style={{ filter: "brightness(0.95) contrast(0.95) saturate(0.90)" }}>
               <ScrollColorImage
                 src="/images/infocus.jpg"
                 alt="Catarina Marques Rodrigues"
-                className="aspect-square rounded-[4px] shadow-xl shadow-black/30 border border-white/[0.08]"
+                className="aspect-[360/470] rounded-[4px] shadow-xl shadow-black/30 border border-white/[0.08]"
               />
             </div>
           </div>
 
           {/* Text content — top-aligned with portrait */}
-          <div className="reveal-right w-full md:w-[61%] md:pt-1">
+          <div className="reveal-right w-full md:flex-1 md:pt-1">
             <p className="text-[10px] tracking-[0.3em] text-dsh-label/40 uppercase mb-5">
               In Focus
             </p>
