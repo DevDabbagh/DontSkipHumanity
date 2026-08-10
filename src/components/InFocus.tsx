@@ -26,12 +26,12 @@ export default function InFocus() {
             top: "-10%",
             objectFit: "cover",
             objectPosition: "center 70%",
-            filter: "brightness(0.15) contrast(0.85) saturate(0.80) blur(2px)",
-            opacity: 0.08,
+            filter: "brightness(0.28) contrast(0.9) saturate(0.85) blur(2px)",
+            opacity: 0.16,
           }}
         />
-        {/* Heavy black overlay above the portrait */}
-        <div className="absolute inset-0 bg-[rgba(0,0,0,0.86)]" />
+        {/* Black overlay above the portrait — lighter so the image reads */}
+        <div className="absolute inset-0 bg-[rgba(0,0,0,0.72)]" />
         {/* Subtle vignette */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_45%_50%,transparent_0%,transparent_55%,rgba(0,0,0,0.30)_100%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_40%_50%,rgba(255,255,255,0.015)_0%,transparent_65%)]" />

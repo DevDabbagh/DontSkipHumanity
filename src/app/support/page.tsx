@@ -28,21 +28,21 @@ const IMPACT_CARDS = [
     title: "Beneath the Canopy",
     sub: "847 supporters · 94 min · Sundance 2024",
     img: "/images/slider1.jpg",
-    accent: "#9B59B6",
+    accent: "#B23495",
   },
   {
     label: "DOCUMENTARY — IN PRODUCTION",
     title: "The Archive Has No Walls",
     sub: "Currently filming · Palestine · 2025",
     img: "/images/slider2.jpg",
-    accent: "#1ABC9C",
+    accent: "#B23495",
   },
   {
     label: "WORKSHOP — SCREENED",
     title: "27 Cities, One Story",
     sub: "Community screenings · Global tour",
     img: "/images/slidere3.jpg",
-    accent: "#9B59B6",
+    accent: "#B23495",
   },
 ];
 
@@ -51,7 +51,7 @@ const OTHER_WAYS = [
     title: "Share the work",
     desc: "Amplify on social media, embed in your newsletter, or forward to someone who needs to see it.",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1ABC9C" strokeWidth={1.5}>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B23495" strokeWidth={1.5}>
         <path d="M18 8a3 3 0 100-6 3 3 0 000 6zM6 15a3 3 0 100-6 3 3 0 000 6zM18 22a3 3 0 100-6 3 3 0 000 6z" strokeLinecap="round" strokeLinejoin="round" />
         <path d="M8.6 13.5l6.8 3.9M15.4 6.6L8.6 10.5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
@@ -61,7 +61,7 @@ const OTHER_WAYS = [
     title: "Host a screening",
     desc: "Bring a DSH film to your community, university, or festival — we handle the rights.",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1ABC9C" strokeWidth={1.5}>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B23495" strokeWidth={1.5}>
         <rect x="3" y="5" width="14" height="14" rx="1.5" />
         <path d="M17 9.5l4-2.5v10l-4-2.5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
@@ -71,7 +71,7 @@ const OTHER_WAYS = [
     title: "Partner with us",
     desc: "Co-production, sponsorship, or institutional collaboration. Let's build something together.",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1ABC9C" strokeWidth={1.5}>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B23495" strokeWidth={1.5}>
         <path d="M11 21l-7-7a3 3 0 010-4.2l5.6-5.6a3 3 0 014.2 0L19 9.4M8 12l3 3M11 9l3 3" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
@@ -102,7 +102,7 @@ export default function SupportPage() {
           <p
             style={{
               fontSize: 11,
-              color: "#1ABC9C",
+              color: "#B23495",
               letterSpacing: "0.3em",
               textTransform: "uppercase",
               marginBottom: 20,
@@ -169,7 +169,7 @@ export default function SupportPage() {
               boxShadow: "0 48px 120px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.03) inset",
             }}
           >
-            <div style={{ height: 2, background: "linear-gradient(90deg, transparent 0%, #9B59B6 35%, #1ABC9C 65%, transparent 100%)" }} />
+            <div style={{ height: 2, background: "linear-gradient(90deg, transparent 0%, #B23495 35%, #B23495 65%, transparent 100%)" }} />
 
             {/* Type toggle */}
             <div style={{ padding: "24px 28px 0" }}>
@@ -192,11 +192,11 @@ export default function SupportPage() {
                     }}
                   >
                     {t === "Monthly" && (
-                      <span style={{ marginRight: 6, fontSize: 11, color: donationType === t ? "#1ABC9C" : "#444" }}>↻</span>
+                      <span style={{ marginRight: 6, fontSize: 11, color: donationType === t ? "#B23495" : "#444" }}>↻</span>
                     )}
                     {t}
                     {t === "Monthly" && donationType === t && (
-                      <span style={{ marginLeft: 8, fontSize: 10, color: "#1ABC9C", background: "rgba(26,188,156,0.12)", padding: "1px 6px", borderRadius: 4 }}>
+                      <span style={{ marginLeft: 8, fontSize: 10, color: "#B23495", background: "rgba(178,52,149,0.12)", padding: "1px 6px", borderRadius: 4 }}>
                         BEST
                       </span>
                     )}
@@ -217,9 +217,9 @@ export default function SupportPage() {
                       borderRadius: 8,
                       fontSize: 17,
                       fontWeight: 600,
-                      background: amount === a ? "rgba(26,188,156,0.12)" : "rgba(255,255,255,0.04)",
-                      color: amount === a ? "#1ABC9C" : "#666",
-                      border: amount === a ? "1px solid rgba(26,188,156,0.4)" : "1px solid rgba(255,255,255,0.07)",
+                      background: amount === a ? "rgba(178,52,149,0.12)" : "rgba(255,255,255,0.04)",
+                      color: amount === a ? "#B23495" : "#666",
+                      border: amount === a ? "1px solid rgba(178,52,149,0.4)" : "1px solid rgba(255,255,255,0.07)",
                       transition: "all 200ms",
                       position: "relative",
                     }}
@@ -240,13 +240,13 @@ export default function SupportPage() {
                   alignItems: "center",
                   padding: "12px 16px",
                   borderRadius: 8,
-                  background: amount === "Custom" ? "rgba(26,188,156,0.06)" : "rgba(255,255,255,0.03)",
-                  border: amount === "Custom" ? "1px solid rgba(26,188,156,0.35)" : "1px solid rgba(255,255,255,0.06)",
+                  background: amount === "Custom" ? "rgba(178,52,149,0.06)" : "rgba(255,255,255,0.03)",
+                  border: amount === "Custom" ? "1px solid rgba(178,52,149,0.35)" : "1px solid rgba(255,255,255,0.06)",
                   cursor: "text",
                   transition: "all 200ms",
                 }}
               >
-                <span style={{ fontSize: 15, color: amount === "Custom" ? "#1ABC9C" : "#444", marginRight: 8 }}>€</span>
+                <span style={{ fontSize: 15, color: amount === "Custom" ? "#B23495" : "#444", marginRight: 8 }}>€</span>
                 <input
                   value={amount === "Custom" ? customAmount : ""}
                   onChange={(e) => {
@@ -255,7 +255,7 @@ export default function SupportPage() {
                   }}
                   placeholder="Custom amount"
                   className="outline-none bg-transparent flex-1"
-                  style={{ fontSize: 15, color: "#F0F0F0", caretColor: "#1ABC9C" }}
+                  style={{ fontSize: 15, color: "#F0F0F0", caretColor: "#B23495" }}
                 />
               </div>
             </div>
@@ -328,9 +328,9 @@ export default function SupportPage() {
           {/* Stats row */}
           <div className="grid grid-cols-1 sm:grid-cols-3" style={{ gap: 12, marginBottom: 12 }}>
             {[
-              { num: "4,200+", label: "Free courses — forever", accent: "#1ABC9C" },
+              { num: "4,200+", label: "Free courses — forever", accent: "#B23495" },
               { num: "63", label: "Emerging voices funded", accent: "#B23495" },
-              { num: "847", label: "Supporters made this film", accent: "#9B59B6" },
+              { num: "847", label: "Supporters made this film", accent: "#B23495" },
             ].map((s) => (
               <div
                 key={s.num}
@@ -410,13 +410,13 @@ export default function SupportPage() {
           style={{ background: "linear-gradient(to bottom, #0D0D0D 0%, rgba(13,13,13,0.3) 35%, rgba(13,13,13,0.3) 65%, #0D0D0D 100%)" }}
         />
         <div ref={r3} className="reveal relative" style={{ maxWidth: 720, padding: "0 48px", textAlign: "center", zIndex: 1 }}>
-          <div style={{ width: 32, height: 1, background: "rgba(26,188,156,0.6)", margin: "0 auto 28px" }} />
+          <div style={{ width: 32, height: 1, background: "rgba(178,52,149,0.6)", margin: "0 auto 28px" }} />
           <p style={{ fontSize: "clamp(1.2rem, 2.2vw, 1.85rem)", fontStyle: "italic", color: "rgba(255,255,255,0.88)", lineHeight: 1.5, fontWeight: 300 }}>
             &ldquo;Every film, every free course, every fellow we support — these exist because someone decided
             this work matters.&rdquo;
           </p>
-          <p style={{ fontSize: 13, color: "#1ABC9C", marginTop: 24, letterSpacing: "0.12em" }}>— Don&apos;t Skip Humanity</p>
-          <div style={{ width: 32, height: 1, background: "rgba(155,89,182,0.6)", margin: "28px auto 0" }} />
+          <p style={{ fontSize: 13, color: "#B23495", marginTop: 24, letterSpacing: "0.12em" }}>— Don&apos;t Skip Humanity</p>
+          <div style={{ width: 32, height: 1, background: "rgba(178,52,149,0.6)", margin: "28px auto 0" }} />
         </div>
       </div>
 
@@ -442,8 +442,8 @@ export default function SupportPage() {
                     width: 40,
                     height: 40,
                     borderRadius: 10,
-                    background: "rgba(26,188,156,0.08)",
-                    border: "1px solid rgba(26,188,156,0.15)",
+                    background: "rgba(178,52,149,0.08)",
+                    border: "1px solid rgba(178,52,149,0.15)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -454,7 +454,7 @@ export default function SupportPage() {
                 </div>
                 <p style={{ fontSize: 17, fontWeight: 600, color: "#E8E8E8", marginBottom: 10 }}>{card.title}</p>
                 <p style={{ fontSize: 13, color: "#484848", lineHeight: 1.7, marginBottom: 20 }}>{card.desc}</p>
-                <button style={{ fontSize: 13, color: "#1ABC9C", background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+                <button style={{ fontSize: 13, color: "#B23495", background: "none", border: "none", cursor: "pointer", padding: 0 }}>
                   Get in touch →
                 </button>
               </div>
