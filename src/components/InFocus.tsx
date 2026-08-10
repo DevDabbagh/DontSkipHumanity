@@ -27,15 +27,9 @@ export default function InFocus({ config }: { config?: InFocusConfig }) {
           style={{
             objectPosition: "center 42%",
             filter: "grayscale(1) brightness(0.6) contrast(0.95)",
-            opacity: 0.7,
+            opacity: 0.2,
           }}
         />
-        {/* gentle darkening so text stays readable */}
-        <div className="absolute inset-0 bg-black/30" />
-        {/* top edge fades in from the black above */}
-        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#0A0A0A] to-transparent" />
-        {/* bottom edge fades back into the page */}
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0A0A0A] to-transparent" />
       </div>
 
       {/* ── Layer 2: Content ── */}
