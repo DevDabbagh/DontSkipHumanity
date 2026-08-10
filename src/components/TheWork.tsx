@@ -49,16 +49,22 @@ function SectionHeader() {
 export default function TheWork({
   filmsConfig,
   studioConfig,
+  showFilms = true,
+  showStudio = true,
 }: {
   filmsConfig?: CurtainConfig;
   studioConfig?: CurtainConfig;
+  showFilms?: boolean;
+  showStudio?: boolean;
 }) {
+  if (!showFilms && !showStudio) return null;
+
   return (
     <section id="films" className="py-10 sm:py-12 lg:py-16">
       <SectionHeader />
 
       {/* Films: image left → slides to reveal text right */}
-      <CurtainReveal
+      {showFilms && <CurtainReveal
         className="mb-20 sm:mb-24 lg:mb-28"
         image={
           <ScrollColorImage
@@ -81,10 +87,10 @@ export default function TheWork({
         <Link href="/films" className="mt-3 sm:mt-4 md:mt-6 inline-block self-start text-xs sm:text-sm border border-white/15 rounded-[3px] px-4 sm:px-6 py-2 sm:py-2.5 text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 hover:border-white/25 transition-colors">
           {filmsConfig?.cta || "Explore Films"} <span className="text-[#B23495]">+</span>
         </Link>
-      </CurtainReveal>
+      </CurtainReveal>}
 
       {/* Studio: mirrored — image right → slides to reveal text left */}
-      <CurtainReveal
+      {showStudio && <CurtainReveal
         mirrored
         image={
           <ScrollColorImage
@@ -110,7 +116,7 @@ export default function TheWork({
         <Link href="/studio" className="mt-3 sm:mt-4 md:mt-6 inline-block self-start text-xs sm:text-sm border border-white/15 rounded-[3px] px-4 sm:px-6 py-2 sm:py-2.5 text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 hover:border-white/25 transition-colors">
           {studioConfig?.cta || "Explore Studio"} <span className="text-[#8665A7]">+</span>
         </Link>
-      </CurtainReveal>
+      </CurtainReveal>}
     </section>
   );
 }

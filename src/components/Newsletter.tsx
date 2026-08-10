@@ -2,8 +2,13 @@
 
 import { useState } from "react";
 import { useReveal } from "@/hooks/useReveal";
+import type { LandingSectionText } from "@/lib/landing";
 
-export default function Newsletter() {
+interface NewsletterConfig extends LandingSectionText {
+  imageSrc?: string;
+}
+
+export default function Newsletter({ config }: { config?: NewsletterConfig }) {
   const [email, setEmail] = useState("");
   const sectionRef = useReveal();
 
@@ -11,7 +16,7 @@ export default function Newsletter() {
     <section className="relative py-16 sm:py-20 lg:py-24 overflow-hidden" ref={sectionRef}>
       {/* Background image — ic_newsletter, B&W with shadow */}
       <img
-        src="/images/newsletter-bg.jpg"
+        src={config?.imageSrc || "/images/newsletter-bg.jpg"}
         alt=""
         className="absolute inset-0 w-full h-full object-cover"
         style={{ filter: "grayscale(1) brightness(0.25) contrast(1.1)" }}
@@ -21,13 +26,12 @@ export default function Newsletter() {
 
       <div className="relative max-w-[500px] mx-auto px-5 sm:px-8 text-center">
         <h2 className="reveal text-2xl sm:text-3xl md:text-4xl font-bold text-white">
-          Don&apos;t look away.
+          {config?.heading || "Don't look away."}
         </h2>
 
-        <p className="reveal stagger-1 text-xs sm:text-sm text-[#595C5C] mt-4 sm:mt-5 leading-relaxed">
-          One email when something matters — a new film, a piece, a screening, an open call.
-          <br />
-          Work that names what power tries to hide. No noise.
+        <p className="reveal stagger-1 text-xs sm:text-sm text-[#595C5C] mt-4 sm:mt-5 leading-relaxed whitespace-pre-line">
+          {config?.description ||
+            "One email when something matters — a new film, a piece, a screening, an open call.\nWork that names what power tries to hide. No noise."}
         </p>
 
         {/* Email input */}
@@ -49,13 +53,13 @@ export default function Newsletter() {
             }
           `}</style>
           <button className="w-full h-[44px] rounded-[3px] gradient-fill-btn text-sm text-white font-medium flex items-center justify-center gap-2">
-            Subscribe our newsletter
+            {config?.cta || "Subscribe our newsletter"}
             <img src="/images/ic_newsletter_btn.png" alt="" className="w-4 h-4 object-contain" />
           </button>
         </div>
 
         <p className="reveal stagger-3 text-xs text-[#595C5C] mt-4">
-          I agree to receive emails from DSH. We don&apos;t share your data.
+          {config?.subtitle || "I agree to receive emails from DSH. We don't share your data."}
         </p>
       </div>
     </section>

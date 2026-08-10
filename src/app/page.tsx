@@ -10,8 +10,20 @@ import Notebook from "@/components/Notebook";
 import Agenda from "@/components/Agenda";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
+import { getLandingConfig, firstSlotImage } from "@/lib/landing";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const cms = await getLandingConfig();
+
+  const films = cms.films;
+  const studio = cms.studio;
+  const academy = cms.academy;
+  const read = cms.read;
+  const infocus = cms.infocus;
+  const newsletter = cms.newsletter;
+
   return (
     <main className="relative">
       {/* Film grain overlay */}
@@ -19,15 +31,28 @@ export default function Home() {
 
       <Navbar />
       <Hero />
-      <TheWork />
-      <Academy />
-      <Journalism />
-      <InFocus />
+      <TheWork
+        filmsConfig={{ ...films?.text, imageSrc: firstSlotImage(films) }}
+        studioConfig={{ ...studio?.text, imageSrc: firstSlotImage(studio) }}
+        showFilms={films?.enabled !== false}
+        showStudio={studio?.enabled !== false}
+      />
+      {academy?.enabled !== false && (
+        <Academy config={{ ...academy?.text, imageSrc: firstSlotImage(academy) }} />
+      )}
+      {read?.enabled !== false && (
+        <Journalism config={{ ...read?.text, imageSrc: firstSlotImage(read) }} />
+      )}
+      {infocus?.enabled !== false && (
+        <InFocus config={{ ...infocus?.text, imageSrc: firstSlotImage(infocus) }} />
+      )}
       <Impact />
       <SupportCTA />
       <Notebook />
       <Agenda />
-      <Newsletter />
+      {newsletter?.enabled !== false && (
+        <Newsletter config={{ ...newsletter?.text, imageSrc: firstSlotImage(newsletter) }} />
+      )}
       <Footer />
     </main>
   );

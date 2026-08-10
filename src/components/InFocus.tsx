@@ -2,49 +2,40 @@
 
 import { useReveal } from "@/hooks/useReveal";
 import ScrollColorImage from "./ScrollColorImage";
+import type { LandingSectionText } from "@/lib/landing";
 
-export default function InFocus() {
+interface InFocusConfig extends LandingSectionText {
+  imageSrc?: string;
+}
+
+export default function InFocus({ config }: { config?: InFocusConfig }) {
   const sectionRef = useReveal();
+  const image = config?.imageSrc || "/images/infocus.jpg";
 
   return (
     <section className="relative py-10 sm:py-12 lg:py-20 pb-16 sm:pb-20 lg:pb-28 overflow-hidden" ref={sectionRef}>
-      {/* ── Layer 1: Oversized decorative portrait ──
-          An independent, absolutely positioned copy of the SAME portrait used
-          in the thumbnail. Anchored right, cropped to lower body, heavily
-          darkened. Discovered only after careful looking. */}
-      <div className="absolute inset-0 pointer-events-none" style={{ bottom: "-4rem" }}>
-        {/* The oversized portrait element — NOT a CSS background */}
+      {/* ── Layer 1: Background band ──
+          The SAME portrait, zoomed into its lower-face / neck region, shown as
+          a full-width horizontal band that begins ~40% down the section and
+          runs to the bottom — sitting behind the name, description and buttons.
+          Grayscale, darkened, with the top & bottom edges fading into black. */}
+      <div className="absolute inset-x-0 bottom-0 top-[40%] pointer-events-none select-none overflow-hidden">
         <img
-          src="/images/infocus.jpg"
+          src={image}
           alt=""
-          className="absolute pointer-events-none select-none"
+          className="absolute inset-0 w-full h-full object-cover"
           style={{
-            /* Size: ~250% of the thumbnail, anchored right */
-            width: "65%",
-            height: "130%",
-            right: "-2%",
-            top: "-10%",
-            objectFit: "cover",
-            /* same portrait, cropped to its LOWER part (bottom of the thumbnail) */
-            objectPosition: "center bottom",
-            filter: "brightness(0.5) contrast(0.95) saturate(0.9) blur(2px)",
-            opacity: 0.32,
+            objectPosition: "center 42%",
+            filter: "grayscale(1) brightness(0.6) contrast(0.95)",
+            opacity: 0.7,
           }}
         />
-        {/* Black overlay above the portrait — lighter so the image clearly reads */}
-        <div className="absolute inset-0 bg-[rgba(0,0,0,0.55)]" />
-        {/* Subtle vignette */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_45%_50%,transparent_0%,transparent_55%,rgba(0,0,0,0.30)_100%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_40%_50%,rgba(255,255,255,0.015)_0%,transparent_65%)]" />
-        {/* Near-imperceptible noise texture */}
-        <div
-          className="absolute inset-0 opacity-[0.02]"
-          style={{
-            backgroundImage:
-              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-            backgroundRepeat: "repeat",
-          }}
-        />
+        {/* gentle darkening so text stays readable */}
+        <div className="absolute inset-0 bg-black/30" />
+        {/* top edge fades in from the black above */}
+        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#0A0A0A] to-transparent" />
+        {/* bottom edge fades back into the page */}
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0A0A0A] to-transparent" />
       </div>
 
       {/* ── Layer 2: Content ── */}
@@ -54,8 +45,8 @@ export default function InFocus() {
           <div className="reveal-left w-full md:w-[360px] shrink-0">
             <div style={{ filter: "brightness(0.95) contrast(0.95) saturate(0.90)" }}>
               <ScrollColorImage
-                src="/images/infocus.jpg"
-                alt="Catarina Marques Rodrigues"
+                src={image}
+                alt={config?.personName || "Catarina Marques Rodrigues"}
                 className="aspect-[360/470] rounded-[4px] shadow-xl shadow-black/30 border border-white/[0.08]"
               />
             </div>
@@ -64,29 +55,25 @@ export default function InFocus() {
           {/* Text content — top-aligned with portrait */}
           <div className="reveal-right w-full md:flex-1 md:pt-1">
             <p className="text-[10px] tracking-[0.3em] text-dsh-label/40 uppercase mb-5">
-              In Focus
+              {config?.subtitle || "In Focus"}
             </p>
 
-            <p className="text-sm text-[#8665A7] mb-4">Youtube series · 2026</p>
+            <p className="text-sm text-[#8665A7] mb-4">{config?.meta || "Youtube series · 2026"}</p>
 
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight text-white">
-              We look where the world
-              <br />
-              is told not to look
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight text-white whitespace-pre-line">
+              {config?.heading || "We look where the world\nis told not to look"}
             </h2>
 
-            <p className="text-[#8665A7] text-sm mt-8 mb-4">Catarina Marques Rodrigues</p>
+            <p className="text-[#8665A7] text-sm mt-8 mb-4">{config?.personName || "Catarina Marques Rodrigues"}</p>
 
             <p className="text-sm text-dsh-desc leading-relaxed max-w-[600px]">
-              Documentary and fiction that stay close — to siege, displacement,
-              and the daily labour of remaining human — and refuse the distance
-              through which violence is made acceptable. Festivals, screenings,
-              distribution, and the political context around each film.
+              {config?.description ||
+                "Documentary and fiction that stay close — to siege, displacement, and the daily labour of remaining human — and refuse the distance through which violence is made acceptable. Festivals, screenings, distribution, and the political context around each film."}
             </p>
 
             <div className="flex items-center gap-5 mt-10">
               <button className="text-sm border border-dsh-text-primary/15 rounded-[3px] px-5 py-2 text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:border-dsh-text-primary/25 transition-colors">
-                view more <span className="text-[#8665A7]">+</span>
+                {config?.cta || "view more"} <span className="text-[#8665A7]">+</span>
               </button>
               <a href="#support" className="text-sm text-dsh-desc hover:text-dsh-text-primary transition-colors">
                 Support our work
