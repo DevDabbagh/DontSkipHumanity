@@ -179,7 +179,22 @@ export default function FilmsListing({ films }: { films: Film[] }) {
           FEATURED SECTION
          ═══════════════════════════════════════ */}
       {featured && (
-        <section className="max-w-[1200px] mx-auto px-5 sm:px-8 pt-20 sm:pt-24 lg:pt-28 pb-16 sm:pb-20">
+        <section className="relative overflow-hidden">
+          {/* Background — featured film's own image, blurred & darkened */}
+          <div className="absolute inset-0">
+            <img
+              src={featured.posterUrl || featured.thumbnailUrl}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{
+                filter: "blur(40px) brightness(0.15) saturate(0.6)",
+                transform: "scale(1.2)",
+              }}
+            />
+            <div className="absolute inset-0 bg-black/60" />
+          </div>
+
+          <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8 pt-20 sm:pt-24 lg:pt-28 pb-16 sm:pb-20">
           {/* Label */}
           <p className="text-[10px] tracking-[0.3em] text-[#363636] uppercase mb-8">
             Featured
@@ -277,6 +292,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
                 </Link>
               </div>
             </div>
+          </div>
           </div>
         </section>
       )}
