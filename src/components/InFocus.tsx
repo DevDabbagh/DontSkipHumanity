@@ -19,7 +19,7 @@ export default function InFocus({ config }: { config?: InFocusConfig }) {
           a full-width horizontal band that begins ~40% down the section and
           runs to the bottom — sitting behind the name, description and buttons.
           Grayscale, darkened, with the top & bottom edges fading into black. */}
-      <div className="absolute inset-x-0 bottom-0 top-[40%] pointer-events-none select-none overflow-hidden">
+      <div className="absolute inset-x-0 bottom-[15%] top-[45%] pointer-events-none select-none overflow-hidden">
         <img
           src={image}
           alt=""
@@ -41,7 +41,7 @@ export default function InFocus({ config }: { config?: InFocusConfig }) {
               <ScrollColorImage
                 src={image}
                 alt={config?.personName || "Catarina Marques Rodrigues"}
-                className="aspect-[360/470] rounded-[4px] shadow-xl shadow-black/30 border border-white/[0.08]"
+                className="aspect-[360/470] rounded-[6px] shadow-xl shadow-black/30 border border-white/[0.08]"
               />
             </div>
           </div>

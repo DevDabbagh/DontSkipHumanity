@@ -101,7 +101,7 @@ export default function FilmsListing({ films, header }: { films: Film[]; header?
           style={{ width: "max(64px, calc((100vw - 1264px) / 2))" }}
         >
           <img
-            src={HERO_IMAGE}
+            src={heroImage}
             alt=""
             className="absolute inset-0 w-full h-full object-cover"
             style={{
@@ -124,20 +124,30 @@ export default function FilmsListing({ films, header }: { films: Film[]; header?
                 className="font-semibold text-[40px] leading-[42px] sm:text-[50px] sm:leading-[52px] lg:w-[362px]"
                 style={{ letterSpacing: "-0.02em" }}
               >
-                Documentary
-                <br />
-                and fiction that
-                <br />
-                stay close and
-                <br />
-                <span className="gradient-text">refuse erasure.</span>
+                {hasCustomTitle ? (
+                  <>
+                    {headerTitleNormal && (
+                      <span className="whitespace-pre-line">{headerTitleNormal} </span>
+                    )}
+                    {headerTitleColored && (
+                      <span className="gradient-text">{headerTitleColored}</span>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    Documentary
+                    <br />
+                    and fiction that
+                    <br />
+                    stay close and
+                    <br />
+                    <span className="gradient-text">refuse erasure.</span>
+                  </>
+                )}
               </h1>
-              <p className="text-[16px] leading-[24px] text-white/40 mt-[60px] lg:w-[408px]">
-                DSH makes documentary and fiction — from development and
-                production to festivals and distribution. Films are not
-                streamed here. This section presents the work with rigour
-                and context, and opens paths to screenings, distribution,
-                and press.
+              <p className="text-[16px] leading-[24px] text-white/40 mt-[60px] lg:w-[408px] whitespace-pre-line">
+                {headerDescription ||
+                  "DSH makes documentary and fiction — from development and production to festivals and distribution. Films are not streamed here. This section presents the work with rigour and context, and opens paths to screenings, distribution, and press."}
               </p>
               <div className="flex items-center gap-3 mt-[60px]">
                 <button

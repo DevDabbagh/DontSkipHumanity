@@ -10,7 +10,7 @@ import Notebook from "@/components/Notebook";
 import Agenda from "@/components/Agenda";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
-import { getLandingConfig, firstSlotImage } from "@/lib/landing";
+import { getLandingConfig, firstSlotImage, buildHeroSlides } from "@/lib/landing";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +23,7 @@ export default async function Home() {
   const read = cms.read;
   const infocus = cms.infocus;
   const newsletter = cms.newsletter;
+  const heroSlides = buildHeroSlides(cms.hero);
 
   return (
     <main className="relative">
@@ -30,7 +31,7 @@ export default async function Home() {
       <div className="film-grain" />
 
       <Navbar />
-      <Hero />
+      <Hero slides={heroSlides} />
       <TheWork
         filmsConfig={{ ...films?.text, imageSrc: firstSlotImage(films) }}
         studioConfig={{ ...studio?.text, imageSrc: firstSlotImage(studio) }}

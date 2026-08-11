@@ -151,6 +151,47 @@ export function buildAcademySlides(section: LandingSection | undefined, programs
   }));
 }
 
+/**
+ * Homepage Hero carousel slide — image or video, played only while active.
+ * There's no live "programs" table to fall back to here (unlike Academy), so
+ * `buildHeroSlides` returns `null` when the admin hasn't added any slides —
+ * Hero.tsx keeps its own hardcoded default carousel in that case.
+ */
+export interface HeroSlide {
+  id: string;
+  mediaType: "image" | "video";
+  mediaSrc: string;
+  poster: string;
+  type: string;
+  title: string;
+  href: string | null;
+}
+
+export function buildHeroSlides(section?: LandingSection): HeroSlide[] | null {
+  if (!section || section.enabled === false || !section.slotIds?.length) return null;
+
+  const slides = section.slotIds
+    .map((id) => {
+      const s = section.slots[id];
+      if (!s) return null;
+      const mediaType: "image" | "video" = s.mediaType === "video" ? "video" : "image";
+      const mediaSrc = mediaType === "video" ? s.videoSrc ?? "" : s.imageSrc ?? "";
+      if (!mediaSrc) return null;
+      return {
+        id,
+        mediaType,
+        mediaSrc,
+        poster: mediaType === "video" ? s.imageSrc ?? "" : mediaSrc,
+        type: s.cardType || "",
+        title: s.cardTitle || "",
+        href: s.ctaLink || null,
+      };
+    })
+    .filter((s): s is HeroSlide => s !== null);
+
+  return slides.length > 0 ? slides : null;
+}
+
 /* ── Films page header (editable from the dashboard → Settings) ── */
 export interface FilmsHeader {
   imageSrc?: string;

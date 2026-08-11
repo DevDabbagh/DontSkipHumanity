@@ -1,10 +1,22 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import type { HeroSlide } from "@/lib/landing";
 
-const CAROUSEL_ITEMS = [
+interface CarouselSlide {
+  id: string;
+  mediaType: "image" | "video";
+  mediaSrc: string;
+  poster: string;
+  type: string;
+  typeColor: string;
+  title: string;
+  href: string | null;
+}
+
+const DEFAULT_RAW_ITEMS = [
   {
     type: "Documentary",
     typeColor: "text-[#D81B60]", // Matches vibrant pink from design
@@ -56,13 +68,35 @@ const CAROUSEL_ITEMS = [
   },
 ];
 
+const DEFAULT_ITEMS: CarouselSlide[] = DEFAULT_RAW_ITEMS.map((item, i) => ({
+  id: `hero-default-${i}`,
+  mediaType: "image",
+  mediaSrc: item.image,
+  poster: item.image,
+  type: item.type,
+  typeColor: item.typeColor,
+  title: item.title,
+  href: item.slug ? `/film/${item.slug}` : null,
+}));
+
+function typeColorFor(type: string) {
+  return /series|academy/i.test(type) ? "text-[#9B59B6]" : "text-[#D81B60]";
+}
+
 const HERO_LINES = [
   { text: "An independent media company creating films,", gradient: false },
   { text: " journalism and educational projects rooted in", gradient: false },
   { text: " dignity, witness and collective liberation.", gradient: true },
 ];
 
-export default function Hero() {
+export default function Hero({ slides }: { slides?: HeroSlide[] | null }) {
+  const items = useMemo<CarouselSlide[]>(() => {
+    if (slides && slides.length > 0) {
+      return slides.map((s) => ({ ...s, typeColor: typeColorFor(s.type) }));
+    }
+    return DEFAULT_ITEMS;
+  }, [slides]);
+
   const [activeIndex, setActiveIndex] = useState(0);
   const initialChars = HERO_LINES[0].text.length + HERO_LINES[1].text.length;
   const [typedChars, setTypedChars] = useState(initialChars);
@@ -106,12 +140,12 @@ export default function Hero() {
   }, []);
 
   const next = useCallback(() => {
-    goTo((activeIndex + 1) % CAROUSEL_ITEMS.length);
-  }, [activeIndex, goTo]);
+    goTo((activeIndex + 1) % items.length);
+  }, [activeIndex, goTo, items.length]);
 
   const prev = useCallback(() => {
-    goTo((activeIndex - 1 + CAROUSEL_ITEMS.length) % CAROUSEL_ITEMS.length);
-  }, [activeIndex, goTo]);
+    goTo((activeIndex - 1 + items.length) % items.length);
+  }, [activeIndex, goTo, items.length]);
 
   useEffect(() => {
     // Wait for the entrance animation to finish before starting the timer,
@@ -124,8 +158,8 @@ export default function Hero() {
 
   // Map all items to create a continuous looping track with absolute positioning
   const getVisibleItems = () => {
-    const total = CAROUSEL_ITEMS.length;
-    return CAROUSEL_ITEMS.map((item, index) => {
+    const total = items.length;
+    return items.map((item, index) => {
       let offset = index - activeIndex;
       // Normalize to shortest path
       if (offset > Math.floor(total / 2)) offset -= total;
@@ -233,8 +267,8 @@ export default function Hero() {
               <div
                 key={index}
                 onClick={() => {
-                  if (isActive && item.slug) {
-                    router.push(`/film/${item.slug}`);
+                  if (isActive && item.href) {
+                    router.push(item.href);
                   } else {
                     goTo(index);
                   }
@@ -247,13 +281,28 @@ export default function Hero() {
                 `}
                 style={{ transform: `${finalTransform} translateY(-50%)` }}
               >
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className={`absolute inset-0 w-full h-full object-cover transition-all duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                    isActive ? "scale-100 grayscale-0" : "scale-[1.02] grayscale"
-                  }`}
-                />
+                {/* Video slides only load + play once they're active — every other
+                    slide (including inactive video slides) just shows its poster. */}
+                {item.mediaType === "video" && isActive ? (
+                  <video
+                    key={`${item.id}-playing`}
+                    src={item.mediaSrc}
+                    poster={item.poster || undefined}
+                    className="absolute inset-0 w-full h-full object-cover transition-all duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] scale-100 grayscale-0"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                  />
+                ) : (
+                  <img
+                    src={item.poster || item.mediaSrc}
+                    alt={item.title}
+                    className={`absolute inset-0 w-full h-full object-cover transition-all duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                      isActive ? "scale-100 grayscale-0" : "scale-[1.02] grayscale"
+                    }`}
+                  />
+                )}
                 {/* Layer overlay: center = subtle bottom gradient; sides = heavy dark */}
                 <div className={`absolute inset-0 transition-all duration-[1100ms] ${
                   isActive
@@ -284,9 +333,9 @@ export default function Hero() {
                     {item.title}
                   </h3>
                   {/* Pill button — backdrop blur, bordered. Padding/size decreases for near + far cards. */}
-                  {item.slug ? (
+                  {item.href ? (
                     <Link
-                      href={`/film/${item.slug}`}
+                      href={item.href}
                       className={`mt-2 sm:mt-3 inline-flex items-center gap-1.5 border border-dsh-text-primary/20 rounded-[3px] bg-dsh-btn-bg/20 backdrop-blur-sm text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:bg-dsh-btn-bg/30 transition-all duration-300 ${
                         isActive
                           ? "px-3 py-1.5 text-[11px] sm:text-[12px] xl:px-5 xl:py-2.5 xl:text-[13px]"
