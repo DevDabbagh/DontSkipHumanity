@@ -1,9 +1,44 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { HeroSlide } from "@/lib/landing";
+
+/**
+ * Plays a slide's video once it becomes active. Doesn't rely on the `autoPlay`
+ * attribute alone — some browsers ignore it after client-side re-renders unless
+ * `.muted` is also set as a real DOM property, so this sets both explicitly and
+ * calls `.play()` itself. If the file fails to load/decode, it hides itself so
+ * the poster image underneath keeps showing instead of a broken black box.
+ */
+function ActiveSlideVideo({ src, className }: { src: string; className: string }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.muted = true;
+    const playPromise = el.play();
+    if (playPromise) playPromise.catch(() => {});
+  }, [src]);
+
+  if (failed) return null;
+
+  return (
+    <video
+      ref={ref}
+      src={src}
+      className={className}
+      muted
+      loop
+      playsInline
+      autoPlay
+      onError={() => setFailed(true)}
+    />
+  );
+}
 
 interface CarouselSlide {
   id: string;
@@ -281,26 +316,21 @@ export default function Hero({ slides }: { slides?: HeroSlide[] | null }) {
                 `}
                 style={{ transform: `${finalTransform} translateY(-50%)` }}
               >
-                {/* Video slides only load + play once they're active — every other
-                    slide (including inactive video slides) just shows its poster. */}
-                {item.mediaType === "video" && isActive ? (
-                  <video
-                    key={`${item.id}-playing`}
+                {/* Poster is always the base layer — the video (once active) plays on
+                    top of it, and if the video ever fails to load, the poster is
+                    already there underneath instead of a broken/black frame. */}
+                <img
+                  src={item.poster || item.mediaSrc}
+                  alt={item.title}
+                  className={`absolute inset-0 w-full h-full object-cover transition-all duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                    isActive ? "scale-100 grayscale-0" : "scale-[1.02] grayscale"
+                  }`}
+                />
+                {item.mediaType === "video" && isActive && (
+                  <ActiveSlideVideo
+                    key={item.id}
                     src={item.mediaSrc}
-                    poster={item.poster || undefined}
-                    className="absolute inset-0 w-full h-full object-cover transition-all duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] scale-100 grayscale-0"
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                  />
-                ) : (
-                  <img
-                    src={item.poster || item.mediaSrc}
-                    alt={item.title}
-                    className={`absolute inset-0 w-full h-full object-cover transition-all duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                      isActive ? "scale-100 grayscale-0" : "scale-[1.02] grayscale"
-                    }`}
+                    className="absolute inset-0 w-full h-full object-cover scale-100 grayscale-0"
                   />
                 )}
                 {/* Layer overlay: center = subtle bottom gradient; sides = heavy dark */}

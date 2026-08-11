@@ -6,6 +6,31 @@ import type { SliderSlide } from "@/lib/landing";
 
 const SLIDE_DURATION = 6000;
 
+/**
+ * Plays a slide's video once it becomes active. Explicitly sets `.muted` and calls
+ * `.play()` itself instead of relying only on the `autoPlay` attribute, which some
+ * browsers ignore after a client-side re-render. Hides itself on load failure so
+ * the poster image underneath keeps showing instead of a broken black box.
+ */
+function ActiveSlideVideo({ src, className, style }: { src: string; className: string; style?: React.CSSProperties }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.muted = true;
+    const playPromise = el.play();
+    if (playPromise) playPromise.catch(() => {});
+  }, [src]);
+
+  if (failed) return null;
+
+  return (
+    <video ref={ref} src={src} className={className} style={style} muted loop playsInline autoPlay onError={() => setFailed(true)} />
+  );
+}
+
 export default function FeaturedSlider({ slides }: { slides: SliderSlide[] }) {
   const [current, setCurrent] = useState(0);
   const [textKey, setTextKey] = useState(0);
@@ -49,21 +74,9 @@ export default function FeaturedSlider({ slides }: { slides: SliderSlide[] }) {
       <div className="slider-track absolute inset-0" style={{ transform: `translateX(-${current * 100}%)` }}>
         {slides.map((s, i) => (
           <div key={s.id} className="relative flex-shrink-0 w-full h-full" style={{ width: "100%" }}>
-            {/* Video slides only load + play once they become the active slide — every
-                other slide (including inactive video slides) just shows its poster image. */}
-            {s.mediaType === "video" && i === current ? (
-              <video
-                key={`${s.id}-playing`}
-                src={s.mediaSrc}
-                poster={s.poster || undefined}
-                className="absolute inset-0 w-full h-full object-cover"
-                style={{ opacity: 0.55 }}
-                autoPlay
-                muted
-                loop
-                playsInline
-              />
-            ) : s.poster ? (
+            {/* Poster is always the base layer — the video (once active) plays on top
+                of it, so a failed/slow video never shows a broken black box. */}
+            {s.poster && (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={s.poster}
@@ -72,7 +85,15 @@ export default function FeaturedSlider({ slides }: { slides: SliderSlide[] }) {
                 style={{ opacity: 0.55 }}
                 loading={i === 0 ? "eager" : "lazy"}
               />
-            ) : null}
+            )}
+            {s.mediaType === "video" && i === current && (
+              <ActiveSlideVideo
+                key={s.id}
+                src={s.mediaSrc}
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ opacity: 0.55 }}
+              />
+            )}
             <div
               className="absolute inset-0"
               style={{ background: "linear-gradient(to bottom, rgba(13,13,13,0.1) 0%, rgba(13,13,13,0.6) 55%, #0D0D0D 100%)" }}
