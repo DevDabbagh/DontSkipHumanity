@@ -5,16 +5,17 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { SliderSlide } from "@/lib/landing";
 
 const SLIDE_DURATION = 6000;
+const VIDEO_REVEAL_DELAY = 2000;
 
 /**
- * Plays a slide's video once it becomes active. Explicitly sets `.muted` and calls
- * `.play()` itself instead of relying only on the `autoPlay` attribute, which some
- * browsers ignore after a client-side re-render. Hides itself on load failure so
- * the poster image underneath keeps showing instead of a broken black box.
+ * Plays a slide's video. Explicitly sets `.muted` and calls `.play()` itself
+ * instead of relying only on the `autoPlay` attribute, which some browsers
+ * ignore after a client-side re-render.
  */
-function ActiveSlideVideo({ src, className, style }: { src: string; className: string; style?: React.CSSProperties }) {
+function SlideVideo({ src, className, style, onFail }: {
+  src: string; className: string; style?: React.CSSProperties; onFail: () => void;
+}) {
   const ref = useRef<HTMLVideoElement>(null);
-  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     const el = ref.current;
@@ -24,10 +25,40 @@ function ActiveSlideVideo({ src, className, style }: { src: string; className: s
     if (playPromise) playPromise.catch(() => {});
   }, [src]);
 
-  if (failed) return null;
+  return <video ref={ref} src={src} className={className} style={style} muted loop playsInline autoPlay onError={onFail} />;
+}
+
+/**
+ * Holds a slide's poster on screen for a beat after it becomes active, then
+ * fades the video in on top of it instead of jump-cutting into playback. The
+ * reveal fade lives on a wrapper div so it composes cleanly with the slide's
+ * own dim `style` (e.g. opacity 0.55) instead of fighting over the same
+ * opacity value. Only ever rendered while its slide is active (the caller
+ * mounts/unmounts it), so a fresh mount is all the "reset" it needs. Falls
+ * back to the poster (renders nothing here) if the video fails to load.
+ */
+function SlideMedia({ mediaSrc, className, style }: { mediaSrc: string; className: string; style?: React.CSSProperties }) {
+  const [reveal, setReveal] = useState(false);
+  const [entered, setEntered] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setReveal(true), VIDEO_REVEAL_DELAY);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (!reveal) return;
+    const raf = requestAnimationFrame(() => setEntered(true));
+    return () => cancelAnimationFrame(raf);
+  }, [reveal]);
+
+  if (!reveal || failed) return null;
 
   return (
-    <video ref={ref} src={src} className={className} style={style} muted loop playsInline autoPlay onError={() => setFailed(true)} />
+    <div className="absolute inset-0 transition-opacity duration-700 ease-out" style={{ opacity: entered ? 1 : 0 }}>
+      <SlideVideo src={mediaSrc} className={className} style={style} onFail={() => setFailed(true)} />
+    </div>
   );
 }
 
@@ -87,9 +118,9 @@ export default function FeaturedSlider({ slides }: { slides: SliderSlide[] }) {
               />
             )}
             {s.mediaType === "video" && i === current && (
-              <ActiveSlideVideo
+              <SlideMedia
                 key={s.id}
-                src={s.mediaSrc}
+                mediaSrc={s.mediaSrc}
                 className="absolute inset-0 w-full h-full object-cover"
                 style={{ opacity: 0.55 }}
               />

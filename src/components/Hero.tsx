@@ -5,16 +5,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { HeroSlide } from "@/lib/landing";
 
+const VIDEO_REVEAL_DELAY = 2000;
+
 /**
- * Plays a slide's video once it becomes active. Doesn't rely on the `autoPlay`
- * attribute alone — some browsers ignore it after client-side re-renders unless
- * `.muted` is also set as a real DOM property, so this sets both explicitly and
- * calls `.play()` itself. If the file fails to load/decode, it hides itself so
- * the poster image underneath keeps showing instead of a broken black box.
+ * Plays a slide's video. Doesn't rely on the `autoPlay` attribute alone — some
+ * browsers ignore it after client-side re-renders unless `.muted` is also set
+ * as a real DOM property, so this sets both explicitly and calls `.play()` itself.
  */
-function ActiveSlideVideo({ src, className }: { src: string; className: string }) {
+function SlideVideo({ src, className, onFail }: { src: string; className: string; onFail: () => void }) {
   const ref = useRef<HTMLVideoElement>(null);
-  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     const el = ref.current;
@@ -24,19 +23,39 @@ function ActiveSlideVideo({ src, className }: { src: string; className: string }
     if (playPromise) playPromise.catch(() => {});
   }, [src]);
 
-  if (failed) return null;
+  return <video ref={ref} src={src} className={className} muted loop playsInline autoPlay onError={onFail} />;
+}
+
+/**
+ * Holds a slide's poster on screen for a beat after it becomes active, then
+ * fades the video in on top of it — so switching slides never jump-cuts
+ * straight into playback. Only ever rendered while its slide is active (the
+ * caller mounts/unmounts it), so a fresh mount is all the "reset" it needs.
+ * If the video fails to load/decode, it renders nothing and the poster
+ * underneath keeps showing.
+ */
+function HeroSlideMedia({ mediaSrc, className }: { mediaSrc: string; className: string }) {
+  const [reveal, setReveal] = useState(false);
+  const [entered, setEntered] = useState(false);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setReveal(true), VIDEO_REVEAL_DELAY);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (!reveal) return;
+    const raf = requestAnimationFrame(() => setEntered(true));
+    return () => cancelAnimationFrame(raf);
+  }, [reveal]);
+
+  if (!reveal || failed) return null;
 
   return (
-    <video
-      ref={ref}
-      src={src}
-      className={className}
-      muted
-      loop
-      playsInline
-      autoPlay
-      onError={() => setFailed(true)}
-    />
+    <div className="absolute inset-0 transition-opacity duration-700 ease-out" style={{ opacity: entered ? 1 : 0 }}>
+      <SlideVideo src={mediaSrc} className={className} onFail={() => setFailed(true)} />
+    </div>
   );
 }
 
@@ -327,9 +346,9 @@ export default function Hero({ slides }: { slides?: HeroSlide[] | null }) {
                   }`}
                 />
                 {item.mediaType === "video" && isActive && (
-                  <ActiveSlideVideo
+                  <HeroSlideMedia
                     key={item.id}
-                    src={item.mediaSrc}
+                    mediaSrc={item.mediaSrc}
                     className="absolute inset-0 w-full h-full object-cover scale-100 grayscale-0"
                   />
                 )}
