@@ -19,7 +19,7 @@ export default function InFocus({ config }: { config?: InFocusConfig }) {
           a full-width horizontal band that begins ~40% down the section and
           runs to the bottom — sitting behind the name, description and buttons.
           Grayscale, darkened, with the top & bottom edges fading into black. */}
-      <div className="absolute inset-x-0 bottom-[15%] top-[45%] pointer-events-none select-none overflow-hidden">
+      <div className="absolute inset-x-0 bottom-[15%] top-[40%] pointer-events-none select-none overflow-hidden">
         <img
           src={image}
           alt=""
