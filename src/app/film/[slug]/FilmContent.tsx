@@ -448,13 +448,14 @@ export default function FilmContent({
       <Footer />
 
       {/* On-platform trailer player (no external redirect) */}
-      {film.trailerUrl && (
+      {film.trailerUrl && trailerOpen && (
         <TrailerModal
-          open={trailerOpen}
           onClose={() => setTrailerOpen(false)}
           src={film.trailerUrl}
           poster={film.posterUrl || film.thumbnailUrl}
           title={film.title}
+          filmId={film.id}
+          requiresRequest={film.accessMode === "request_only"}
         />
       )}
     </main>

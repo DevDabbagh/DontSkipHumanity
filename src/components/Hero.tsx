@@ -137,13 +137,32 @@ function typeColorFor(type: string) {
   return /series|academy/i.test(type) ? "text-[#9B59B6]" : "text-[#D81B60]";
 }
 
-const HERO_LINES = [
-  { text: "An independent media company creating films,", gradient: false },
-  { text: " journalism and educational projects rooted in", gradient: false },
+const DEFAULT_HERO_LINES = [
+  { text: "An independent media company creating films", gradient: false },
+  { text: " and educational projects rooted in", gradient: false },
   { text: " dignity, witness and collective liberation.", gradient: true },
 ];
 
-export default function Hero({ slides }: { slides?: HeroSlide[] | null }) {
+/**
+ * Splits an admin-editable heading string into the typewriter's line/gradient
+ * segments. Groups words into thirds (roughly matching the original 3-line
+ * design) and highlights the final third with the gradient treatment — so any
+ * heading typed in Landing Settings drives the animation, not just the
+ * hardcoded default.
+ */
+function splitHeadingIntoLines(text: string): { text: string; gradient: boolean }[] {
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return DEFAULT_HERO_LINES;
+  const third = Math.ceil(words.length / 3);
+  const chunks = [
+    words.slice(0, third).join(" "),
+    words.slice(third, third * 2).join(" "),
+    words.slice(third * 2).join(" "),
+  ].filter(Boolean);
+  return chunks.map((t, i) => ({ text: (i === 0 ? "" : " ") + t, gradient: i === chunks.length - 1 }));
+}
+
+export default function Hero({ slides, heading }: { slides?: HeroSlide[] | null; heading?: string }) {
   const items = useMemo<CarouselSlide[]>(() => {
     if (slides && slides.length > 0) {
       return slides.map((s) => ({ ...s, typeColor: typeColorFor(s.type) }));
@@ -151,8 +170,13 @@ export default function Hero({ slides }: { slides?: HeroSlide[] | null }) {
     return DEFAULT_ITEMS;
   }, [slides]);
 
+  const lines = useMemo(
+    () => (heading && heading.trim() ? splitHeadingIntoLines(heading) : DEFAULT_HERO_LINES),
+    [heading]
+  );
+
   const [activeIndex, setActiveIndex] = useState(0);
-  const initialChars = HERO_LINES[0].text.length + HERO_LINES[1].text.length;
+  const initialChars = (lines[0]?.text.length ?? 0) + (lines[1]?.text.length ?? 0);
   const [typedChars, setTypedChars] = useState(initialChars);
   const [showCursor, setShowCursor] = useState(true);
   const [carouselState, setCarouselState] = useState<'hidden' | 'center-visible' | 'full-visible'>('hidden');
@@ -168,8 +192,20 @@ export default function Hero({ slides }: { slides?: HeroSlide[] | null }) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const fullText = HERO_LINES.map((l) => l.text).join("");
+  const fullText = lines.map((l) => l.text).join("");
   const totalChars = fullText.length;
+
+  // Precomputed once per `lines` change (not mutated during render) so each
+  // line knows where its typed-character range starts within the full text.
+  const linesWithOffsets = useMemo(() => {
+    const result: { text: string; gradient: boolean; start: number }[] = [];
+    let offset = 0;
+    for (const line of lines) {
+      result.push({ ...line, start: offset });
+      offset += line.text.length;
+    }
+    return result;
+  }, [lines]);
 
   useEffect(() => {
     if (typedChars >= totalChars) {
@@ -230,30 +266,25 @@ export default function Hero({ slides }: { slides?: HeroSlide[] | null }) {
       <div className="max-w-[1200px] mx-auto px-5 sm:px-8 text-center mb-6 sm:mb-8 lg:mb-10 xl:mb-[70px]">
         <div className="mb-1 sm:mb-2">
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] xl:text-[50px] font-semibold tracking-tight text-white/90 leading-[1.3] xl:leading-[1.04]">
-            {(() => {
-              let charCount = 0;
-              return HERO_LINES.map((line, i) => {
-                const lineStart = charCount;
-                charCount += line.text.length;
-                const visibleLen = Math.max(0, Math.min(line.text.length, typedChars - lineStart));
-                const visibleText = line.text.slice(0, visibleLen);
-                const isCursorHere = typedChars >= lineStart && typedChars < lineStart + line.text.length;
+            {linesWithOffsets.map((line, i) => {
+              const visibleLen = Math.max(0, Math.min(line.text.length, typedChars - line.start));
+              const visibleText = line.text.slice(0, visibleLen);
+              const isCursorHere = typedChars >= line.start && typedChars < line.start + line.text.length;
 
-                return (
-                  <span key={i}>
-                    {i > 0 && <br className="hidden md:block" />}
-                    {line.gradient ? (
-                      <span className="gradient-text-static">{visibleText}</span>
-                    ) : (
-                      <span>{visibleText}</span>
-                    )}
-                    {isCursorHere && showCursor && (
-                      <span className="typing-cursor">|</span>
-                    )}
-                  </span>
-                );
-              });
-            })()}
+              return (
+                <span key={i}>
+                  {i > 0 && <br className="hidden md:block" />}
+                  {line.gradient ? (
+                    <span className="gradient-text-static">{visibleText}</span>
+                  ) : (
+                    <span>{visibleText}</span>
+                  )}
+                  {isCursorHere && showCursor && (
+                    <span className="typing-cursor">|</span>
+                  )}
+                </span>
+              );
+            })}
             {typedChars >= totalChars && showCursor && (
               <span className="typing-cursor">|</span>
             )}

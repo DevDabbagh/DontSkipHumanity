@@ -31,7 +31,7 @@ export default async function Home() {
       <div className="film-grain" />
 
       <Navbar />
-      <Hero slides={heroSlides} />
+      <Hero slides={heroSlides} heading={cms.hero?.text?.heading} />
       <TheWork
         filmsConfig={{ ...films?.text, imageSrc: firstSlotImage(films) }}
         studioConfig={{ ...studio?.text, imageSrc: firstSlotImage(studio) }}
