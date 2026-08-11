@@ -1,4 +1,5 @@
 import { getFilms } from "@/lib/api";
+import { getFilmsHeader } from "@/lib/landing";
 import FilmsListing from "./FilmsListing";
 
 export const dynamic = "force-dynamic";
@@ -9,6 +10,6 @@ export const metadata = {
 };
 
 export default async function FilmsPage() {
-  const films = await getFilms();
-  return <FilmsListing films={films} />;
+  const [films, header] = await Promise.all([getFilms(), getFilmsHeader()]);
+  return <FilmsListing films={films} header={header} />;
 }

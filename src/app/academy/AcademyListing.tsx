@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FeaturedSlider from "@/components/academy/FeaturedSlider";
 import type { AcademyProgram } from "@/lib/types";
+import type { SliderSlide } from "@/lib/landing";
 
 const TYPE_LABELS: Record<string, { label: string; color: string }> = {
   course: { label: "Course", color: "bg-[#9B59B6]/20 text-[#c084fc]" },
@@ -15,16 +16,15 @@ const TYPE_LABELS: Record<string, { label: string; color: string }> = {
   mentorship: { label: "Mentorship", color: "bg-indigo-500/20 text-indigo-300" },
 };
 
-export default function AcademyListing({ programs }: { programs: AcademyProgram[] }) {
+export default function AcademyListing({ programs, slides }: { programs: AcademyProgram[]; slides: SliderSlide[] }) {
   const sectionRef = useReveal();
-  const featured = programs.slice(0, 4);
 
   return (
     <main className="min-h-screen bg-[#0D0D0D] text-white">
       <Navbar />
 
       <div style={{ paddingTop: 64 }}>
-        <FeaturedSlider programs={featured} />
+        <FeaturedSlider slides={slides} />
       </div>
 
       <div className="max-w-[1400px] mx-auto px-5 sm:px-8 pb-20" ref={sectionRef}>

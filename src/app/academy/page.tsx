@@ -1,4 +1,5 @@
 import { getPrograms } from "@/lib/api";
+import { getLandingConfig, buildAcademySlides } from "@/lib/landing";
 
 export const dynamic = "force-dynamic";
 import AcademyListing from "./AcademyListing";
@@ -9,6 +10,7 @@ export const metadata = {
 };
 
 export default async function AcademyPage() {
-  const programs = await getPrograms();
-  return <AcademyListing programs={programs} />;
+  const [programs, cms] = await Promise.all([getPrograms(), getLandingConfig()]);
+  const slides = buildAcademySlides(cms.academy_slider, programs);
+  return <AcademyListing programs={programs} slides={slides} />;
 }

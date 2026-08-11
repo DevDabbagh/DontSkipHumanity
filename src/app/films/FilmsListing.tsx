@@ -5,10 +5,11 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import type { Film, FilmStage } from "@/lib/types";
+import type { FilmsHeader } from "@/lib/landing";
 
 /* ── Constants ── */
 
-/* Hero image — intentionally SEPARATE from the featured film poster below */
+/* Hero image — default; overridden by the dashboard Header settings if set */
 const HERO_IMAGE = "/images/journalism.jpg";
 
 const STAGE_LABELS: Record<string, string> = {
@@ -34,7 +35,14 @@ const FILTER_BTN_ACTIVE =
 
 /* ── Component ── */
 
-export default function FilmsListing({ films }: { films: Film[] }) {
+export default function FilmsListing({ films, header }: { films: Film[]; header?: FilmsHeader }) {
+  /* Header (from dashboard, with fallbacks) */
+  const heroImage = header?.imageSrc || HERO_IMAGE;
+  const headerTitleNormal = header?.titleNormal?.trim();
+  const headerTitleColored = header?.titleColored?.trim();
+  const headerDescription = header?.description?.trim();
+  const hasCustomTitle = !!(headerTitleNormal || headerTitleColored);
+
   /* Featured */
   const featuredFilms = useMemo(() => films.filter((f) => f.isFeatured), [films]);
   const [featuredIdx, setFeaturedIdx] = useState(0);
@@ -156,7 +164,7 @@ export default function FilmsListing({ films }: { films: Film[] }) {
                 style={{ boxShadow: "0 24px 70px -20px rgba(0,0,0,0.7)" }}
               >
                 <img
-                  src={HERO_IMAGE}
+                  src={heroImage}
                   alt=""
                   className="absolute inset-0 w-full h-full object-cover"
                   style={{
