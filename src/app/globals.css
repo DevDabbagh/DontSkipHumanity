@@ -270,7 +270,7 @@
 
 /* Gradient text — static (for typewriter) */
 .gradient-text-static {
-  background: linear-gradient(90deg, #9B59B6, #1ABC9C);
+  background: linear-gradient(90deg, #32C6CC, #9B59B6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
