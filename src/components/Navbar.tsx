@@ -144,7 +144,7 @@ export default function Navbar() {
                 <Link
                   key={link.label}
                   href={link.href}
-                  className={`text-[13px] tracking-wide transition-colors ${active ? "" : "text-dsh-nav hover:text-dsh-nav-hover"}`}
+                  className={`text-[13px] font-medium tracking-wide transition-colors ${active ? "" : "text-dsh-nav hover:text-dsh-nav-hover"}`}
                   style={active ? { color: NAV_ACTIVE_COLOR } : undefined}
                 >
                   {link.label}
@@ -161,9 +161,9 @@ export default function Navbar() {
             ) : !isLoggedIn ? (
               <button
                 onClick={() => setIsLoginModalOpen(true)}
-                className="text-[13px] tracking-wide text-dsh-nav hover:text-dsh-nav-hover transition-colors"
+                className="text-[13px] font-medium tracking-wide text-dsh-nav hover:text-dsh-nav-hover transition-colors"
               >
-                Log in
+                Login
               </button>
             ) : (
               <div className="relative" ref={dropdownRef}>
@@ -244,7 +244,7 @@ export default function Navbar() {
                 <Link
                   key={link.label}
                   href={link.href}
-                  className={`text-[13px] tracking-wide transition-colors ${active ? "" : "text-dsh-nav hover:text-dsh-nav-hover"}`}
+                  className={`text-[13px] font-medium tracking-wide transition-colors ${active ? "" : "text-dsh-nav hover:text-dsh-nav-hover"}`}
                   style={active ? { color: NAV_ACTIVE_COLOR } : undefined}
                   onClick={() => setMenuOpen(false)}
                 >
