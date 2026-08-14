@@ -18,18 +18,14 @@ function isNavLinkActive(pathname: string, href: string) {
 
 const NAV_LINKS = [
   { label: "Films", href: "/films" },
+  { label: "Studio", href: "/studio" },
   { label: "Academy", href: "/academy" },
+  { label: "Read", href: "/read" },
   { label: "About", href: "/about" },
   { label: "Support", href: "/support" },
 ];
 
-const MENU_LINKS = [
-  { label: "Films", href: "/films" },
-  { label: "Academy", href: "/academy" },
-  { label: "About", href: "/about" },
-  { label: "Support", href: "/support" },
-  { label: "Membership", href: "/support" },
-];
+const MENU_LINKS = NAV_LINKS;
 
 const DEFAULT_SOCIAL_LINKS = [
   { label: "Instagram", href: "https://instagram.com/dontskiphumanity" },
@@ -124,18 +120,18 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className={`nav-animate fixed top-0 left-0 right-0 z-40 transition-all duration-500 ease-in-out bg-[#0D0D0D] border-b border-white/10 ${
-        scrolled ? "shadow-2xl py-1" : "py-3"
+      <nav className={`nav-animate fixed top-0 left-0 right-0 z-40 bg-[#0D0D0D]/70 backdrop-blur-md ${
+        scrolled ? "shadow-2xl shadow-black/30" : ""
       }`}>
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 grid grid-cols-[auto_1fr_auto] items-center">
-          {/* Logo */}
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-[128px] grid grid-cols-[auto_1fr_auto] items-center">
+          {/* Logo — fixed 127x52 SVG, no shrink on scroll */}
           <Link href="/" className="flex items-center shrink-0">
             <Image
-              src="/images/ic_logo.png"
+              src="/images/ic_logo_navbar.svg"
               alt="Don't Skip Humanity"
-              width={180}
+              width={127}
               height={52}
-              className={`w-auto transition-all duration-500 ${scrolled ? 'h-7 sm:h-8 lg:h-9' : 'h-8 sm:h-10 lg:h-11'}`}
+              className="w-[127px] h-[52px]"
               priority
             />
           </Link>
@@ -165,7 +161,7 @@ export default function Navbar() {
             ) : !isLoggedIn ? (
               <button
                 onClick={() => setIsLoginModalOpen(true)}
-                className="text-sm font-medium text-dsh-nav-hover border border-white/20 rounded-full px-4 py-1.5 hover:bg-white/10 transition-colors"
+                className="text-[13px] tracking-wide text-dsh-nav hover:text-dsh-nav-hover transition-colors"
               >
                 Log in
               </button>
@@ -203,16 +199,13 @@ export default function Navbar() {
               </div>
             )}
 
-            {/* Hamburger — always visible */}
+            {/* Hamburger — always visible (Figma svg) */}
             <button
-              className="p-2 text-dsh-nav hover:text-dsh-nav-hover transition-colors"
+              className="p-2 opacity-90 hover:opacity-100 transition-opacity"
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="Toggle menu"
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5" />
-              </svg>
+              <Image src="/images/ic_menu.svg" alt="Menu" width={24} height={24} className="w-6 h-6" />
             </button>
           </div>
         </div>
@@ -234,11 +227,11 @@ export default function Navbar() {
           {/* Left: Logo */}
           <Link href="/" className="flex items-center shrink-0 justify-self-start" onClick={() => setMenuOpen(false)}>
             <Image
-              src="/images/ic_logo.png"
+              src="/images/ic_logo_navbar.svg"
               alt="Don't Skip Humanity"
-              width={180}
+              width={127}
               height={52}
-              className="h-8 sm:h-10 lg:h-11 w-auto"
+              className="w-[127px] h-[52px]"
               priority
             />
           </Link>
