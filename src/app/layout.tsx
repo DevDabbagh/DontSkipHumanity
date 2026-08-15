@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 import SupportBanner from "@/components/SupportBanner";
 import { AuthProvider } from "@/contexts/AuthContext";
 
 const inter = Inter({
   variable: "--font-inter",
+  subsets: ["latin"],
+});
+
+const sourceSans3 = Source_Sans_3({
+  variable: "--font-source-sans",
   subsets: ["latin"],
 });
 
@@ -43,7 +48,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} antialiased`}>
+    <html lang="en" className={`${inter.variable} ${sourceSans3.variable} antialiased`}>
       <body className="min-h-screen bg-[#0D0D0D] text-white font-[var(--font-inter)]">
         <AuthProvider>
           {children}

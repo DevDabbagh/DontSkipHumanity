@@ -41,7 +41,7 @@ export default function InFocus({ config }: { config?: InFocusConfig }) {
               <ScrollColorImage
                 src={image}
                 alt={config?.personName || "Catarina Marques Rodrigues"}
-                className="aspect-[360/470] rounded-[6px] shadow-xl shadow-black/30 border border-white/[0.08]"
+                className="aspect-[360/470] rounded-[6px] border-[1.5px] border-[#F0F0F0]/10 shadow-[0_6px_20px_2px_rgba(0,0,0,0.5)]"
               />
             </div>
           </div>
@@ -54,19 +54,19 @@ export default function InFocus({ config }: { config?: InFocusConfig }) {
 
             <p className="text-sm text-[#8665A7] mb-4">{config?.meta || "Youtube series · 2026"}</p>
 
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight text-white whitespace-pre-line">
+            <h2 className="text-[24px] leading-[32px] md:text-[30px] md:leading-[40px] tracking-[-1px] font-semibold text-white whitespace-pre-line">
               {config?.heading || "We look where the world\nis told not to look"}
             </h2>
 
             <p className="text-[#8665A7] text-sm mt-8 mb-4">{config?.personName || "Catarina Marques Rodrigues"}</p>
 
-            <p className="text-sm text-dsh-desc leading-relaxed max-w-[600px]">
+            <p className="font-[family-name:var(--font-source-sans)] text-[16px] leading-[24px] tracking-[0.5px] text-dsh-desc max-w-[600px]">
               {config?.description ||
                 "Documentary and fiction that stay close — to siege, displacement, and the daily labour of remaining human — and refuse the distance through which violence is made acceptable. Festivals, screenings, distribution, and the political context around each film."}
             </p>
 
             <div className="flex items-center gap-5 mt-10">
-              <button className="text-sm border border-dsh-text-primary/15 rounded-[3px] px-5 py-2 text-dsh-text-primary/40 hover:text-dsh-text-primary/60 hover:border-dsh-text-primary/25 transition-colors">
+              <button className="inline-flex items-center gap-1.5 text-[13px] font-medium px-[14px] py-[12px] rounded-[3px] border border-[#F0F0F0]/15 bg-[#1B1B1B]/20 backdrop-blur-[3px] text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 hover:border-[#F0F0F0]/25 transition-colors">
                 {config?.cta || "view more"} <span className="text-[#8665A7]">+</span>
               </button>
               <a href="#support" className="text-sm text-dsh-desc hover:text-dsh-text-primary transition-colors">
