@@ -27,8 +27,10 @@ export default async function Home() {
 
   return (
     <main className="relative">
-      {/* Film grain overlay */}
-      <div className="film-grain" />
+      {/* Top background gradient — #1E1E1E at the very top fading into the page's
+          solid #0D0D0D (body background). Sits behind all content. Replaces the
+          old noise/film-grain overlay. */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[700px] -z-10 bg-gradient-to-b from-[#1E1E1E] to-[#0D0D0D]" />
 
       <Navbar />
       <Hero slides={heroSlides} heading={cms.hero?.text?.heading} />
