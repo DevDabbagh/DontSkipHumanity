@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type { HeroSlide } from "@/lib/landing";
 
@@ -73,49 +74,49 @@ interface CarouselSlide {
 const DEFAULT_RAW_ITEMS = [
   {
     type: "Documentary",
-    typeColor: "text-[#D81B60]", // Matches vibrant pink from design
+    typeColor: "text-[#B23495]", // Matches vibrant pink from design
     title: "What We\nCarried",
     slug: "beneath-the-canopy",
     image: "/images/slider1.jpg",
   },
   {
     type: "Documentary",
-    typeColor: "text-[#D81B60]",
+    typeColor: "text-[#B23495]",
     title: "Free Fish",
     slug: "free-fish",
     image: "/images/slider2.jpg",
   },
   {
     type: "Documentary",
-    typeColor: "text-[#D81B60]",
+    typeColor: "text-[#B23495]",
     title: "Bisan Owda\nInside Creators",
     slug: "salt-and-light",
     image: "/images/journalism.jpg",
   },
   {
     type: "Youtube Series",
-    typeColor: "text-[#9B59B6]",
+    typeColor: "text-[#32C6CC]",
     title: "Saber Não\nOcupa Espaço",
     slug: "the-classroom",
     image: "/images/political-education.jpg",
   },
   {
     type: "Academy",
-    typeColor: "text-[#9B59B6]",
+    typeColor: "text-[#32C6CC]",
     title: "Catarina Marques\nRodrigues",
     slug: null,
     image: "/images/slidere3.jpg",
   },
   {
     type: "Documentary",
-    typeColor: "text-[#D81B60]",
+    typeColor: "text-[#B23495]",
     title: "Salt and\nLight",
     slug: "salt-and-light",
     image: "/images/studio.jpg",
   },
   {
     type: "Documentary",
-    typeColor: "text-[#D81B60]",
+    typeColor: "text-[#B23495]",
     title: "The\nClassroom",
     slug: "the-classroom",
     image: "/images/infocus.jpg",
@@ -134,7 +135,7 @@ const DEFAULT_ITEMS: CarouselSlide[] = DEFAULT_RAW_ITEMS.map((item, i) => ({
 }));
 
 function typeColorFor(type: string) {
-  return /series|academy/i.test(type) ? "text-[#9B59B6]" : "text-[#D81B60]";
+  return /series|academy/i.test(type) ? "text-[#32C6CC]" : "text-[#B23495]";
 }
 
 const DEFAULT_HERO_LINES = [
@@ -320,7 +321,7 @@ export default function Hero({ slides, heading }: { slides?: HeroSlide[] | null;
             // Smooth Transform calculation using exact CSS to avoid Tailwind JIT issues
             let translateX = "-50%";
             let zIndexClass = "z-10";
-            let shadowClass = "shadow-2xl shadow-black/40 border-white/10";
+            let shadowClass = "shadow-[0_30px_80px_-24px_rgba(0,0,0,0.6)] border-white/10";
             let baseOpacity = "opacity-100";
 
             if (offset === -1) { translateX = "-170%"; zIndexClass = "z-[5]"; shadowClass = "border-white/[0.06]"; }
@@ -358,7 +359,7 @@ export default function Hero({ slides, heading }: { slides?: HeroSlide[] | null;
                     goTo(index);
                   }
                 }}
-                className={`absolute left-1/2 top-1/2 overflow-hidden cursor-pointer rounded-[8px] origin-center
+                className={`absolute left-1/2 top-1/2 overflow-hidden cursor-pointer rounded-[6px] origin-center
                   transition-all duration-[1200ms] ease-[cubic-bezier(0.2,1,0.2,1)]
                   ${cardWidth} ${cardHeight}
                   ${finalOpacity}
@@ -391,24 +392,24 @@ export default function Hero({ slides, heading }: { slides?: HeroSlide[] | null;
                 }`} />
 
                 {/* Card content */}
-                <div className={`absolute bottom-0 left-0 right-0 p-3 sm:p-4 md:p-5 transition-all duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                <div className={`absolute bottom-0 left-0 right-0 p-4 sm:p-5 md:p-6 xl:p-[30px] transition-all duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
                   isActive ? "opacity-100" : "opacity-70"
                 }`}>
-                  <span className={`font-medium tracking-wider uppercase ${item.typeColor} ${
+                  <span className={`font-semibold ${item.typeColor} ${
                     isActive
                       ? "text-[9px] sm:text-[10px] xl:text-[13px]"
                       : isNear
-                        ? "text-[9px] sm:text-[10px] xl:text-[12px]"
-                        : "text-[9px] sm:text-[10px] xl:text-[11px]"
+                        ? "text-[8px] sm:text-[9px] xl:text-[10px]"
+                        : "text-[8px] sm:text-[8px] xl:text-[8px]"
                   }`}>
                     {item.type}
                   </span>
-                  <h3 className={`text-white font-bold whitespace-pre-line leading-[1.15] mt-1 transition-all duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                  <h3 className={`text-[#F0F0F0] font-semibold whitespace-pre-line leading-[1.1] tracking-[-0.01em] mt-[10px] transition-all duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
                     isActive
-                      ? "text-[20px] sm:text-[24px] md:text-[28px] xl:text-[30px]"
+                      ? "text-[20px] sm:text-[24px] md:text-[28px] xl:text-[30px] xl:leading-[33px]"
                       : isNear
-                        ? "text-[16px] sm:text-[18px] md:text-[20px] xl:text-[26px]"
-                        : "text-[13px] sm:text-[15px] md:text-[17px] xl:text-[22px]"
+                        ? "text-[16px] sm:text-[18px] md:text-[20px] xl:text-[26px] xl:leading-[26px]"
+                        : "text-[13px] sm:text-[15px] md:text-[17px] xl:text-[22px] xl:leading-[22px]"
                   }`}>
                     {item.title}
                   </h3>
@@ -455,19 +456,17 @@ export default function Hero({ slides, heading }: { slides?: HeroSlide[] | null;
           <>
             <button
               onClick={prev}
-              className="absolute left-2 sm:left-4 md:left-6 lg:left-10 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/40 border border-white/20 flex items-center justify-center text-white/80 hover:text-white hover:bg-black/60 hover:border-white/30 transition-all duration-300 z-20 backdrop-blur-sm opacity-0 group-hover:opacity-100"
+              aria-label="Previous"
+              className="absolute left-2 sm:left-4 md:left-6 lg:left-10 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center transition-opacity duration-300 z-20 opacity-0 group-hover:opacity-100 hover:opacity-80"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
+              <Image src="/ic_arrow_left.svg" alt="" width={40} height={40} className="w-10 h-10" unoptimized />
             </button>
             <button
               onClick={next}
-              className="absolute right-2 sm:right-4 md:right-6 lg:right-10 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-black/40 border border-white/20 flex items-center justify-center text-white/80 hover:text-white hover:bg-black/60 hover:border-white/30 transition-all duration-300 z-20 backdrop-blur-sm opacity-0 group-hover:opacity-100"
+              aria-label="Next"
+              className="absolute right-2 sm:right-4 md:right-6 lg:right-10 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center transition-opacity duration-300 z-20 opacity-0 group-hover:opacity-100 hover:opacity-80"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
+              <Image src="/ic_arrow_right.svg" alt="" width={40} height={40} className="w-10 h-10" unoptimized />
             </button>
           </>
         )}
@@ -483,18 +482,12 @@ export default function Hero({ slides, heading }: { slides?: HeroSlide[] | null;
       }`}>
         <p className="text-xs sm:text-sm text-gray-500 tracking-wide">Welcome to our world!</p>
 
-        {/* Mounted/unmounted (not just faded) based on scroll position so the dot +
-            chevron animation genuinely replays every time you scroll back up to the top. */}
+        {/* Old, quieter scroll cue — a simple thin vertical line (no "techy" mouse
+            animation). Mounted/unmounted with scroll position so it fades back in
+            when you return to the top. */}
         {nearTop && (
-          <div key={carouselState === 'full-visible' ? 'si-in' : 'si-pending'} className="scroll-indicator flex flex-col items-center mt-4">
-            <div className="scroll-indicator-mouse">
-              <span className="scroll-indicator-dot" />
-            </div>
-            <div className="scroll-indicator-chevron">
-              <svg width="12" height="7" viewBox="0 0 12 7" fill="none">
-                <path d="M1 1l5 4.5L11 1" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
+          <div key={carouselState === 'full-visible' ? 'si-in' : 'si-pending'} className="scroll-indicator flex justify-center mt-5">
+            <span className="block w-px h-10 bg-white/20" />
           </div>
         )}
       </div>
