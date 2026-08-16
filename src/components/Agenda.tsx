@@ -134,12 +134,12 @@ export default function Agenda() {
             <Link
               key={`${event.slug}-${i}`}
               href={`/agenda/${event.slug}`}
-              className={`reveal stagger-${Math.min(i + 1, 5)} block group transition-colors`}
+              className={`reveal stagger-${Math.min(i + 1, 5)} block group transition-colors ${
+                event.upcoming ? "" : "hover:bg-[#363636]/[0.14]"
+              }`}
               style={{
                 borderBottom: "1px solid rgba(54,54,54,0.5)",
-                background: event.upcoming
-                  ? "rgba(54,54,54,0.14)"
-                  : "transparent",
+                ...(event.upcoming ? { background: "rgba(54,54,54,0.14)" } : {}),
               }}
             >
               <div className="flex items-center gap-4 sm:gap-6 md:gap-10 py-5 sm:py-6 md:py-8 px-2 sm:px-4">
