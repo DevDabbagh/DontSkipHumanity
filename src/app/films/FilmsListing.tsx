@@ -3,6 +3,8 @@
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import Newsletter from "@/components/Newsletter";
+import SupportCTA from "@/components/SupportCTA";
 import Footer from "@/components/Footer";
 import type { Film, FilmStage } from "@/lib/types";
 import type { FilmsHeader } from "@/lib/landing";
@@ -380,11 +382,11 @@ export default function FilmsListing({ films, header }: { films: Film[]; header?
             No films match these filters.
           </p>
         ) : (
-          <div className="space-y-16 sm:space-y-20 pb-20 sm:pb-24">
+          <div className="space-y-[100px] pb-20 sm:pb-24">
             {rows.map((row, ri) => (
               <div
                 key={ri}
-                className="grid md:grid-cols-2 gap-10 md:gap-8 lg:gap-10"
+                className="grid md:grid-cols-2 gap-[100px] md:gap-x-[24px] md:gap-y-[100px]"
               >
                 {row.map((film) => (
                   <FilmRow key={film.slug} film={film} />
@@ -395,92 +397,116 @@ export default function FilmsListing({ films, header }: { films: Film[]; header?
         )}
       </div>
 
+      {/* 230px gap — Figma #54 */}
+      <div className="h-[230px]" />
+
+      {/* Closing CTA — Figma #56: always a support CTA or newsletter */}
+      <SupportCTA />
+
+      {/* Newsletter — Figma #70: same as landing page */}
+      <Newsletter />
+
       <Footer />
     </main>
   );
 }
 
-/* ── Film row item — editorial layout matching Figma ── */
+/* ── Film row item — editorial layout matching Figma (node 342:300) ──
+   Poster 221×288, mix-blend-luminosity, buttons below poster.
+   Info column: category chip + stage text + title + description + directed-by. */
 
 function FilmRow({ film }: { film: Film }) {
   const stage = STAGE_LABELS[film.stage] ?? film.stage;
 
   return (
-    <div className="flex flex-col">
-      <div className="flex gap-6">
-        {/* Poster — B&W, cinematic */}
-        <Link
-          href={`/film/${film.slug}`}
-          className="shrink-0 w-[180px] sm:w-[210px] group"
-        >
-          <div className="relative aspect-[4/5] rounded-[4px] overflow-hidden border border-white/[0.06]">
+    <div className="flex gap-[40px] items-start">
+      {/* Left column — poster + buttons stacked */}
+      <div className="shrink-0 w-[221px] flex flex-col gap-[40px] items-center">
+        {/* Poster — luminosity blend, Figma 339:212 */}
+        <Link href={`/film/${film.slug}`} className="block w-full group">
+          <div
+            className="relative w-full h-[288px] rounded-[6px] overflow-hidden border-[1.5px] border-[#F0F0F0]/10"
+            style={{ boxShadow: "0 6px 20px 2px rgba(0,0,0,0.5)" }}
+          >
+            <div className="absolute inset-0 bg-[#0D0D0D] rounded-[6px]" />
             <img
               src={film.posterUrl || film.thumbnailUrl}
               alt={film.title}
-              className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
-              style={{
-                filter: "grayscale(1) brightness(0.55) contrast(1.1)",
-              }}
+              className="absolute inset-0 w-full h-full object-cover rounded-[6px] mix-blend-luminosity opacity-50 group-hover:opacity-70 transition-opacity duration-500"
             />
           </div>
         </Link>
 
-        {/* Info */}
-        <div className="flex-1 min-w-0 pt-1">
-          {/* Category chips + year */}
-          <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span
-              className="text-[11px] px-2.5 py-1 rounded-[3px] text-white font-medium"
-              style={{
-                backgroundColor: film.credits.form === "documentary" ? "#B23495" : "rgba(119,29,92,0.7)",
-              }}
+        {/* Buttons — below poster, gap-[24px] (Figma 339:288) */}
+        <div className="flex items-center gap-[24px] w-full">
+          {film.trailerUrl && (
+            <a
+              href={film.trailerUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="backdrop-blur-[3px] bg-[#1B1B1B]/20 border border-[#F0F0F0]/20 rounded-[3px] px-[14px] py-[12px] text-[13px] font-medium text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 hover:border-[#F0F0F0]/30 transition-colors inline-flex items-center gap-[6px]"
             >
-              {film.credits.form === "documentary" ? "Documentary" : "Fiction"}
-            </span>
-            <span className="text-[11px] px-2.5 py-1 rounded-[3px] border border-white/10 text-white/50">
-              {stage}
-            </span>
-            <span className="text-[11px] text-white/30">{film.credits.year}</span>
-          </div>
-
-          {/* Title */}
-          <Link href={`/film/${film.slug}`}>
-            <h3 className="text-lg sm:text-[22px] font-bold text-white leading-snug hover:text-white/80 transition-colors">
-              {film.title}
-            </h3>
+              Watch trailer
+              {/* Play arrow icon — Figma Vector 10 */}
+              <svg width="6" height="8" viewBox="0 0 6 9" fill="currentColor" className="text-[#B23495]">
+                <path d="M0.5 0.5L5.5 4.5L0.5 8.5V0.5Z" />
+              </svg>
+            </a>
+          )}
+          <Link
+            href={`/film/${film.slug}`}
+            className="text-[13px] font-medium text-[#F0F0F0]/30 hover:text-[#F0F0F0]/50 transition-colors"
+          >
+            Know more
           </Link>
-
-          {/* Description */}
-          <p className="text-[14px] text-white/40 mt-3 leading-[1.7] line-clamp-3">
-            {film.logline}
-          </p>
-
-          {/* Directed by */}
-          <p className="text-[10px] tracking-[0.25em] text-white/25 uppercase mt-6 mb-1">
-            Directed by
-          </p>
-          <p className="text-[14px] text-white/60">{film.credits.direction}</p>
         </div>
       </div>
 
-      {/* Buttons — below the card */}
-      <div className="flex items-center gap-4 mt-6 pl-0">
-        {film.trailerUrl && (
-          <a
-            href={film.trailerUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white/80 hover:text-white hover:border-white/25 transition-colors inline-flex items-center gap-2"
-          >
-            Watch trailer <span className="text-[#B23495]">▶</span>
-          </a>
-        )}
-        <Link
-          href={`/film/${film.slug}`}
-          className="text-sm text-white/35 hover:text-white/60 transition-colors"
-        >
-          Know more
-        </Link>
+      {/* Right column — info (Figma 342:299, w-[338px]) */}
+      <div className="flex-1 min-w-0 flex flex-col gap-[63px]">
+        {/* Top block: category + title + description */}
+        <div className="flex flex-col gap-[20px]">
+          {/* Category + title block */}
+          <div className="flex flex-col gap-[30px]">
+            {/* Category chips + stage + year (Figma 339:206) */}
+            <div className="flex items-center gap-[20px]">
+              <span
+                className="text-[12px] font-medium text-[#F0F0F0] px-[8px] py-[5px] rounded-[3px]"
+                style={{
+                  backgroundColor: film.credits.form === "documentary" ? "#B23495" : "#771D5C",
+                }}
+              >
+                {film.credits.form === "documentary" ? "Documentary" : "Fiction"}
+              </span>
+              <span className="text-[12px] font-medium flex items-center gap-[10px]">
+                <span className="text-[#B23495]">{stage}</span>
+                <span className="text-[#595C5C]">{film.credits.year}</span>
+              </span>
+            </div>
+
+            {/* Title — H6_Desktop_DSH: 24px/30 Semi Bold (Figma 339:201) */}
+            <Link href={`/film/${film.slug}`}>
+              <h3 className="text-[24px] font-semibold leading-[30px] text-[#F0F0F0] hover:text-[#F0F0F0]/80 transition-colors">
+                {film.title}
+              </h3>
+            </Link>
+          </div>
+
+          {/* Description — Body-Medium: Source Sans 3, 16/24, #595C5C (Figma 339:202) */}
+          <p className="font-[family-name:var(--font-source-sans)] text-[16px] leading-[24px] tracking-[-0.08px] text-[#595C5C] line-clamp-3">
+            {film.logline}
+          </p>
+        </div>
+
+        {/* Directed by (Figma 339:203) — gap-[6px] */}
+        <div className="flex flex-col gap-[6px]">
+          <p className="text-[10px] leading-[24px] tracking-[1.6px] uppercase text-[#363636]">
+            Directed by
+          </p>
+          <p className="text-[15px] leading-[18px] text-[#F0F0F0]">
+            {film.credits.direction}
+          </p>
+        </div>
       </div>
     </div>
   );

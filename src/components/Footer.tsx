@@ -72,15 +72,16 @@ export default function Footer() {
         <div className="reveal stagger-2 mt-10 sm:mt-16 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <Link href="/" className="flex items-center gap-3">
             <Image
-              src="/images/ic_logo.png"
+              src="/images/ic_logo_navbar.svg"
               alt="Don't Skip Humanity"
-              width={120}
-              height={32}
-              className="h-7 w-auto"
+              width={100}
+              height={41}
+              className="w-[100px] h-auto"
+              unoptimized
             />
           </Link>
           <p className="text-xs text-[#363636] text-center">
-            Copyright 2026 &copy; Don&apos;t Skip Humanity – an independent media company. All rights reserved.
+            Copyright {new Date().getFullYear()} &copy; Don&apos;t Skip Humanity – an independent media company. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
             <Link href="#" className="text-xs text-[#363636] hover:text-white transition-colors">

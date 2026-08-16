@@ -133,6 +133,7 @@ export default function Navbar() {
               height={52}
               className="w-[127px] h-[52px]"
               priority
+              unoptimized
             />
           </Link>
 
@@ -205,7 +206,7 @@ export default function Navbar() {
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="Toggle menu"
             >
-              <Image src="/images/ic_menu.svg" alt="Menu" width={24} height={24} className="w-6 h-6" />
+              <Image src="/images/ic_menu.svg" alt="Menu" width={24} height={24} className="w-6 h-6" unoptimized />
             </button>
           </div>
         </div>
@@ -233,6 +234,7 @@ export default function Navbar() {
               height={52}
               className="w-[127px] h-[52px]"
               priority
+              unoptimized
             />
           </Link>
 

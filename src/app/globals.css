@@ -147,19 +147,6 @@
   100% { height: 32px; opacity: 1; }
 }
 
-/* Scroll indicator — wheel dot travelling inside the mouse shape */
-@keyframes scrollWheel {
-  0% { transform: translate(-50%, 0); opacity: 1; }
-  70% { opacity: 1; }
-  100% { transform: translate(-50%, 14px); opacity: 0; }
-}
-
-/* Scroll indicator — gentle bounce on the chevron beneath the mouse */
-@keyframes scrollChevronBounce {
-  0%, 100% { transform: translateY(0); opacity: 0.4; }
-  50% { transform: translateY(5px); opacity: 1; }
-}
-
 /* Navbar slide down */
 @keyframes navSlideDown {
   0% {
@@ -338,29 +325,6 @@ input:-webkit-autofill:active{
 .scroll-indicator {
   opacity: 0;
   animation: fadeInUp 0.5s ease-out forwards;
-}
-.scroll-indicator-mouse {
-  position: relative;
-  width: 22px;
-  height: 36px;
-  border: 1.5px solid rgba(255, 255, 255, 0.35);
-  border-radius: 12px;
-}
-.scroll-indicator-dot {
-  position: absolute;
-  top: 6px;
-  left: 50%;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #1ABC9C;
-  animation: scrollWheel 1.6s ease-in-out 0.3s infinite;
-}
-.scroll-indicator-chevron {
-  margin-top: 6px;
-  display: flex;
-  justify-content: center;
-  animation: scrollChevronBounce 1.6s ease-in-out 0.3s infinite;
 }
 
 /* Scroll-triggered reveal classes */
