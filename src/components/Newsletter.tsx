@@ -10,6 +10,7 @@ interface NewsletterConfig extends LandingSectionText {
 
 export default function Newsletter({ config }: { config?: NewsletterConfig }) {
   const [email, setEmail] = useState("");
+  const [agreed, setAgreed] = useState(false);
   const sectionRef = useReveal();
 
   return (
@@ -52,15 +53,26 @@ export default function Newsletter({ config }: { config?: NewsletterConfig }) {
               color: #595C5C;
             }
           `}</style>
-          <button className="w-full h-[44px] rounded-[3px] gradient-fill-btn text-sm text-white font-medium flex items-center justify-center gap-2">
+
+          {/* Consent checkbox — must be ticked before subscribing */}
+          <label className="flex items-start gap-2 text-left text-xs text-[#595C5C] cursor-pointer">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+              className="mt-0.5 h-4 w-4 shrink-0 accent-[#8665A7]"
+            />
+            <span>{config?.subtitle || "I agree to receive emails from DSH. We don't share your data."}</span>
+          </label>
+
+          <button
+            disabled={!agreed}
+            className="w-full h-[44px] rounded-[3px] gradient-fill-btn text-sm text-white font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             {config?.cta || "Subscribe our newsletter"}
             <img src="/images/ic_newsletter_btn.png" alt="" className="w-4 h-4 object-contain" />
           </button>
         </div>
-
-        <p className="reveal stagger-3 text-xs text-[#595C5C] mt-4">
-          {config?.subtitle || "I agree to receive emails from DSH. We don't share your data."}
-        </p>
       </div>
     </section>
   );

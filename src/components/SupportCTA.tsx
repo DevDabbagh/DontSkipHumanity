@@ -78,12 +78,12 @@ export default function SupportCTA() {
         <div className="grid md:grid-cols-2 gap-6">
           {/* Give monthly — highlighted card with teal→pink gradient wash */}
           <div
-            className="reveal-scale stagger-1 rounded-[6px] p-8"
+            className="reveal-scale stagger-1 rounded-[6px] p-8 text-center"
             style={{
               background:
                 "linear-gradient(110deg, #32C6CC14 0%, #B2349533 100%), rgba(16,16,20,0.55)",
-              border: "1px solid #F0F0F01A",
-              boxShadow: "0 6px 20px 2px rgba(0,0,0,0.30)",
+              border: "1.5px solid rgba(240,240,240,0.10)",
+              boxShadow: "0 6px 20px 2px rgba(0,0,0,0.50)",
               backdropFilter: "blur(6px)",
               WebkitBackdropFilter: "blur(6px)",
             }}
@@ -102,11 +102,11 @@ export default function SupportCTA() {
 
           {/* Support the work — plain dark card, same border + shadow */}
           <div
-            className="reveal-scale stagger-2 rounded-[6px] p-8"
+            className="reveal-scale stagger-2 rounded-[6px] p-8 text-center"
             style={{
               background: "rgba(16,16,20,0.45)",
-              border: "1px solid #F0F0F01A",
-              boxShadow: "0 6px 20px 2px rgba(0,0,0,0.30)",
+              border: "1.5px solid rgba(240,240,240,0.10)",
+              boxShadow: "0 6px 20px 2px rgba(0,0,0,0.50)",
               backdropFilter: "blur(6px)",
               WebkitBackdropFilter: "blur(6px)",
             }}
