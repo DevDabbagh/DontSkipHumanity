@@ -26,8 +26,8 @@ export default function InFocus({ config }: { config?: InFocusConfig }) {
           className="absolute inset-0 w-full h-full object-cover"
           style={{
             objectPosition: "center 42%",
-            filter: "grayscale(1) brightness(0.6) contrast(0.95)",
-            opacity: 0.2,
+            filter: "grayscale(1)",
+            opacity: 0.05,
           }}
         />
       </div>
