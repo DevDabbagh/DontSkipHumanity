@@ -46,7 +46,7 @@ export default function SupportCTA() {
             <p className="text-xs tracking-[0.25em] text-dsh-label uppercase mb-4">
               Support
             </p>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight text-[#FFFFFF]">
+            <h2 className="text-[26px] sm:text-[32px] md:text-[38px] leading-tight md:leading-[40px] tracking-[-1.5px] font-semibold text-[#FFFFFF]">
               Not pity — solidarity.
               <br />
               Lorem ipsum new line please.
@@ -118,7 +118,7 @@ export default function SupportCTA() {
             <p className="text-sm text-[#595C5C] mt-2">
               A single contribution, any amount.
             </p>
-            <button className="mt-6 w-full py-3 rounded-[3px] border border-dsh-text-primary/20 text-sm text-[#F0F0F0] font-medium flex items-center justify-center gap-2 hover:bg-dsh-btn-bg/20 transition-colors">
+            <button className="mt-6 w-full py-[13px] rounded-[3px] border border-[#F0F0F0]/20 bg-[#1B1B1B]/20 text-[13px] font-medium text-[#F0F0F0]/40 flex items-center justify-center gap-1.5 hover:text-[#F0F0F0]/60 transition-colors">
               Support our work ♡
             </button>
           </div>

@@ -116,7 +116,7 @@ export default function Impact() {
           Impact
         </p>
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
-          <h2 className="text-3xl sm:text-4xl md:text-[40px] font-semibold leading-[1.15] max-w-2xl text-white">
+          <h2 className="text-[28px] sm:text-[32px] md:text-[38px] leading-[1.15] md:leading-[40px] tracking-[-1.5px] font-semibold max-w-2xl text-white">
             Impact is not a dashboard.
             <br />
             It is the line between the work
@@ -127,7 +127,7 @@ export default function Impact() {
             href="#"
             className="text-[13px] border border-white/15 rounded-[3px] px-4 py-2 text-white/40 hover:text-white/60 transition-colors duration-500 self-start md:self-auto md:mb-1"
           >
-            Full impact report <span className="text-[#1ABC9C]">↗</span>
+            Full impact report <span className="text-[#32C6CC]">↗</span>
           </a>
         </div>
       </div>

@@ -46,8 +46,8 @@ export default function InFocus({ config }: { config?: InFocusConfig }) {
             </div>
           </div>
 
-          {/* Text content — top-aligned with portrait */}
-          <div className="reveal-right w-full md:flex-1 md:pt-1">
+          {/* Text content — fits within the portrait height (vertically centered) */}
+          <div className="reveal-right w-full md:flex-1 md:min-h-[470px] md:flex md:flex-col md:justify-center">
             <p className="text-[10px] tracking-[0.3em] text-dsh-label/40 uppercase mb-5">
               {config?.subtitle || "In Focus"}
             </p>

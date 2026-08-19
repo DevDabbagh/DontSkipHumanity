@@ -30,7 +30,7 @@ export default function Newsletter({ config }: { config?: NewsletterConfig }) {
           {config?.heading || "Don't look away."}
         </h2>
 
-        <p className="reveal stagger-1 text-xs sm:text-sm text-[#595C5C] mt-4 sm:mt-5 leading-relaxed whitespace-pre-line">
+        <p className="reveal stagger-1 text-xs sm:text-sm text-[#595C5C] mt-4 sm:mt-5 leading-relaxed whitespace-pre-line line-clamp-2">
           {config?.description ||
             "One email when something matters — a new film, a piece, a screening, an open call.\nWork that names what power tries to hide. No noise."}
         </p>
@@ -67,7 +67,7 @@ export default function Newsletter({ config }: { config?: NewsletterConfig }) {
 
           <button
             disabled={!agreed}
-            className="w-full h-[44px] rounded-[3px] gradient-fill-btn text-sm text-white font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-[44px] rounded-[3px] gradient-fill-btn border border-[#F0F0F0]/20 text-sm text-white font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {config?.cta || "Subscribe our newsletter"}
             <img src="/images/ic_newsletter_btn.png" alt="" className="w-4 h-4 object-contain" />

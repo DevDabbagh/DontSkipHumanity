@@ -91,7 +91,7 @@ export default function Agenda() {
           <p className="text-xs tracking-[0.25em] uppercase mb-4 text-[#363636]">
             Agenda
           </p>
-          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold leading-tight max-w-2xl text-[#F0F0F0]">
+          <h2 className="text-[26px] sm:text-[32px] md:text-[38px] leading-tight md:leading-[40px] tracking-[-1.5px] font-semibold max-w-2xl text-[#F0F0F0]">
             DSH makes documentary and fiction
             <br />
             – from development and production to festivals.
@@ -144,8 +144,8 @@ export default function Agenda() {
             >
               <div className="flex items-center gap-4 sm:gap-6 md:gap-10 py-5 sm:py-6 md:py-8 px-2 sm:px-4">
                 {/* Date */}
-                <div className="shrink-0 flex items-baseline gap-1 w-[70px] sm:w-[90px]">
-                  <span className="text-2xl sm:text-3xl md:text-4xl font-light text-[#F0F0F0]">
+                <div className="shrink-0 flex items-center gap-1 w-[70px] sm:w-[90px]">
+                  <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#F0F0F0]">
                     {event.day}
                   </span>
                   <span

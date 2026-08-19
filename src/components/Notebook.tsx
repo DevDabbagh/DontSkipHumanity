@@ -7,10 +7,13 @@ import ScrollColorImage from "./ScrollColorImage";
 /* Cinematic image treatment matching the dark interface */
 const IMG_STYLE = { filter: "brightness(0.92) contrast(0.95) saturate(0.88)" };
 
+/* Featured (Studio) accent — used for its date, author and arrows */
+const FEATURED_COLOR = "#8665A7";
+
 const ARTICLES = [
   {
     category: "Read",
-    categoryColor: "bg-[#1ABC9C]",
+    color: "#5D94B9",
     date: "23 Aug 2026",
     title: "DSH redistributes $340K to community media projects",
     desc: "Funds distributed to 14 grassroots media organisations across the Global South following our spring solidarity campaign.",
@@ -20,7 +23,7 @@ const ARTICLES = [
   },
   {
     category: "Academy",
-    categoryColor: "bg-[#32C6CC]",
+    color: "#32C6CC",
     date: "23 Aug 2026",
     title: "New workshop: Ethical Narrative Journalism — open call",
     desc: "A free intensive developed with frontline journalists. Tools for covering occupation, displacement, and state violence with rigour and care.",
@@ -30,7 +33,7 @@ const ARTICLES = [
   },
   {
     category: "Films",
-    categoryColor: "bg-[#B23495]",
+    color: "#B23495",
     date: "23 Aug 2026",
     title: '"What We Carried" selected for IDFA 2026 competition',
     desc: "Our latest feature documentary enters the international competition section at the International Documentary Film Festival Amsterdam.",
@@ -71,20 +74,20 @@ export default function Notebook() {
                 href="/read"
                 className="text-xs border border-dsh-text-primary/15 rounded-[3px] px-3.5 py-1.5 text-dsh-text-primary/35 hover:text-dsh-text-primary/55 hover:border-dsh-text-primary/25 transition-colors"
               >
-                View all articles <span className="text-[#1ABC9C]">↗</span>
+                View all articles <span style={{ color: FEATURED_COLOR }}>↗</span>
               </Link>
             </div>
 
             {/* Category + date */}
             <div className="flex items-center gap-3 mb-5">
-              <span className="text-[11px] px-2 py-0.5 rounded-[3px] bg-[#8665A7] text-white font-medium">
+              <span className="text-[11px] px-2 py-0.5 rounded-[3px] text-white font-medium" style={{ background: FEATURED_COLOR }}>
                 Studio
               </span>
-              <span className="text-xs text-[#1ABC9C]">23 Aug 2026</span>
+              <span className="text-xs" style={{ color: FEATURED_COLOR }}>23 Aug 2026</span>
             </div>
 
             {/* Headline */}
-            <h2 className="text-xl sm:text-2xl md:text-[28px] font-semibold leading-[1.2] text-[#F0F0F0] max-w-md">
+            <h2 className="text-[26px] sm:text-[32px] md:text-[38px] leading-[1.2] md:leading-[40px] tracking-[-1.5px] font-semibold text-[#F0F0F0] max-w-md">
               Free Fish — now available
               <br />
               to programmers and press
@@ -104,15 +107,15 @@ export default function Notebook() {
             {/* Author */}
             <p className="text-[13px]">
               <span className="text-dsh-desc">by </span>
-              <span className="text-[#1ABC9C]">Diogo Faro</span>
+              <span style={{ color: FEATURED_COLOR }}>Diogo Faro</span>
             </p>
 
             {/* Button — minimal */}
             <Link
               href="/read/free-fish-distribution"
-              className="mt-7 inline-block text-xs border border-dsh-text-primary/15 rounded-[3px] px-4 py-1.5 text-dsh-text-primary/35 hover:text-dsh-text-primary/55 hover:border-dsh-text-primary/25 transition-colors"
+              className="mt-7 inline-flex items-center gap-1.5 text-[13px] font-medium border border-[#F0F0F0]/20 bg-[#1B1B1B]/20 rounded-[3px] px-[17px] py-[13px] text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 transition-colors"
             >
-              Read more <span className="text-[#1ABC9C]">+</span>
+              Read more <span style={{ color: FEATURED_COLOR }}>+</span>
             </Link>
           </div>
         </div>
@@ -137,10 +140,10 @@ export default function Notebook() {
 
             {/* Category + date */}
             <div className="flex items-center gap-3 mb-4">
-              <span className={`text-[11px] px-2 py-0.5 rounded-[3px] ${article.categoryColor} text-white font-medium`}>
+              <span className="text-[11px] px-2 py-0.5 rounded-[3px] text-white font-medium" style={{ background: article.color }}>
                 {article.category}
               </span>
-              <span className="text-xs text-[#1ABC9C]">{article.date}</span>
+              <span className="text-xs" style={{ color: article.color }}>{article.date}</span>
             </div>
 
             {/* Headline */}
@@ -156,15 +159,15 @@ export default function Notebook() {
             {/* Author */}
             <p className="text-[13px] mt-5">
               <span className="text-dsh-desc">by </span>
-              <span className="text-[#1ABC9C]">{article.author}</span>
+              <span style={{ color: article.color }}>{article.author}</span>
             </p>
 
             {/* Button */}
             <Link
               href={`/read/${article.slug}`}
-              className="mt-5 inline-block text-xs border border-dsh-text-primary/15 rounded-[3px] px-4 py-1.5 text-dsh-text-primary/35 hover:text-dsh-text-primary/55 hover:border-dsh-text-primary/25 transition-colors"
+              className="mt-5 inline-flex items-center gap-1.5 text-[13px] font-medium border border-[#F0F0F0]/20 bg-[#1B1B1B]/20 rounded-[3px] px-[17px] py-[13px] text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 transition-colors"
             >
-              Read more <span className="text-[#1ABC9C]">+</span>
+              Read more <span style={{ color: article.color }}>+</span>
             </Link>
           </div>
         ))}

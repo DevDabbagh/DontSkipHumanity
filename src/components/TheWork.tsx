@@ -36,7 +36,7 @@ function SectionHeader() {
         <p className="text-xs tracking-[0.25em] text-dsh-label uppercase mb-4">
           The work, in its forms
         </p>
-        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.6rem] font-semibold leading-tight max-w-5xl text-dsh-text-primary">
+        <h2 className="text-[26px] sm:text-[32px] md:text-[38px] leading-tight md:leading-[40px] tracking-[-1.5px] font-semibold max-w-5xl text-dsh-text-primary">
           Films, series, journalism, and education
           <br className="hidden sm:block" />
           that name power and refuse erasure.
@@ -84,7 +84,7 @@ export default function TheWork({
           {filmsConfig?.description ||
             "Documentary and fiction that stay close — to siege, displacement, and the daily labour of remaining human — and refuse the distance through which violence is made acceptable. Festivals, screenings, distribution, and the political context around each film."}
         </p>
-        <Link href="/films" className="mt-3 sm:mt-4 md:mt-6 inline-block self-start text-xs sm:text-sm border border-white/15 rounded-[3px] px-4 sm:px-6 py-2 sm:py-2.5 text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 hover:border-white/25 transition-colors">
+        <Link href="/films" className="mt-3 sm:mt-4 md:mt-6 inline-flex items-center gap-1.5 self-start text-[13px] font-medium border border-[#F0F0F0]/20 bg-[#1B1B1B]/20 rounded-[3px] px-[17px] py-[13px] text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 transition-colors">
           {filmsConfig?.cta || "Explore Films"} <span className="text-[#B23495]">+</span>
         </Link>
       </CurtainReveal>}
@@ -113,7 +113,7 @@ export default function TheWork({
           {studioConfig?.description ||
             "Docuseries, videocasts, podcasts, and series — and the production and co-production capacity behind them. Bold, independent media that strengthens movements, made with the same politics and care."}
         </p>
-        <Link href="/studio" className="mt-3 sm:mt-4 md:mt-6 inline-block self-start text-xs sm:text-sm border border-white/15 rounded-[3px] px-4 sm:px-6 py-2 sm:py-2.5 text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 hover:border-white/25 transition-colors">
+        <Link href="/studio" className="mt-3 sm:mt-4 md:mt-6 inline-flex items-center gap-1.5 self-start text-[13px] font-medium border border-[#F0F0F0]/20 bg-[#1B1B1B]/20 rounded-[3px] px-[17px] py-[13px] text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 transition-colors">
           {studioConfig?.cta || "Explore Studio"} <span className="text-[#8665A7]">+</span>
         </Link>
       </CurtainReveal>}
