@@ -17,12 +17,12 @@ function isNavLinkActive(pathname: string, href: string) {
 }
 
 const NAV_LINKS = [
-  { label: "Films", href: "/films" },
-  { label: "Studio", href: "/studio" },
-  { label: "Academy", href: "/academy" },
-  { label: "Read", href: "/read" },
-  { label: "About", href: "/about" },
-  { label: "Support", href: "/support" },
+  { label: "Films", href: "/films", hover: "hover:text-[#B23495]" },
+  { label: "Studio", href: "/studio", hover: "hover:text-[#8665A7]" },
+  { label: "Academy", href: "/academy", hover: "hover:text-[#32C6CC]" },
+  { label: "Read", href: "/read", hover: "hover:text-[#5D94B9]" },
+  { label: "About", href: "/about", hover: "hover:text-[#9D9C9C]" },
+  { label: "Support", href: "/support", hover: "hover:text-[#9D9C9C]" },
 ];
 
 const MENU_LINKS = NAV_LINKS;
@@ -145,7 +145,7 @@ export default function Navbar() {
                 <Link
                   key={link.label}
                   href={link.href}
-                  className={`text-[13px] font-medium tracking-wide transition-colors ${active ? "" : "text-dsh-nav hover:text-dsh-nav-hover"}`}
+                  className={`text-[13px] font-medium tracking-wide transition-colors ${active ? "" : `text-dsh-nav ${link.hover}`}`}
                   style={active ? { color: NAV_ACTIVE_COLOR } : undefined}
                 >
                   {link.label}
@@ -246,7 +246,7 @@ export default function Navbar() {
                 <Link
                   key={link.label}
                   href={link.href}
-                  className={`text-[13px] font-medium tracking-wide transition-colors ${active ? "" : "text-dsh-nav hover:text-dsh-nav-hover"}`}
+                  className={`text-[13px] font-medium tracking-wide transition-colors ${active ? "" : `text-dsh-nav ${link.hover}`}`}
                   style={active ? { color: NAV_ACTIVE_COLOR } : undefined}
                   onClick={() => setMenuOpen(false)}
                 >

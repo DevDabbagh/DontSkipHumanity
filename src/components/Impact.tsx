@@ -145,7 +145,7 @@ export default function Impact() {
                 </span>
                 <div className="border-l border-white/[0.08] pl-6">
                   <h4 className="text-white/90 text-[15px] font-medium">{row.title}</h4>
-                  <p className="text-sm mt-1.5 leading-relaxed" style={{ color: "rgba(255,255,255,0.35)" }}>
+                  <p className="font-[family-name:var(--font-source-sans)] text-[14px] mt-1.5 leading-[20px]" style={{ color: "rgba(255,255,255,0.35)" }}>
                     {row.desc}
                   </p>
                 </div>

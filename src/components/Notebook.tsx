@@ -57,7 +57,7 @@ export default function Notebook() {
               <ScrollColorImage
                 src="/images/note.jpg"
                 alt="Featured article"
-                className="aspect-[3/4] rounded-[4px] border border-white/[0.08] shadow-[0_12px_30px_rgba(0,0,0,0.25)]"
+                className="aspect-[3/4] rounded-[6px] border-[1.5px] border-[#F0F0F0]/10 shadow-[0_6px_20px_2px_rgba(0,0,0,0.5)]"
                 imgClassName="group-hover:scale-[1.02] transition-transform duration-700"
               />
             </Link>
@@ -94,7 +94,7 @@ export default function Notebook() {
             </h2>
 
             {/* Description */}
-            <p className="text-[13px] text-dsh-desc mt-6 leading-[1.7] max-w-md">
+            <p className="font-[family-name:var(--font-source-sans)] text-[15px] text-dsh-desc mt-6 leading-[24px] max-w-md">
               Bisan Owda&apos;s short documentary enters distribution. Screeners
               available on request for programmers, press, and partners. Bisan
               Owda&apos;s short documentary enters distribution. Screeners
@@ -133,7 +133,7 @@ export default function Notebook() {
               <ScrollColorImage
                 src={article.image}
                 alt={article.title}
-                className="aspect-[16/10] rounded-[4px] border border-white/[0.06]"
+                className="aspect-[16/10] rounded-[6px] border-[1.5px] border-[#F0F0F0]/10"
                 imgClassName="group-hover:scale-[1.03] transition-transform duration-500"
               />
             </Link>
@@ -152,7 +152,7 @@ export default function Notebook() {
             </h3>
 
             {/* Description */}
-            <p className="text-[13px] text-dsh-desc mt-3 leading-[1.7] line-clamp-3">
+            <p className="font-[family-name:var(--font-source-sans)] text-[14px] text-dsh-desc mt-3 leading-[20px] line-clamp-3">
               {article.desc}
             </p>
 

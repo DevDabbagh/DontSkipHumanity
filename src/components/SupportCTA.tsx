@@ -40,7 +40,7 @@ export default function SupportCTA() {
 
       <div className="relative px-5 sm:px-8 max-w-[1400px] mx-auto">
         {/* Header row */}
-        <div className="flex flex-col md:flex-row gap-8 md:gap-12 mb-10 sm:mb-16">
+        <div className="flex flex-col md:flex-row md:items-center gap-8 md:gap-12 mb-10 sm:mb-16">
           {/* Left: text */}
           <div className="reveal-left md:w-1/2">
             <p className="text-xs tracking-[0.25em] text-dsh-label uppercase mb-4">
@@ -51,7 +51,7 @@ export default function SupportCTA() {
               <br />
               Lorem ipsum new line please.
             </h2>
-            <p className="text-sm text-[#595C5C] mt-6 leading-relaxed max-w-lg">
+            <p className="font-[family-name:var(--font-source-sans)] text-[15px] text-[#595C5C] mt-6 leading-[24px] max-w-lg">
               Independent political film, journalism, and education don&apos;t pay for
               themselves, and we don&apos;t want them owned by those who could.
               Support keeps the work free of editorial strings: it funds production,
