@@ -58,7 +58,7 @@ export default function InFocus({ config }: { config?: InFocusConfig }) {
               {config?.heading || "We look where the world\nis told not to look"}
             </h2>
 
-            <p className="text-[#8665A7] text-sm mt-8 mb-4">{config?.personName || "Catarina Marques Rodrigues"}</p>
+            <p className="text-[#8665A7] text-sm mt-16 lg:mt-[100px] mb-5">{config?.personName || "Catarina Marques Rodrigues"}</p>
 
             <p className="font-[family-name:var(--font-source-sans)] text-[16px] leading-[24px] tracking-[0.5px] text-dsh-desc max-w-[600px]">
               {config?.description ||

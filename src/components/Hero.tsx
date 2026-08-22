@@ -480,14 +480,14 @@ export default function Hero({ slides, heading }: { slides?: HeroSlide[] | null;
           ? 'opacity-100 translate-y-0'
           : 'opacity-0 translate-y-3 pointer-events-none'
       }`}>
-        <p className="text-xs sm:text-sm text-gray-500 tracking-wide">Welcome to our world!</p>
+        <p className="text-xs sm:text-sm text-[#363636] tracking-wide">Welcome to our world!</p>
 
         {/* Old, quieter scroll cue — a simple thin vertical line (no "techy" mouse
             animation). Mounted/unmounted with scroll position so it fades back in
             when you return to the top. */}
         {nearTop && (
           <div key={carouselState === 'full-visible' ? 'si-in' : 'si-pending'} className="scroll-indicator flex justify-center mt-5">
-            <span className="block w-px h-10 bg-white/20" />
+            <span className="block w-px h-10 bg-[#363636]" />
           </div>
         )}
       </div>

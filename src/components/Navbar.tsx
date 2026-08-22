@@ -120,8 +120,8 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className={`nav-animate fixed top-0 left-0 right-0 z-40 bg-[#0D0D0D]/70 backdrop-blur-md ${
-        scrolled ? "shadow-2xl shadow-black/30" : ""
+      <nav className={`nav-animate fixed top-0 left-0 right-0 z-40 transition-colors duration-300 ${
+        scrolled ? "bg-[#0D0D0D]/70 backdrop-blur-md shadow-2xl shadow-black/30" : "bg-transparent"
       }`}>
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-[128px] grid grid-cols-[auto_1fr_auto] items-center">
           {/* Logo — fixed 127x52 SVG, no shrink on scroll */}
@@ -286,10 +286,10 @@ export default function Navbar() {
                     active ? "" : "text-dsh-nav-hover"
                   } ${menuOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
                   style={{
-                    fontSize: "clamp(1.5rem, 3.2vw, 2.75rem)",
+                    fontSize: "clamp(1.15rem, min(3vw, 4.6vh), 2.25rem)",
                     transitionDelay: menuOpen ? `${i * 60}ms` : "0ms",
-                    paddingTop: "0.4em",
-                    paddingBottom: "0.4em",
+                    paddingTop: "0.22em",
+                    paddingBottom: "0.22em",
                     ...(active ? { color: NAV_ACTIVE_COLOR } : {}),
                   }}
                 >
@@ -308,10 +308,10 @@ export default function Navbar() {
                   menuOpen ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
                 }`}
                 style={{
-                  fontSize: "clamp(1.5rem, 3.2vw, 2.75rem)",
+                  fontSize: "clamp(1.15rem, min(3vw, 4.6vh), 2.25rem)",
                   transitionDelay: menuOpen ? `${MENU_LINKS.length * 60}ms` : "0ms",
-                  paddingTop: "0.3em",
-                  paddingBottom: "0.3em",
+                  paddingTop: "0.22em",
+                  paddingBottom: "0.22em",
                 }}
               >
                 Login
