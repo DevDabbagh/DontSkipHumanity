@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useReveal } from "@/hooks/useReveal";
 import { useScrollGrayscale } from "@/hooks/useScrollGrayscale";
 
@@ -125,9 +126,10 @@ export default function Impact() {
           </h2>
           <a
             href="#"
-            className="text-[13px] border border-white/15 rounded-[3px] px-4 py-2 text-white/40 hover:text-white/60 transition-colors duration-500 self-start md:self-auto md:mb-1"
+            className="inline-flex items-center gap-1.5 text-[13px] border border-white/15 rounded-[3px] px-4 py-2 text-white/40 hover:text-white/60 transition-colors duration-500 self-start md:self-auto md:mb-1"
           >
-            Full impact report <span className="text-[#32C6CC]">↗</span>
+            Full impact report
+            <Image src="/ic_arrow_impact_report.svg" alt="" width={8} height={8} className="w-2 h-2" unoptimized />
           </a>
         </div>
       </div>
@@ -139,13 +141,13 @@ export default function Impact() {
           <div key={row.num} className={`reveal stagger-${i + 1} flex flex-col lg:flex-row lg:items-center gap-5 lg:gap-0`}>
             {/* Left: index · divider · title + description */}
             <div className="lg:w-5/12 px-5 sm:px-8 lg:pl-[max(2rem,calc((100vw-1400px)/2+2rem))] lg:pr-10">
-              <div className="flex gap-6 items-start">
-                <span className="text-[11px] font-mono mt-1.5" style={{ color: ACCENTS[i] }}>
+              <div className="flex gap-6 items-center">
+                <span className="text-[11px] leading-[24px] font-semibold" style={{ color: ACCENTS[i] }}>
                   {row.num}
                 </span>
                 <div className="border-l border-white/[0.08] pl-6">
                   <h4 className="text-white/90 text-[15px] font-medium">{row.title}</h4>
-                  <p className="font-[family-name:var(--font-source-sans)] text-[14px] mt-1.5 leading-[20px]" style={{ color: "rgba(255,255,255,0.35)" }}>
+                  <p className="font-[family-name:var(--font-source-sans)] text-[14px] mt-1.5 leading-[20px] line-clamp-1" style={{ color: "rgba(255,255,255,0.35)" }}>
                     {row.desc}
                   </p>
                 </div>
