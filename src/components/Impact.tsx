@@ -109,7 +109,7 @@ export default function Impact() {
   const { ref: photoRef, colorAmount } = useScrollGrayscale<HTMLDivElement>();
 
   return (
-    <section id="about" className="py-20 sm:py-24 lg:py-32 overflow-hidden bg-[#0A0A0A]" ref={sectionRef}>
+    <section id="about" className="py-20 sm:py-24 lg:py-32 overflow-hidden bg-[#0D0D0D]" ref={sectionRef}>
       {/* Header — label, heading, report button */}
       <div className="reveal px-5 sm:px-8 max-w-[1400px] mx-auto">
         <p className="text-[11px] tracking-[0.25em] uppercase mb-5" style={{ color: "#363636" }}>

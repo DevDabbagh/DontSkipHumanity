@@ -28,8 +28,6 @@ export default function InFocus({ config }: { config?: InFocusConfig }) {
             objectPosition: "center 42%",
             filter: "grayscale(1)",
             opacity: 0.05,
-            WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, #000 30%, #000 70%, transparent 100%)",
-            maskImage: "linear-gradient(to bottom, transparent 0%, #000 30%, #000 70%, transparent 100%)",
           }}
         />
       </div>
