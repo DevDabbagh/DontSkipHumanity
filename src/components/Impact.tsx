@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useReveal } from "@/hooks/useReveal";
 import { useScrollGrayscale } from "@/hooks/useScrollGrayscale";
 
@@ -129,7 +128,7 @@ export default function Impact() {
             className="inline-flex items-center gap-1.5 text-[13px] border border-white/15 rounded-[3px] px-4 py-2 text-white/40 hover:text-white/60 transition-colors duration-500 self-start md:self-auto md:mb-1"
           >
             Full impact report
-            <Image src="/ic_arrow_impact_report.svg" alt="" width={8} height={8} className="w-2 h-2" unoptimized />
+            <img src="/ic_arrow_impact_report.svg" alt="" className="w-2.5 h-2.5 shrink-0" />
           </a>
         </div>
       </div>
