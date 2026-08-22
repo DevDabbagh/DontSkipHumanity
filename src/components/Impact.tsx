@@ -93,10 +93,10 @@ function StatCard({
       />
       {/* 2 — heavy black overlay so the number always wins over the photo */}
       <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.82)" }} />
-      {/* 3 — colored tint: strong at the left, gone by ~70% across */}
+      {/* 3 — colored tint: transparent at the left, strongest at the right edge (matches Figma #21) */}
       <div
         className="absolute inset-0"
-        style={{ background: `linear-gradient(90deg, ${tint(accent, 0.34)} 0%, ${tint(accent, 0.12)} 38%, transparent 70%)` }}
+        style={{ background: `linear-gradient(90deg, transparent 30%, ${tint(accent, 0.12)} 62%, ${tint(accent, 0.34)} 100%)` }}
       />
       {/* 4 — content */}
       <div className="relative w-full px-5 sm:px-6 py-4">{children}</div>
