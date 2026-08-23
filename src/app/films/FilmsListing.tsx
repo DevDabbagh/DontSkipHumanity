@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import HeroMosaic from "@/components/HeroMosaic";
 import Newsletter from "@/components/Newsletter";
 import SupportCTA from "@/components/SupportCTA";
 import Footer from "@/components/Footer";
@@ -44,6 +45,16 @@ export default function FilmsListing({ films, header }: { films: Film[]; header?
   const headerTitleColored = header?.titleColored?.trim();
   const headerDescription = header?.description?.trim();
   const hasCustomTitle = !!(headerTitleNormal || headerTitleColored);
+
+  /* Hero mosaic tiles — the real slate. Falls back to the header image (and
+     then the stock hero) so the wall is never empty on a fresh install. */
+  const heroTiles = useMemo(() => {
+    const fromFilms = films
+      .map((f) => f.thumbnailUrl || f.posterUrl)
+      .filter((src): src is string => Boolean(src));
+    const unique = Array.from(new Set(fromFilms));
+    return unique.length >= 3 ? unique : [...unique, heroImage, HERO_IMAGE];
+  }, [films, heroImage]);
 
   /* Featured */
   const featuredFilms = useMemo(() => films.filter((f) => f.isFeatured), [films]);
@@ -87,43 +98,38 @@ export default function FilmsListing({ films, header }: { films: Film[]; header?
       <Navbar />
 
       {/* ═══════════════════════════════════════
-          HERO  (exact Figma spec — DSH – Films Landing)
-          · Heading: Inter SemiBold 50/52, -2% tracking, block 362px
-          · Description: 16/24, block 408px
-          · Gaps: label→heading 14, heading→desc 60, desc→buttons 60
-          · Image: starts at 50%, H 646, 1.5px #F0F0F0/10 border, bleeds right
-          · Left preview strip: same image, another crop, fixed 80px
-          · Text column fixed width (aligned to page container); image is the
-            only fluid element — it absorbs all extra viewport width.
+          HERO  (Figma — DSH – Films Landing v2, node 641:199)
+          Same construction as Studio Landing: a full-bleed drifting photo
+          mosaic (`Frame 109` 641:200, 1930×646) with the solid
+          `Rectangle 727` panel (641:201 — x=232, w=728) over the middle, so
+          photos read only in the left strip and the right block.
+          · Band: h 646, starts below the fixed 128px navbar
+          · Eyebrow → heading gap 14 · heading block 362 · description 496
+          · Buttons at the foot of the band
          ═══════════════════════════════════════ */}
-      <section className="relative overflow-hidden pt-[96px] lg:pt-[104px]">
-        {/* Far-left preview strip — SAME image, another crop, fixed 80px */}
-        <div
-          className="hidden xl:block absolute top-[104px] left-0 h-[clamp(560px,42vw,780px)] overflow-hidden pointer-events-none select-none"
-          style={{ width: "max(64px, calc((100vw - 1264px) / 2))" }}
-        >
-          <img
-            src={heroImage}
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{
-              objectPosition: "20% 42%",
-              filter: "grayscale(1) brightness(0.5) contrast(0.92)",
-            }}
-          />
-          <div className="absolute inset-0 bg-black/45" />
-        </div>
+      <section className="relative h-[646px] mt-[128px]">
+        {/* Drifting mosaic — built from the real film stills, so the wall is
+            always the current slate. Rows alternate direction. */}
+        <HeroMosaic
+          mode="tiles"
+          tiles={heroTiles}
+          tileWidth={330}
+          dim={0.55}
+          /* Tile mode gets raw photos, so match the knocked-back look the
+             Studio sheet arrives with from Figma. */
+          tileFilter="grayscale(1) brightness(0.42) contrast(1.05)"
+          /* DSH pink wash entering from the right, as in the Figma frame */
+          tint="linear-gradient(270deg, rgba(178,52,149,0.20) 0%, rgba(178,52,149,0.09) 32%, rgba(178,52,149,0) 62%)"
+        />
 
-        <div className="flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-0">
-          {/* Text column — FIXED width, aligned to the page's 1200 container.
-              shrink-0 + grow-0 lock it; never scales or reflows. */}
-          <div className="shrink-0 grow-0 w-full lg:w-auto px-5 sm:px-8 lg:px-0 lg:pl-[max(2rem,calc((100vw-1200px)/2+2rem))] lg:pr-[64px]">
-            <div className="lg:w-[408px]">
-              <p className="text-[11px] leading-[24px] tracking-[0.28em] text-white/30 uppercase mb-[14px]">
+        <div className="relative h-full max-w-[1224px] mx-auto px-5 sm:px-8 xl:px-0">
+          <div className="absolute top-[124px] left-5 sm:left-8 xl:left-0 flex flex-col gap-[60px] w-full max-w-[496px] pr-5 sm:pr-8 xl:pr-0">
+            <div className="flex flex-col gap-[14px] items-start">
+              <p className="text-[11px] leading-[24px] tracking-[1.76px] uppercase text-[#363636]">
                 Films
               </p>
               <h1
-                className="font-semibold text-[40px] leading-[42px] sm:text-[50px] sm:leading-[52px] lg:w-[362px]"
+                className="font-semibold text-[38px] leading-[40px] sm:text-[50px] sm:leading-[52px] xl:w-[362px]"
                 style={{ letterSpacing: "-0.02em" }}
               >
                 {hasCustomTitle ? (
@@ -147,50 +153,27 @@ export default function FilmsListing({ films, header }: { films: Film[]; header?
                   </>
                 )}
               </h1>
-              <p className="text-[16px] leading-[24px] text-white/40 mt-[60px] lg:w-[408px] whitespace-pre-line">
-                {headerDescription ||
-                  "DSH makes documentary and fiction — from development and production to festivals and distribution. Films are not streamed here. This section presents the work with rigour and context, and opens paths to screenings, distribution, and press."}
-              </p>
-              <div className="flex items-center gap-3 mt-[60px]">
-                <button
-                  onClick={() => exploreForm("documentary")}
-                  className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white/80 bg-transparent hover:border-white/30 hover:text-white transition-colors"
-                >
-                  Explore documentaries
-                </button>
-                <button
-                  onClick={() => exploreForm("fiction")}
-                  className="text-sm border border-white/15 rounded-[3px] px-5 py-2.5 text-white/80 bg-transparent hover:border-white/30 hover:text-white transition-colors"
-                >
-                  Explore fiction
-                </button>
-              </div>
             </div>
-          </div>
 
-          {/* Hero image — the ONLY fluid element. flex-1 + w-0 absorbs all
-              remaining viewport width; object-cover reveals more as it widens. */}
-          <div className="w-full lg:flex-1 lg:w-0 lg:min-w-0 px-5 sm:px-8 lg:px-0">
-              <div
-                className="relative aspect-[4/3] lg:aspect-auto lg:h-[clamp(560px,42vw,780px)] overflow-hidden"
-                style={{ boxShadow: "0 24px 70px -20px rgba(0,0,0,0.7)" }}
+            <p className="font-[family-name:var(--font-source-sans)] text-[16px] leading-[24px] tracking-[-0.08px] text-[#595C5C] whitespace-pre-line">
+              {headerDescription ||
+                "DSH makes documentary and fiction — from development and production to festivals and distribution. Films are not streamed here. This section presents the work with rigour and context, and opens paths to screenings, distribution, and press."}
+            </p>
+
+            <div className="flex flex-wrap items-center gap-[24px]">
+              <button
+                onClick={() => exploreForm("documentary")}
+                className="backdrop-blur-[3px] bg-[rgba(27,27,27,0.2)] border border-[rgba(240,240,240,0.2)] rounded-[3px] px-[14px] py-[12px] text-[13px] font-medium text-[rgba(240,240,240,0.4)] hover:text-[rgba(240,240,240,0.6)] hover:border-[rgba(240,240,240,0.3)] transition-colors"
               >
-                <img
-                  src={heroImage}
-                  alt=""
-                  className="absolute inset-0 w-full h-full object-cover"
-                  style={{
-                    objectPosition: "55% 42%",
-                    filter: "grayscale(1) brightness(0.8) contrast(1)",
-                  }}
-                />
-                {/* Light cinematic overlay — image is clearly visible, text sits beside it */}
-                <div className="absolute inset-0 bg-black/20" />
-                {/* Shadow layer — soft left-side gradient so the image blends toward the text */}
-                <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-transparent to-transparent" />
-                {/* Bottom shadow — the image fades into darkness at the bottom */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-              </div>
+                Explore documentaries
+              </button>
+              <button
+                onClick={() => exploreForm("fiction")}
+                className="backdrop-blur-[3px] bg-[rgba(27,27,27,0.2)] border border-[rgba(240,240,240,0.2)] rounded-[3px] px-[14px] py-[12px] text-[13px] font-medium text-[rgba(240,240,240,0.4)] hover:text-[rgba(240,240,240,0.6)] hover:border-[rgba(240,240,240,0.3)] transition-colors"
+              >
+                Explore fiction
+              </button>
+            </div>
           </div>
         </div>
       </section>

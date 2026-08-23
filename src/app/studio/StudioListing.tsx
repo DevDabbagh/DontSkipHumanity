@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import HeroMosaic from "@/components/HeroMosaic";
 import SupportCTA from "@/components/SupportCTA";
 import Footer from "@/components/Footer";
 import type { StudioProject } from "@/lib/types";
@@ -147,24 +148,14 @@ export default function StudioListing({ projects }: { projects: StudioProject[] 
           the 128px navbar; buttons close the block at y 734.
          ═══════════════════════════════════════════════════════════ */}
       <section className="relative h-[645px] mt-[128px]">
-        {/* Photo mosaic — the exported Figma asset (Frame 563, 1920×645).
-            Rendered at its native band height so the tile grid lands exactly
-            where the design puts it. */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
-          <img
-            src="/images/studio-hero-mosaic.png"
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover object-center"
-          />
-          {/* Dim — the export is the bare Frame 563; in the design the overlay
-              frames above it (691:484 / 643:545) knock the photos back */}
-          <div className="absolute inset-0 bg-[#0D0D0D]/[0.55]" />
-          {/* Left scrim (Figma 643:545 — the 728px panel behind the headline) */}
-          <div className="absolute inset-y-0 left-0 w-[68%] bg-gradient-to-r from-[#0D0D0D] via-[#0D0D0D]/95 to-transparent" />
-          {/* Vertical falloff into the page background */}
-          <div className="absolute inset-x-0 bottom-0 h-[240px] bg-gradient-to-t from-[#0D0D0D] to-transparent" />
-          <div className="absolute inset-x-0 top-0 h-[140px] bg-gradient-to-b from-[#0D0D0D] to-transparent" />
-        </div>
+        {/* Photo mosaic — exported Figma asset (Frame 563, 1920×645) */}
+        <HeroMosaic
+          mode="sheet"
+          src="/images/studio-hero-mosaic.png"
+          sheetWidth={1920}
+          sheetHeight={645}
+          dim={0.55}
+        />
 
         {/* Hero copy */}
         <div className="relative h-full max-w-[1224px] mx-auto px-5 sm:px-8 xl:px-0">

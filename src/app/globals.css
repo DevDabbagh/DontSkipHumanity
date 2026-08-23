@@ -469,6 +469,43 @@ html {
 ::-webkit-scrollbar-thumb { background: #2A2A2A; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #3A3A3A; }
 
+/* ── Studio hero mosaic ────────────────────────────────────────────
+   Three tile rows drift in opposite directions. The background image
+   is the exported Figma frame (1920×645 = 3 rows of 215px); each row
+   shows its own slice via background-position-y and repeats on X, so
+   shifting exactly one image width (1920px) loops seamlessly.        */
+@keyframes studioMosaicLeft {
+  from { background-position-x: 0; }
+  to   { background-position-x: -1920px; }
+}
+@keyframes studioMosaicRight {
+  from { background-position-x: -1920px; }
+  to   { background-position-x: 0; }
+}
+
+.studio-mosaic-row {
+  background-image: url("/images/studio-hero-mosaic.png");
+  background-repeat: repeat-x;
+  background-size: 1920px 645px;
+  will-change: background-position;
+}
+.studio-mosaic-row--left  { animation: studioMosaicLeft  90s linear infinite; }
+.studio-mosaic-row--right { animation: studioMosaicRight 90s linear infinite; }
+
+/* Tile-mode marquee — the row holds its tiles twice over, so translating by
+   -50% lands on an identical frame and the loop is seamless. */
+@keyframes heroMarqueeLeft {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+@keyframes heroMarqueeRight {
+  from { transform: translate3d(-50%, 0, 0); }
+  to   { transform: translate3d(0, 0, 0); }
+}
+.hero-marquee-track { will-change: transform; }
+.hero-marquee-track--left  { animation: heroMarqueeLeft  90s linear infinite; }
+.hero-marquee-track--right { animation: heroMarqueeRight 90s linear infinite; }
+
 /* Reduce motion for accessibility */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
