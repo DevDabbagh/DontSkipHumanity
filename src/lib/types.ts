@@ -74,7 +74,30 @@ export interface StudioProject {
   oneLineDescription: string;
   synopsisShort: string;
   synopsisLong: string;
-  episodes: { title: string; description: string; duration?: string }[];
+  /**
+   * Episodes. `title` / `description` / `duration` are the original shape.
+   * The rest are surfaced by the Studio details design (Figma `704:971` —
+   * episode rows `709:1455` etc.) and are all OPTIONAL, so existing data,
+   * mocks and the dashboard form keep working untouched. The detail page
+   * renders whichever of them are present.
+   */
+  episodes: {
+    title: string;
+    description: string;
+    duration?: string;
+    /** Shown under the title, e.g. "– Aida Refugee Camp, Palestine" */
+    subtitle?: string;
+    /** 1-based; falls back to array order */
+    number?: number;
+    season?: number;
+    year?: string;
+    /** Guest credited beneath the episode still */
+    guest?: string;
+    /** Episode still — 406×260 in the design */
+    imageUrl?: string;
+    /** Deep link for "View episode" */
+    slug?: string;
+  }[];
   credits: {
     production: string;
     coProduction: string;
@@ -82,6 +105,12 @@ export interface StudioProject {
     partners: string[];
     year: string;
     language: string;
+    /** Optional — additional credit rows in the Studio details design */
+    direction?: string;
+    duration?: string;
+    form?: string;
+    formatLabel?: string;
+    country?: string;
   };
   status: StudioStatus;
   editorialContext: string;

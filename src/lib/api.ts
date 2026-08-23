@@ -178,6 +178,24 @@ export async function getStudioProjects(): Promise<StudioProject[]> {
   return MOCK_STUDIO;
 }
 
+export async function getStudioProjectBySlug(
+  slug: string
+): Promise<StudioProject | null> {
+  if (await isModuleLive("studio")) {
+    try {
+      const { data, error } = await supabase
+        .from("studio_items")
+        .select("*, studio_episodes(*), studio_platform_links(*)")
+        .eq("slug", slug)
+        .eq("status", "published")
+        .single();
+
+      if (!error && data) return mapStudioProject(data);
+    } catch {}
+  }
+  return MOCK_STUDIO.find((p) => p.slug === slug) ?? null;
+}
+
 // ─── Academy Programs ───────────────────────────────────────────
 
 export async function getPrograms(): Promise<AcademyProgram[]> {
