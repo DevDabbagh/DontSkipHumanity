@@ -63,11 +63,15 @@ export default function SupportCTA() {
           {/* Right: numbered pillars */}
           <div className="reveal-right md:w-1/2 space-y-8 md:pt-12">
             {SUPPORT_PILLARS.map((p, i) => (
-              <div key={p.num} className={`reveal stagger-${i + 1} flex gap-6 items-start`}>
-                <span className="text-xs font-mono mt-1" style={{ color: p.color }}>{p.num}</span>
-                <div>
-                  <h4 className="text-[#FFFFFF] font-medium">{p.title}</h4>
-                  <p className="text-sm text-[#595C5C] mt-1">{p.desc}</p>
+              <div key={p.num} className={`reveal stagger-${i + 1} flex gap-6 md:gap-[50px] items-center`}>
+                {/* number (H6_IntroTitles: Inter Regular 11/24, 1.76px tracking) + 60px divider */}
+                <div className="flex items-center justify-between w-[64px] shrink-0">
+                  <span className="text-[11px] leading-[24px] font-normal tracking-[1.76px] uppercase" style={{ color: p.color }}>{p.num}</span>
+                  <span className="block w-px h-[60px] bg-[#363636]" />
+                </div>
+                <div className="flex flex-col gap-2.5">
+                  <h4 className="text-[16px] font-semibold text-white leading-[20px]">{p.title}</h4>
+                  <p className="font-[family-name:var(--font-source-sans)] text-[14px] text-[#595C5C] leading-[20px]">{p.desc}</p>
                 </div>
               </div>
             ))}

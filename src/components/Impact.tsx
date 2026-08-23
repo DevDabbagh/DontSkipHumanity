@@ -141,7 +141,7 @@ export default function Impact() {
             {/* Left: index · divider · title + description */}
             <div className="lg:w-5/12 px-5 sm:px-8 lg:pl-[max(2rem,calc((100vw-1400px)/2+2rem))] lg:pr-10">
               <div className="flex gap-6 items-center">
-                <span className="text-[11px] leading-[24px] font-semibold" style={{ color: ACCENTS[i] }}>
+                <span className="text-[11px] leading-[24px] font-normal tracking-[1.76px] uppercase" style={{ color: ACCENTS[i] }}>
                   {row.num}
                 </span>
                 <div className="border-l border-white/[0.08] pl-6">
