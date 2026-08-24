@@ -257,7 +257,8 @@
 
 /* Gradient text — static (for typewriter) */
 .gradient-text-static {
-  background: linear-gradient(90deg, #32C6CC, #9B59B6);
+  /* Figma 303:92 — teal → DSH pink (not purple). */
+  background: linear-gradient(90deg, #32C6CC, #B23495);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

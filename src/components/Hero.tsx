@@ -266,7 +266,8 @@ export default function Hero({ slides, heading }: { slides?: HeroSlide[] | null;
       {/* Hero text — typewriter effect. Responsive 120px top/bottom padding (smaller on mobile). */}
       <div className="max-w-[1200px] mx-auto px-5 sm:px-8 text-center pt-16 pb-16 sm:pt-24 sm:pb-24 lg:pt-[120px] lg:pb-[120px]">
         <div className="mb-1 sm:mb-2">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] xl:text-[50px] font-semibold tracking-tight text-white/90 leading-[1.3] xl:leading-[1.04]">
+          {/* H1_Desktop_DSH — Inter SemiBold 50/52, letter-spacing -2% (Figma 303:92) */}
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.75rem] xl:text-[50px] font-semibold tracking-[-0.02em] text-[#F0F0F0] leading-[1.3] xl:leading-[1.04]">
             {linesWithOffsets.map((line, i) => {
               const visibleLen = Math.max(0, Math.min(line.text.length, typedChars - line.start));
               const visibleText = line.text.slice(0, visibleLen);
