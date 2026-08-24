@@ -91,7 +91,7 @@ export default function Agenda() {
           <p className="text-xs tracking-[0.25em] uppercase mb-4 text-[#363636]">
             Agenda
           </p>
-          <h2 className="text-[26px] sm:text-[32px] md:text-[38px] leading-tight md:leading-[40px] tracking-[-1.5px] font-semibold max-w-2xl text-[#F0F0F0]">
+          <h2 className="text-[26px] sm:text-[32px] md:text-[38px] leading-tight md:leading-[40px] tracking-[-0.57px] font-semibold max-w-2xl text-[#F0F0F0]">
             DSH makes documentary and fiction
             <br />
             – from development and production to festivals.

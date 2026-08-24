@@ -116,7 +116,7 @@ export default function Impact() {
           Impact
         </p>
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
-          <h2 className="text-[28px] sm:text-[32px] md:text-[38px] leading-[1.15] md:leading-[40px] tracking-[-1.5px] font-semibold max-w-2xl text-white">
+          <h2 className="text-[28px] sm:text-[32px] md:text-[38px] leading-[1.15] md:leading-[40px] tracking-[-0.57px] font-semibold max-w-2xl text-white">
             Impact is not a dashboard.
             <br />
             It is the line between the work

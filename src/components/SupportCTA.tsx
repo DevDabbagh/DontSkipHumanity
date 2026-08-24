@@ -46,7 +46,7 @@ export default function SupportCTA() {
             <p className="text-xs tracking-[0.25em] text-dsh-label uppercase mb-4">
               Support
             </p>
-            <h2 className="text-[26px] sm:text-[32px] md:text-[38px] leading-tight md:leading-[40px] tracking-[-1.5px] font-semibold text-[#FFFFFF]">
+            <h2 className="text-[26px] sm:text-[32px] md:text-[38px] leading-tight md:leading-[40px] tracking-[-0.57px] font-semibold text-[#FFFFFF]">
               Not pity — solidarity.
               <br />
               Lorem ipsum new line please.

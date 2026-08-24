@@ -67,34 +67,37 @@ export default function Notebook() {
           <div className="reveal-right w-full md:w-[62%] md:pt-0">
             {/* Label + View all — separated row */}
             <div className="flex items-center justify-between mb-8">
-              <p className="text-[10px] tracking-[0.3em] text-dsh-label/40 uppercase">
+              {/* H6_IntroTitles — Inter Regular 11/24, +16% tracking, #363636 (Figma 303:481) */}
+              <p className="text-[11px] leading-[24px] font-normal tracking-[1.76px] uppercase text-[#363636]">
                 Read
               </p>
+              {/* Canonical DSH button (Figma 303:482) */}
               <Link
                 href="/read"
-                className="text-xs border border-dsh-text-primary/15 rounded-[3px] px-3.5 py-1.5 text-dsh-text-primary/35 hover:text-dsh-text-primary/55 hover:border-dsh-text-primary/25 transition-colors"
+                className="inline-flex items-center justify-center gap-[7px] text-[13px] font-medium px-[14px] py-[12px] rounded-[3px] border border-[#F0F0F0]/20 bg-[#1B1B1B]/20 backdrop-blur-[3px] text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 hover:border-[#F0F0F0]/25 transition-colors"
               >
-                View all articles <span style={{ color: FEATURED_COLOR }}>↗</span>
+                View all articles
+                <img src="/ic_arrow_impact_report.svg" alt="" className="w-[6.25px] h-[6.25px] shrink-0" />
               </Link>
             </div>
 
             {/* Category + date */}
             <div className="flex items-center gap-3 mb-5">
-              <span className="text-[11px] px-2 py-0.5 rounded-[3px] text-white font-medium" style={{ background: FEATURED_COLOR }}>
+              <span className="text-[12px] px-2 py-0.5 rounded-[3px] text-white font-medium" style={{ background: FEATURED_COLOR }}>
                 Studio
               </span>
               <span className="text-xs" style={{ color: FEATURED_COLOR }}>23 Aug 2026</span>
             </div>
 
             {/* Headline */}
-            <h2 className="text-[26px] sm:text-[32px] md:text-[38px] leading-[1.2] md:leading-[40px] tracking-[-1.5px] font-semibold text-[#F0F0F0] max-w-md">
+            <h2 className="text-[26px] sm:text-[32px] md:text-[38px] leading-[1.2] md:leading-[40px] tracking-[-0.57px] font-semibold text-[#F0F0F0] max-w-md">
               Free Fish — now available
               <br />
               to programmers and press
             </h2>
 
             {/* Description */}
-            <p className="font-[family-name:var(--font-source-sans)] text-[15px] text-dsh-desc mt-6 leading-[24px] max-w-md">
+            <p className="font-[family-name:var(--font-source-sans)] text-[15px] md:text-[16px] tracking-[-0.08px] text-dsh-desc mt-6 leading-[24px] max-w-md">
               Bisan Owda&apos;s short documentary enters distribution. Screeners
               available on request for programmers, press, and partners. Bisan
               Owda&apos;s short documentary enters distribution. Screeners
@@ -140,7 +143,7 @@ export default function Notebook() {
 
             {/* Category + date */}
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-[11px] px-2 py-0.5 rounded-[3px] text-white font-medium" style={{ background: article.color }}>
+              <span className="text-[12px] px-2 py-0.5 rounded-[3px] text-white font-medium" style={{ background: article.color }}>
                 {article.category}
               </span>
               <span className="text-xs" style={{ color: article.color }}>{article.date}</span>
