@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useReveal } from "@/hooks/useReveal";
 
 const SUPPORT_PILLARS = [
@@ -99,9 +100,12 @@ export default function SupportCTA() {
             <p className="text-sm text-[#FFFFFF73] mt-2">
               Ongoing solidarity. The most useful kind.
             </p>
-            <button className="mt-6 w-full py-3 rounded-[3px] gradient-fill-btn text-sm text-[#F0F0F0] font-medium flex items-center justify-center gap-2">
+            <Link
+              href="/support?type=monthly"
+              className="mt-6 w-full py-3 rounded-[3px] gradient-fill-btn text-sm text-[#F0F0F0] font-medium flex items-center justify-center gap-2"
+            >
               Give monthly ♡
-            </button>
+            </Link>
           </div>
 
           {/* Support the work — plain dark card, same border + shadow */}
@@ -122,9 +126,12 @@ export default function SupportCTA() {
             <p className="text-sm text-[#595C5C] mt-2">
               A single contribution, any amount.
             </p>
-            <button className="mt-6 w-full py-[13px] rounded-[3px] border border-[#F0F0F0]/20 bg-[#1B1B1B]/20 text-[13px] font-medium text-[#F0F0F0]/40 flex items-center justify-center gap-1.5 hover:text-[#F0F0F0]/60 transition-colors">
+            <Link
+              href="/support?type=one-time"
+              className="mt-6 w-full py-[13px] rounded-[3px] border border-[#F0F0F0]/20 bg-[#1B1B1B]/20 text-[13px] font-medium text-[#F0F0F0]/40 flex items-center justify-center gap-1.5 hover:text-[#F0F0F0]/60 transition-colors"
+            >
               Support our work ♡
-            </button>
+            </Link>
           </div>
         </div>
       </div>

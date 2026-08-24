@@ -1,11 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import { useReveal } from "@/hooks/useReveal";
 import ScrollColorImage from "./ScrollColorImage";
 import type { LandingSectionText } from "@/lib/landing";
 
 interface InFocusConfig extends LandingSectionText {
   imageSrc?: string;
+  /** Where "view more" goes — the featured item's detail page, set from the dashboard. */
+  ctaHref?: string;
 }
 
 export default function InFocus({ config }: { config?: InFocusConfig }) {
@@ -66,9 +69,23 @@ export default function InFocus({ config }: { config?: InFocusConfig }) {
             </p>
 
             <div className="flex items-center gap-5 mt-10">
-              <button className="inline-flex items-center gap-1.5 text-[13px] font-medium px-[14px] py-[12px] rounded-[3px] border border-[#F0F0F0]/15 bg-[#1B1B1B]/20 backdrop-blur-[3px] text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 hover:border-[#F0F0F0]/25 transition-colors">
-                {config?.cta || "view more"} <span className="text-[#8665A7]">+</span>
-              </button>
+              {/* Links to the featured item's detail page when the dashboard has
+                  set one; otherwise stays inert rather than shipping a dead button. */}
+              {config?.ctaHref ? (
+                <Link
+                  href={config.ctaHref}
+                  className="inline-flex items-center gap-1.5 text-[13px] font-medium px-[14px] py-[12px] rounded-[3px] border border-[#F0F0F0]/15 bg-[#1B1B1B]/20 backdrop-blur-[3px] text-[#F0F0F0]/40 hover:text-[#F0F0F0]/60 hover:border-[#F0F0F0]/25 transition-colors"
+                >
+                  {config?.cta || "view more"} <span className="text-[#8665A7]">+</span>
+                </Link>
+              ) : (
+                <span
+                  aria-disabled="true"
+                  className="inline-flex items-center gap-1.5 text-[13px] font-medium px-[14px] py-[12px] rounded-[3px] border border-[#F0F0F0]/15 bg-[#1B1B1B]/20 backdrop-blur-[3px] text-[#F0F0F0]/25 cursor-default"
+                >
+                  {config?.cta || "view more"} <span className="text-[#8665A7]">+</span>
+                </span>
+              )}
               <a href="#support" className="text-sm text-dsh-desc hover:text-dsh-text-primary transition-colors">
                 Support our work
               </a>

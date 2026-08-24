@@ -10,7 +10,7 @@ import Notebook from "@/components/Notebook";
 import Agenda from "@/components/Agenda";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
-import { getLandingConfig, firstSlotImage, buildHeroSlides } from "@/lib/landing";
+import { getLandingConfig, firstSlotImage, firstSlotCtaLink, buildHeroSlides } from "@/lib/landing";
 
 export const dynamic = "force-dynamic";
 
@@ -47,7 +47,7 @@ export default async function Home() {
         <Journalism config={{ ...read?.text, imageSrc: firstSlotImage(read) }} />
       )}
       {infocus?.enabled !== false && (
-        <InFocus config={{ ...infocus?.text, imageSrc: firstSlotImage(infocus) }} />
+        <InFocus config={{ ...infocus?.text, imageSrc: firstSlotImage(infocus), ctaHref: firstSlotCtaLink(infocus) }} />
       )}
       <Impact />
       <SupportCTA />

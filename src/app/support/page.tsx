@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import DriftingGrid from "@/components/DriftingGrid";
@@ -78,8 +79,21 @@ const OTHER_WAYS = [
   },
 ];
 
+/** Wrapper — useSearchParams needs a Suspense boundary above it. */
 export default function SupportPage() {
-  const [donationType, setDonationType] = useState<"Monthly" | "One-time">("Monthly");
+  return (
+    <Suspense fallback={<main className="relative bg-[#0D0D0D] min-h-screen" />}>
+      <SupportPageContent />
+    </Suspense>
+  );
+}
+
+function SupportPageContent() {
+  // "Give monthly" / "Support our work" on the landing page arrive here as
+  // /support?type=monthly | one-time, so the right option is already selected.
+  const initialType = useSearchParams().get("type") === "one-time" ? "One-time" : "Monthly";
+
+  const [donationType, setDonationType] = useState<"Monthly" | "One-time">(initialType);
   const [amount, setAmount] = useState("€25");
   const [customAmount, setCustomAmount] = useState("");
   const r2 = useReveal();

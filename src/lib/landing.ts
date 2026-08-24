@@ -85,6 +85,18 @@ export function firstSlotImage(section?: LandingSection): string | undefined {
 }
 
 /**
+ * First slot's CTA destination — the "view more" target a section's featured
+ * item points at, set per-slot from the dashboard. Returns undefined when the
+ * editor hasn't linked an item yet, so the caller can render the button inert
+ * instead of shipping a dead control.
+ */
+export function firstSlotCtaLink(section?: LandingSection): string | undefined {
+  if (!section) return undefined;
+  const id = section.slotIds[0];
+  return id ? section.slots[id]?.ctaLink || undefined : undefined;
+}
+
+/**
  * Slide shape the Academy listing page's hero slider renders — normalized so the
  * component never has to know whether a slide came from the CMS or from live
  * Academy program data.
