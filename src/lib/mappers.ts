@@ -93,11 +93,25 @@ export function mapStudioProject(row: any): StudioProject {
     synopsisShort: str(row.synopsis_short),
     synopsisLong: str(row.synopsis_long),
     episodes: Array.isArray(row.studio_episodes)
-      ? row.studio_episodes.map((e: any) => ({
-          title: str(e.title),
-          description: str(e.description),
-          duration: e.duration || undefined,
-        }))
+      ? row.studio_episodes
+          .map((e: any) => ({
+            title: str(e.title),
+            description: str(e.description),
+            duration: e.duration || undefined,
+            subtitle: str(e.subtitle) || undefined,
+            number: e.episode ?? undefined,
+            season: e.season ?? undefined,
+            year: e.year || undefined,
+            guest: e.guest || undefined,
+            imageUrl: e.image_url || undefined,
+            slug: e.slug || undefined,
+          }))
+          // Supabase returns joined rows unordered; the details page lists
+          // episodes in running order.
+          .sort(
+            (a: { season?: number; number?: number }, b: { season?: number; number?: number }) =>
+              (a.season ?? 1) - (b.season ?? 1) || (a.number ?? 0) - (b.number ?? 0)
+          )
       : [],
     credits: {
       production: row.credit_production || "",
@@ -110,7 +124,13 @@ export function mapStudioProject(row: any): StudioProject {
         : [],
       year: row.credit_year || "",
       language: row.credit_language || "",
+      direction: row.credit_direction || undefined,
+      duration: row.credit_duration || undefined,
+      form: row.credit_form || undefined,
+      formatLabel: row.credit_format_label || undefined,
+      country: row.credit_country || undefined,
     },
+    stills: Array.isArray(row.stills) && row.stills.length > 0 ? row.stills : undefined,
     status: (row.studio_status || "upcoming") as StudioStatus,
     editorialContext: str(row.editorial_context),
     listenLinks: Array.isArray(row.studio_platform_links)
