@@ -1,11 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
 import type { StudioProject } from "@/lib/types";
+import { useScrollColorize } from "@/hooks/useScrollColorize";
+import EpisodeLightbox from "@/components/EpisodeLightbox";
 
 /* ═══════════════════════════════════════════════════════════════
    DSH – Studio details
@@ -140,9 +142,13 @@ function CreditRow({
   value?: string;
   tone?: "bright" | "muted" | "accent";
 }) {
-  if (!value) return null;
-  const cls =
-    tone === "accent"
+  // Empty credits are shown as a dimmed "None" rather than hidden, so the
+  // credits block always has the same shape and an unfilled field is visible
+  // (as an obvious gap to fill) instead of silently disappearing.
+  const filled = Boolean(value && value.trim());
+  const cls = !filled
+    ? "font-[family-name:var(--font-source-sans)] text-[16px] leading-[24px] tracking-[-0.08px] text-[#363636] italic"
+    : tone === "accent"
       ? "font-[family-name:var(--font-source-sans)] text-[16px] leading-[24px] tracking-[-0.08px] text-[#8665A7]"
       : tone === "muted"
         ? VALUE_MUTED
@@ -150,7 +156,7 @@ function CreditRow({
   return (
     <div className="flex gap-[10px] items-baseline">
       <p className={CAT_LABEL}>{label}</p>
-      <p className={cls}>{value}</p>
+      <p className={cls}>{filled ? value : "None"}</p>
     </div>
   );
 }
@@ -165,8 +171,12 @@ export default function StudioProjectContent({
   const format = FORMAT_LABELS[project.format] ?? project.format;
   const status = STATUS_LABELS[project.status] ?? project.status;
 
-  /* Seasons — derived from the episodes that carry one. If none do, the
-     tab strip is skipped entirely rather than rendering a lone empty tab. */
+  /* Which episode the watch lightbox is showing; null = closed. */
+  const [watchIndex, setWatchIndex] = useState<number | null>(null);
+
+  /* Seasons — derived from the episodes that carry one. The design
+     (`709:1580`) ALWAYS shows the tab strip, so a project with no season data
+     is treated as a single "Season 1" rather than hiding the strip. */
   const seasons = useMemo(() => {
     const found = Array.from(
       new Set(
@@ -175,38 +185,124 @@ export default function StudioProjectContent({
           .filter((s): s is number => typeof s === "number")
       )
     ).sort((a, b) => a - b);
-    return found;
+    return found.length ? found : [1];
   }, [project.episodes]);
 
-  const [season, setSeason] = useState<number | null>(seasons[0] ?? null);
+  const [season, setSeason] = useState<number>(seasons[0]);
 
   const visibleEpisodes = useMemo(() => {
-    if (season === null) return project.episodes;
-    return project.episodes.filter((e) => e.season === season);
+    const hasSeasonData = project.episodes.some((e) => typeof e.season === "number");
+    /* No season data at all ⇒ every episode belongs to the implicit Season 1. */
+    if (!hasSeasonData) return project.episodes;
+    return project.episodes.filter((e) => (e.season ?? 1) === season);
   }, [project.episodes, season]);
 
   const heroImage = project.coverUrl || project.thumbnailUrl;
 
+  /* Gallery stills — Figma `714:2463`. Prefers the explicit `stills` array;
+     otherwise falls back to the cover, the episode stills and the thumbnail so
+     the carousel always cycles real images rather than the same frame twice.
+     Deduped, empties dropped. One image ⇒ the controls don't render at all. */
+  const stills = useMemo(() => {
+    const source = project.stills?.length
+      ? project.stills
+      : [project.coverUrl, ...project.episodes.map((e) => e.imageUrl), project.thumbnailUrl];
+    return Array.from(new Set(source.filter((s): s is string => Boolean(s))));
+  }, [project.stills, project.coverUrl, project.episodes, project.thumbnailUrl]);
+
+  const [stillIndex, setStillIndex] = useState(0);
+
+  /* Black-and-white → colour as the reader scrolls down. Drives every
+     `[data-colorize]` image on the page. */
+  const colorizeRef = useScrollColorize<HTMLElement>();
+
+  /* Drop placeholder URLs ("#", "", "about:blank") so we never render a
+     target="_blank" link that opens an empty tab. */
+  const realListenLinks = useMemo(
+    () =>
+      project.listenLinks.filter((l) => {
+        const u = (l.url || "").trim();
+        return u !== "" && u !== "#" && !u.startsWith("about:");
+      }),
+    [project.listenLinks]
+  );
+
+  /* Jump to the episodes list.
+     Scrolled explicitly rather than with a plain `#episodes` anchor, because
+     a hash link only fires when the hash actually changes — once the URL is
+     already `#episodes`, clicking the button again does nothing. This also
+     lets us subtract the 128px fixed navbar directly instead of relying on
+     `scroll-mt`. The `id` is kept on the section so deep links still work. */
+  const episodesRef = useRef<HTMLElement>(null);
+  const jumpToEpisodes = () => {
+    const el = episodesRef.current;
+    if (!el) return;
+    window.scrollTo({
+      top: el.getBoundingClientRect().top + window.scrollY - 128,
+      behavior: "smooth",
+    });
+  };
+
+  /* Share — Web Share API where available, clipboard everywhere else. */
+  const [shared, setShared] = useState(false);
+  const share = async () => {
+    const url = typeof window !== "undefined" ? window.location.href : "";
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: project.title, url });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      setShared(true);
+      setTimeout(() => setShared(false), 2000);
+    } catch {
+      /* user dismissed the sheet, or clipboard denied — stay silent */
+    }
+  };
+
+  /* `overflow-x-clip`, not `-hidden`: `overflow-x: hidden` forces
+     `overflow-y: auto`, which turns <main> into a scroll container and
+     silently breaks `position: sticky` for everything inside it.
+     `clip` contains the full-bleed bands without creating one. */
   return (
-    <main className="min-h-screen bg-[#0D0D0D] text-white overflow-x-hidden">
+    <main
+      ref={colorizeRef}
+      className="min-h-screen bg-[#0D0D0D] text-white overflow-x-clip"
+    >
       <Navbar />
 
       {/* ═══════════════════════════════════════════════════════════
           HERO — Frame 108 band (h 650) + Frame 479 copy
          ═══════════════════════════════════════════════════════════ */}
       <section className="relative mt-[128px]">
-        {/* Image band */}
+        {/* Image band — Figma `Frame 108` (704:972), h 650.
+            Three layers, exactly as the frame stacks them:
+              1. #0D0D0D base
+              2. photo at mix-blend-luminosity / 30%
+              3. two gradients in one layer — a vertical fade to solid black at
+                 the foot, and the grape wash running diagonally at 108.77°
+            No left scrim: the design darkens the whole band rather than
+            masking one side. */}
         <div className="absolute inset-x-0 top-0 h-[650px] overflow-hidden pointer-events-none select-none">
-          <img
-            src={heroImage}
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ objectPosition: "50% 40%", filter: "grayscale(1)" }}
+          <div className="absolute inset-0 bg-[#0D0D0D]" />
+          {/* Only render once there's a source. `src=""` makes the browser
+              re-request the whole page, which React flags as an error. */}
+          {heroImage && (
+            <img
+              src={heroImage}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-30"
+              style={{ objectPosition: "50% 40%" }}
+            />
+          )}
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage:
+                "linear-gradient(180deg, rgba(13,13,13,0) 0%, rgb(13,13,13) 100%), " +
+                "linear-gradient(108.771319885494deg, rgba(13,13,13,0.2) 2.3431%, rgba(134,101,167,0.2) 99.409%)",
+            }}
           />
-          <div className="absolute inset-0 bg-[#0D0D0D]/[0.72]" />
-          {/* Copy sits left — keep that side flatter */}
-          <div className="absolute inset-y-0 left-0 w-[62%] bg-gradient-to-r from-[#0D0D0D] via-[#0D0D0D]/85 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-[220px] bg-gradient-to-t from-[#0D0D0D] to-transparent" />
         </div>
 
         <div className="relative max-w-[1224px] mx-auto px-5 sm:px-8 xl:px-0">
@@ -250,13 +346,13 @@ export default function StudioProjectContent({
           {/* Action bar — Frame 485: gap 30, pb 90, rule beneath */}
           <div className="flex flex-col gap-[30px] pb-[90px]">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-[24px]">
-              <a
-                href="#episodes"
+              <button
+                onClick={jumpToEpisodes}
                 className={`${GLASS_BTN} px-[16px] py-[12px] self-start`}
               >
                 View all episodes
                 <PlayArrow />
-              </a>
+              </button>
               <div className="flex flex-wrap items-center gap-[24px]">
                 <Link href="/about" className={QUIET_LINK}>
                   Request a screener
@@ -279,23 +375,87 @@ export default function StudioProjectContent({
          ═══════════════════════════════════════════════════════════ */}
       <section className="max-w-[1224px] mx-auto px-5 sm:px-8 xl:px-0">
         <div className="flex flex-col lg:flex-row gap-[80px] xl:gap-[130px] items-start">
-          {/* Poster — Frame 594 */}
-          <div className="shrink-0 w-full lg:w-[406px] flex flex-col gap-[40px]">
+          {/* Poster — Frame 594.
+              Sticky: the gallery travels with the reader while the text column
+              scrolls, and releases on its own when this section ends at the
+              episodes list (the flex parent is already `items-start`). */}
+          {/* A sticky element stops at its containing block's edge, which here
+              is exactly where the season strip starts — so the poster's bottom
+              ended up flush against "Season 1 / Season 2". The bottom margin
+              is what the sticky travel stops against, giving it clear air. */}
+          <div className="shrink-0 w-full lg:w-[406px] flex flex-col gap-[40px] lg:sticky lg:top-[148px] lg:self-start lg:mb-[60px]">
             <div
               className={`relative w-full h-[420px] lg:h-[530px] overflow-hidden ${CARD_BORDER}`}
               style={{ boxShadow: CARD_SHADOW, backgroundColor: "#0D0D0D" }}
             >
-              <img
-                src={project.thumbnailUrl || project.coverUrl}
-                alt={project.title}
-                className="absolute inset-0 w-full h-full object-cover rounded-[6px] opacity-80"
-              />
+              {stills.map((src, i) => (
+                <img
+                  key={src}
+                  data-colorize
+                  src={src}
+                  alt={
+                    stills.length > 1
+                      ? `${project.title} — still ${i + 1} of ${stills.length}`
+                      : project.title
+                  }
+                  aria-hidden={i !== stillIndex}
+                  className="absolute inset-0 w-full h-full object-cover rounded-[6px] opacity-80 transition-opacity duration-500"
+                  style={{ opacity: i === stillIndex ? 0.8 : 0 }}
+                />
+              ))}
             </div>
 
-            {/* Platform links — Frame 644 */}
-            {project.listenLinks.length > 0 && (
+            {/* Carousel controls — Figma `730:644`: w-406, px-30, space-between.
+                Only rendered when there is more than one still, so the arrows
+                are never dead. The centre indicator is NOT in the frame — it's
+                Tiago's suggestion on the arrows. */}
+            {stills.length > 1 && (
+              <div className="flex items-center justify-between px-[30px] w-full lg:w-[406px] self-center">
+                <button
+                  type="button"
+                  onClick={() => setStillIndex((i) => (i - 1 + stills.length) % stills.length)}
+                  aria-label="Previous still"
+                  className="w-[40px] h-[40px] rounded-full backdrop-blur-[2px] transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#B23495]"
+                >
+                  <img src="/images/ic_left_arrow.svg" alt="" className="w-full h-full" />
+                </button>
+
+                {/* Indicator — active stop is a pink pill, the rest are dots */}
+                <div className="flex items-center gap-[8px]" role="tablist" aria-label="Stills">
+                  {stills.map((src, i) => (
+                    <button
+                      key={src}
+                      type="button"
+                      role="tab"
+                      aria-selected={i === stillIndex}
+                      aria-label={`Still ${i + 1}`}
+                      onClick={() => setStillIndex(i)}
+                      className="h-[6px] rounded-full transition-all duration-300"
+                      style={{
+                        width: i === stillIndex ? 24 : 6,
+                        backgroundColor: i === stillIndex ? "#B23495" : "rgba(240,240,240,0.2)",
+                      }}
+                    />
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setStillIndex((i) => (i + 1) % stills.length)}
+                  aria-label="Next still"
+                  className="w-[40px] h-[40px] rounded-full backdrop-blur-[2px] transition-opacity hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#B23495]"
+                >
+                  <img src="/images/ic_right_arrow.svg" alt="" className="w-full h-full" />
+                </button>
+              </div>
+            )}
+
+            {/* Platform links — Frame 644.
+                Only rendered when the URL is real: the seed data ships "#",
+                which would otherwise open a blank tab to nowhere. */}
+            {realListenLinks.length > 0 && (
               <div className="flex items-center gap-[16px]">
-                {project.listenLinks.map((l) => (
+                {realListenLinks.map((l) => (
                   <a
                     key={l.platform}
                     href={l.url}
@@ -356,12 +516,10 @@ export default function StudioProjectContent({
                   label="Co-Production"
                   value={project.credits.coProduction}
                 />
-                {project.credits.partners.length > 0 && (
-                  <CreditRow
-                    label="Partners"
-                    value={project.credits.partners.join(", ")}
-                  />
-                )}
+                <CreditRow
+                  label="Partners"
+                  value={project.credits.partners.join(", ")}
+                />
               </div>
 
               <div className="flex flex-col gap-[40px] items-start">
@@ -402,25 +560,26 @@ export default function StudioProjectContent({
       {project.episodes.length > 0 && (
         <section
           id="episodes"
+          ref={episodesRef}
           className="max-w-[1224px] mx-auto px-5 sm:px-8 xl:px-0 scroll-mt-[128px]"
         >
-          {/* Season tabs — only when the data actually carries seasons */}
-          {seasons.length > 0 && (
-            <div className="flex flex-col gap-[15px]">
-              <div className="flex flex-wrap items-center gap-[10px]">
-                {seasons.map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setSeason(s)}
-                    className={season === s ? PILL_ON : PILL_OFF}
-                  >
-                    Season {s}
-                  </button>
-                ))}
-              </div>
-              <div className="h-px w-full bg-[rgba(240,240,240,0.1)]" />
+          {/* Season tabs — always shown, per the design. A project with no
+              season data renders a single "Season 1". */}
+          <div className="flex flex-col gap-[15px]">
+            <div className="flex flex-wrap items-center gap-[10px]">
+              {seasons.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setSeason(s)}
+                  aria-pressed={season === s}
+                  className={season === s ? PILL_ON : PILL_OFF}
+                >
+                  Season {s}
+                </button>
+              ))}
             </div>
-          )}
+            <div className="h-px w-full bg-[rgba(240,240,240,0.1)]" />
+          </div>
 
           {visibleEpisodes.map((ep, i) => (
             <EpisodeRow
@@ -430,6 +589,15 @@ export default function StudioProjectContent({
               fallbackYear={project.credits.year}
               projectSlug={project.slug}
               poster={project.thumbnailUrl || project.coverUrl}
+              episodeLink={realListenLinks[0]?.url}
+              // The lightbox browses the whole run, so it needs the episode's
+              // position in `project.episodes` — not `i`, which is an index
+              // into the current season's filtered slice.
+              onWatch={
+                ep.videoUrl
+                  ? () => setWatchIndex(project.episodes.indexOf(ep))
+                  : undefined
+              }
             />
           ))}
         </section>
@@ -440,8 +608,11 @@ export default function StudioProjectContent({
          ═══════════════════════════════════════════════════════════ */}
       <section className="max-w-[1224px] mx-auto px-5 sm:px-8 xl:px-0 pb-[40px]">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-[24px]">
-          <button className={`${GLASS_BTN} px-[16px] py-[12px] self-start`}>
-            Share this project
+          <button
+            onClick={share}
+            className={`${GLASS_BTN} px-[16px] py-[12px] self-start`}
+          >
+            {shared ? "Link copied" : "Share this project"}
             <span className="w-[6px] h-[6px] rounded-full bg-[#8665A7] shrink-0" />
           </button>
           <div className="flex flex-wrap items-center gap-[24px]">
@@ -459,23 +630,72 @@ export default function StudioProjectContent({
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
-          BANNER — Frame 483, full bleed h 661
+          SUPPORT BANNER — Figma `Frame 483` (704:1278), full bleed h 661.
+          Not a bare image band: it carries a heading, body copy and a
+          600px one-time-donation card. Base #0D0D0D with the photo at
+          mix-blend-luminosity / 5% — texture only.
          ═══════════════════════════════════════════════════════════ */}
-      <section className="relative h-[400px] lg:h-[661px] overflow-hidden">
-        <img
-          src={heroImage}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-30"
-          style={{ objectPosition: "50% 45%" }}
-        />
-        <div className="absolute inset-0 bg-[#0D0D0D]/40" />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(270deg, rgba(178,52,149,0.18) 0%, rgba(134,101,167,0.10) 40%, rgba(13,13,13,0) 75%)",
-          }}
-        />
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-[#0D0D0D]" />
+        {heroImage && (
+          <img
+            src={heroImage}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-5"
+          />
+        )}
+
+        {/* Content — py 100, gap 80 */}
+        <div className="relative max-w-[1227px] mx-auto px-5 sm:px-8 xl:px-0 py-[100px] flex flex-col gap-[80px] items-center">
+          {/* Heading block — gap 30, inner gap 14, centred */}
+          <div className="flex flex-col gap-[30px] w-full text-center">
+            <div className="flex flex-col gap-[14px] w-full">
+              <p className="text-[10px] leading-[24px] tracking-[1.6px] uppercase text-[#363636]">
+                Support
+              </p>
+              <h2 className="font-semibold text-[30px] leading-[34px] sm:text-[38px] sm:leading-[40px] tracking-[-0.57px] text-white">
+                Want to support directly this project?
+              </h2>
+            </div>
+            <p className={BODY}>
+              Independent political film doesn&rsquo;t pay for itself. Your support
+              keeps the work free of editorial strings.
+            </p>
+          </div>
+
+          {/* One-time card — w 600, blur 3px, 1.5px hairline */}
+          <div
+            className="w-full max-w-[600px] rounded-[6px] border-[1.5px] border-[rgba(240,240,240,0.1)] backdrop-blur-[3px] px-[41.5px] py-[36.5px] flex flex-col gap-[30px]"
+            style={{
+              backgroundColor: "rgba(19,19,19,0.6)",
+              boxShadow: "0px 6px 20px 0px rgba(0,0,0,0.3)",
+            }}
+          >
+            <div className="flex flex-col gap-[10px] items-start w-full">
+              <div className="flex flex-col gap-[14px] items-start w-full">
+                <p className="text-[10px] leading-[24px] tracking-[1.6px] uppercase text-[rgba(255,255,255,0.25)]">
+                  One-time
+                </p>
+                <p className="font-semibold text-[26px] leading-[26px] tracking-[-0.75px] text-white">
+                  Support our work
+                </p>
+              </div>
+              <p className={BODY}>
+                A single contribution, any amount, your project of choice.
+              </p>
+            </div>
+
+            <Link
+              href="/support"
+              className="h-[44px] w-full rounded-[3px] border border-[rgba(240,240,240,0.2)] bg-[rgba(54,54,54,0.1)] flex items-center justify-center gap-[7px] text-[13px] font-medium text-[#F0F0F0] hover:bg-[rgba(54,54,54,0.25)] transition-colors"
+            >
+              Support this project
+              <svg width="12" height="11" viewBox="0 0 12 11" fill="currentColor" aria-hidden>
+                <path d="M6 10.4S0 6.9 0 3.4A3.1 3.1 0 016 2a3.1 3.1 0 016 1.4c0 3.5-6 7-6 7z" />
+              </svg>
+            </Link>
+          </div>
+        </div>
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
@@ -494,6 +714,17 @@ export default function StudioProjectContent({
 
       <Newsletter />
       <Footer />
+
+      {/* Watch lightbox — Figma `DSH – Studio Details – lightbox` (726:566).
+          Mounted once for the whole page; the row that was clicked decides
+          which episode it opens on. */}
+      <EpisodeLightbox
+        open={watchIndex !== null}
+        onClose={() => setWatchIndex(null)}
+        projectTitle={project.title}
+        episodes={project.episodes}
+        initialIndex={watchIndex ?? 0}
+      />
     </main>
   );
 }
@@ -506,15 +737,28 @@ function EpisodeRow({
   fallbackYear,
   projectSlug,
   poster,
+  episodeLink,
+  onWatch,
 }: {
   ep: StudioProject["episodes"][number];
   index: number;
   fallbackYear: string;
   projectSlug: string;
   poster: string;
+  episodeLink?: string;
+  /** Opens the watch lightbox. Absent when the episode has no video. */
+  onWatch?: () => void;
 }) {
   const number = ep.number ?? index + 1;
-  const href = `/studio/${projectSlug}${ep.slug ? `/${ep.slug}` : ""}`;
+
+  /* The episode-details page (Figma `714:3643`) isn't built yet, so an
+     episode only has somewhere to go once it carries its own slug.
+     Second best is its listen link. With neither, we render the CTAs as
+     plain text rather than links that reload the page you're already on. */
+  const href = ep.slug
+    ? `/studio/${projectSlug}/${ep.slug}`
+    : episodeLink || null;
+  const external = !ep.slug && !!episodeLink;
 
   return (
     <div className="flex flex-col lg:flex-row gap-[40px] lg:gap-[130px] items-start py-[60px] lg:py-[100px]">
@@ -524,11 +768,14 @@ function EpisodeRow({
           className={`relative w-full h-[220px] lg:h-[260px] overflow-hidden ${CARD_BORDER}`}
           style={{ boxShadow: CARD_SHADOW, backgroundColor: "#0D0D0D" }}
         >
-          <img
-            src={ep.imageUrl || poster}
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover rounded-[6px] opacity-80"
-          />
+          {(ep.imageUrl || poster) && (
+            <img
+              data-colorize
+              src={ep.imageUrl || poster}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover rounded-[6px] opacity-80"
+            />
+          )}
         </div>
         {ep.guest && (
           <div className="flex gap-[7px] items-end">
@@ -554,6 +801,16 @@ function EpisodeRow({
                   <span className="text-[#9D9C9C]">Season {ep.season}</span>
                 )}
                 <span className="text-[#363636]">{ep.year || fallbackYear}</span>
+                {/* Per-episode runtime. Sits in the meta chip row after the
+                    year, separated by a hairline dot — not in the Figma frame,
+                    added so the dashboard's episode Duration field is visible.
+                    Delete this block to go back to the design exactly. */}
+                {ep.duration && ep.duration.trim() && (
+                  <>
+                    <span className="w-[3px] h-[3px] rounded-full bg-[#363636] shrink-0" />
+                    <span className="text-[#363636]">{ep.duration}</span>
+                  </>
+                )}
               </div>
             </div>
 
@@ -571,16 +828,49 @@ function EpisodeRow({
 
         {/* CTAs — gap 24 */}
         <div className="flex flex-wrap items-center gap-[24px]">
-          <Link href={href} className={`${GLASS_BTN} px-[14px] py-[12px]`}>
-            View episode
-            <PlayArrow />
-          </Link>
-          <Link
-            href={href}
-            className="text-[13px] font-medium text-[rgba(240,240,240,0.3)] hover:text-[rgba(240,240,240,0.5)] transition-colors"
-          >
-            Know more
-          </Link>
+          {/* "View episode" = watch. When the episode has a video it opens the
+              player lightbox in place; "Know more" below is the separate route
+              to the episode's details page. Without a video we fall back to
+              the old link behaviour so nothing becomes a dead end. */}
+          {onWatch ? (
+            <button onClick={onWatch} className={`${GLASS_BTN} px-[14px] py-[12px]`}>
+              View episode
+              <PlayArrow />
+            </button>
+          ) : href ? (
+            external ? (
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${GLASS_BTN} px-[14px] py-[12px]`}
+              >
+                View episode
+                <PlayArrow />
+              </a>
+            ) : (
+              <Link href={href} className={`${GLASS_BTN} px-[14px] py-[12px]`}>
+                View episode
+                <PlayArrow />
+              </Link>
+            )
+          ) : (
+            <span
+              className={`${GLASS_BTN} px-[14px] py-[12px] opacity-50 cursor-default`}
+              title="Episode page coming soon"
+            >
+              View episode
+              <PlayArrow />
+            </span>
+          )}
+          {href && (
+            <Link
+              href={ep.slug ? `/studio/${projectSlug}/${ep.slug}` : `/studio/${projectSlug}`}
+              className="text-[13px] font-medium text-[rgba(240,240,240,0.3)] hover:text-[rgba(240,240,240,0.5)] transition-colors"
+            >
+              Know more
+            </Link>
+          )}
         </div>
       </div>
     </div>

@@ -13,6 +13,19 @@ import type {
 
 // ── Helper ─────────────────────────────────────────────────────
 
+/**
+ * JSONB list → array, or `undefined` when there is nothing to show.
+ *
+ * Returning `undefined` rather than `[]` matters: every editorial section on
+ * the episode page is gated on `x && x.length > 0`, and an empty array from a
+ * default-'[]' column would otherwise still read as "present" to any future
+ * check written as `x !== undefined`.
+ */
+function arr<T>(v: unknown): T[] | undefined {
+  if (!Array.isArray(v) || v.length === 0) return undefined;
+  return v as T[];
+}
+
 function str(v: unknown, fallback = ""): string {
   if (typeof v === "string") return v;
   if (typeof v === "object" && v !== null) {
@@ -105,6 +118,20 @@ export function mapStudioProject(row: any): StudioProject {
             guest: e.guest || undefined,
             imageUrl: e.image_url || undefined,
             slug: e.slug || undefined,
+            videoUrl: e.video_url || undefined,
+            videoProvider: e.video_provider || undefined,
+            /* Editorial half of the details page (Figma 714:3643). Each is
+               left undefined when empty so the section keeps hiding itself
+               rather than rendering an empty heading. */
+            quotes: arr(e.quotes),
+            glossary: arr(e.glossary),
+            glossaryIntro: e.glossary_intro || undefined,
+            glossaryNote: e.glossary_note || undefined,
+            recommendations: arr(e.recommendations),
+            recommendationsIntro: e.recommendations_intro || undefined,
+            recommendationsNote: e.recommendations_note || undefined,
+            gallery: arr(e.gallery),
+            galleryIntro: e.gallery_intro || undefined,
           }))
           // Supabase returns joined rows unordered; the details page lists
           // episodes in running order.

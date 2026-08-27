@@ -342,8 +342,70 @@ export const MOCK_STUDIO: StudioProject[] = [
     synopsisShort: "An interview series with Palestinian cultural workers, activists, and journalists. We explore the intersection of art, resistance, and survival.",
     synopsisLong: "YALLA goes deep into the minds of those who are shaping the Palestinian narrative today. Through long-form interviews, we unpack the realities of creating art under occupation, the burden of representation, and the enduring power of cultural resistance.",
     episodes: [
-      { title: "Episode 1: The Archive as Resistance", description: "A conversation on preserving memory when history is under attack.", duration: "45:00" },
-      { title: "Episode 2: Filming the Unimaginable", description: "Journalists discuss the ethics and toll of documenting violence.", duration: "52:10" }
+      {
+        title: "Living in the most tear-gassed place on Earth",
+        subtitle: "– Aida Refugee Camp, Palestine",
+        description:
+          "A conversation on what it means to raise a family, run a community space and keep working inside a camp that holds the record for tear-gas exposure anywhere in the world.",
+        duration: "45:00",
+        number: 1,
+        season: 2,
+        year: "2026",
+        guest: "Saed Zboan",
+        slug: "living-in-the-most-tear-gassed-place-on-earth",
+        imageUrl: "/images/journalism.jpg",
+        quotes: [
+          "And I don’t know a single person from Gaza whose heart isn’t attached to that place.",
+        ],
+        glossaryIntro: "An essential guide for those that refuse the erasure.",
+        glossaryNote:
+          "This glossary is not neutral. It is a gesture of memory and resistance. Learning about Palestine is recognising colonialism and choosing to stand with the oppressed. These are only the first entries. We will keep building this glossary, word by word, voice by voice.\n\nShare. Inform. Resist. There is no peace without justice. There is no justice without liberation.",
+        glossary: [
+          {
+            term: "Zanana",
+            definition:
+              "Arabic slang used by Palestinians in Gaza for the constant buzz of Israeli surveillance drones, and for the drones themselves. Audible day and night, and never fully gone, even during ceasefires. The sound alone, with no strike, is enough to keep people on permanent alert.",
+            source: "+972 Magazine, The Electronic Intifada",
+            imageUrl: "/images/slider1.jpg",
+          },
+          {
+            term: "Sonic warfare",
+            definition:
+              "The deliberate use of sound as a weapon, not a byproduct of one. Looped music, drone hum, sonic booms: they harm the body before the sound is even consciously heard. In 2005, Israeli sonic booms over Gaza were linked by doctors to a 40% rise in miscarriages, and the UN condemned them as collective punishment.",
+            source: "+972 Magazine, The Electronic Intifada; Al Jazeera (2005)",
+            imageUrl: "/images/slider2.jpg",
+          },
+          {
+            term: "Sound weaponization",
+            definition:
+              "Taking an ordinary sound, music, machine noise, and turning it into an instrument of harm. At checkpoints, a looped pop song becomes a trigger for dread. Those who’ve been through it describe it reaching the chest and throat, taking their breath away, and living in the body long after they’ve crossed.",
+            source: "Reem Khatib, Dar Jacir (YALLA)",
+            imageUrl: "/images/slidere3.jpg",
+          },
+          {
+            term: "Flying checkpoints",
+            definition:
+              "Temporary military checkpoints Israeli forces can set up anywhere in the West Bank, with no warning or schedule. They appear and vanish on a road that was clear the day before, part of the same system of movement control as the permanent ones.",
+            source: "OCHA, B’Tselem",
+            imageUrl: "/images/note.jpg",
+          },
+        ],
+        gallery: [
+          "/images/slider1.jpg",
+          "/images/slider2.jpg",
+          "/images/slidere3.jpg",
+          "/images/note.jpg",
+        ],
+      },
+      {
+        title: "Filming the Unimaginable",
+        description: "Journalists discuss the ethics and toll of documenting violence.",
+        duration: "52:10",
+        number: 2,
+        season: 2,
+        year: "2026",
+        slug: "filming-the-unimaginable",
+      }
     ],
     credits: {
       production: "Don't Skip Humanity",

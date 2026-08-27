@@ -11,7 +11,45 @@ interface NewsletterConfig extends LandingSectionText {
 export default function Newsletter({ config }: { config?: NewsletterConfig }) {
   const [email, setEmail] = useState("");
   const [agreed, setAgreed] = useState(false);
+  const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
   const sectionRef = useReveal();
+
+  /**
+   * Double opt-in: this only creates a PENDING record. The address does not
+   * join the list until the person clicks the link in the confirmation email,
+   * so the success copy says "check your inbox", never "you're subscribed".
+   *
+   * The consent wording is sent with the request and stored alongside the
+   * address — if anyone ever disputes the signup, the exact text they agreed
+   * to is the evidence, and it can't be reconstructed after the fact.
+   */
+  const CONSENT_TEXT =
+    "I agree to receive emails from DSH. We don't share your address.";
+
+  const subscribe = async () => {
+    if (!agreed || state === "sending") return;
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) {
+      setState("error");
+      return;
+    }
+    setState("sending");
+    try {
+      const res = await fetch("/api/newsletter/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.trim(),
+          source: "footer",
+          consentText: CONSENT_TEXT,
+        }),
+      });
+      if (!res.ok) throw new Error("failed");
+      setState("done");
+      setEmail("");
+    } catch {
+      setState("error");
+    }
+  };
 
   return (
     <section className="relative py-16 sm:py-20 lg:py-24 overflow-hidden" ref={sectionRef}>
@@ -61,13 +99,32 @@ export default function Newsletter({ config }: { config?: NewsletterConfig }) {
           {/* Gradient applied inline from Figma (303:567) — the shared
               .gradient-fill-btn class uses a different angle and colours. */}
           <button
-            disabled={!agreed}
+            type="button"
+            onClick={subscribe}
+            disabled={!agreed || state === "sending" || state === "done"}
             className="w-full h-[44px] p-[14px] rounded-[3px] border border-[#F0F0F0]/20 text-[13px] font-medium text-[#F0F0F0] flex items-center justify-center gap-[7px] transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ backgroundImage: "linear-gradient(95.17deg, #32C6CC 0.11%, #B23495 100.11%)" }}
           >
-            {config?.cta || "Subscribe our newsletter"}
+            {state === "sending"
+              ? "Sending…"
+              : state === "done"
+                ? "Check your inbox"
+                : config?.cta || "Subscribe our newsletter"}
             <img src="/images/ic_newsletter_btn.png" alt="" className="w-4 h-3 object-contain" />
           </button>
+
+          {/* Never says "subscribed" — they aren't, until they confirm. */}
+          {state === "done" && (
+            <p className="text-[13px] leading-[20px] text-[#F0F0F0]" role="status">
+              Almost there — we&rsquo;ve sent you a link to confirm. You&rsquo;ll only start
+              receiving emails once you click it.
+            </p>
+          )}
+          {state === "error" && (
+            <p className="text-[13px] leading-[20px] text-[#E06B6B]" role="alert">
+              That didn&rsquo;t go through. Check the address and try again.
+            </p>
+          )}
         </div>
 
         {/* Consent — 30px below the form. Checkbox added per #36; text style

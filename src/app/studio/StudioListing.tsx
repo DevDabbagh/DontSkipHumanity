@@ -132,6 +132,18 @@ export default function StudioListing({ projects }: { projects: StudioProject[] 
 
   const listRef = useRef<HTMLDivElement>(null);
 
+  /* Scroll the window explicitly rather than `scrollIntoView`, so the 128px
+     fixed navbar can be subtracted from the target position — otherwise the
+     first row lands underneath it. */
+  const jumpToList = () => {
+    const el = listRef.current;
+    if (!el) return;
+    window.scrollTo({
+      top: el.getBoundingClientRect().top + window.scrollY - 128,
+      behavior: "smooth",
+    });
+  };
+
   const filtered = rest.filter((p) => {
     const formatOk = formatFilter === "all" || p.format === formatFilter;
     const statusOk = statusFilter === "all" || p.status === statusFilter;
@@ -194,9 +206,7 @@ export default function StudioListing({ projects }: { projects: StudioProject[] 
             {/* CTAs — gap 24 */}
             <div className="flex flex-wrap items-center gap-[24px]">
               <button
-                onClick={() =>
-                  listRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
-                }
+                onClick={jumpToList}
                 className={`${GLASS_BTN} px-[14px] py-[12px]`}
               >
                 Explore the work

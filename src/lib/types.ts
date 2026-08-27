@@ -95,8 +95,48 @@ export interface StudioProject {
     guest?: string;
     /** Episode still — 406×260 in the design */
     imageUrl?: string;
-    /** Deep link for "View episode" */
+    /** Deep link to the episode details page ("Know more") */
     slug?: string;
+    /**
+     * Playback source for the watch lightbox. Empty means the episode has no
+     * video yet — "View episode" then falls back to the details page instead
+     * of opening an empty player.
+     */
+    videoUrl?: string;
+    /** file (direct MP4, today) | hls | bunny | embed. Defaults to "file". */
+    videoProvider?: "file" | "hls" | "bunny" | "embed";
+
+    /* ── Episode details page (Figma `714:3643`) ────────────────────
+       All optional. Each section renders ONLY when its data is present,
+       so nothing placeholder ever reaches the site. */
+
+    /** Pull quotes, in page order. Rendered as grape left-rule blockquotes. */
+    quotes?: string[];
+    /** Glossary — Figma `715:214`. Section hides when empty. */
+    glossary?: {
+      term: string;
+      definition: string;
+      /** Attribution shown after the "Source:" label */
+      source?: string;
+      /** 221×288 still beside the entry */
+      imageUrl?: string;
+    }[];
+    /** Standfirst under the "Glossary" eyebrow */
+    glossaryIntro?: string;
+    /** Body copy beside the Download/Share buttons */
+    glossaryNote?: string;
+    /** Guest recommendations — same card shape as the glossary. */
+    recommendations?: {
+      term: string;
+      definition: string;
+      source?: string;
+      imageUrl?: string;
+    }[];
+    recommendationsIntro?: string;
+    recommendationsNote?: string;
+    /** Episode gallery carousel — Figma `730:657`. */
+    gallery?: string[];
+    galleryIntro?: string;
   }[];
   credits: {
     production: string;
@@ -120,6 +160,13 @@ export interface StudioProject {
   relatedCampaignIds: string[];
   thumbnailUrl: string;
   coverUrl: string;
+  /**
+   * Gallery stills for the details-page carousel (Figma `714:2463`).
+   * OPTIONAL — when absent the page falls back to the cover, the episode
+   * stills and the thumbnail, so the carousel always has real content and
+   * existing data/mocks keep working. Not yet exposed in the dashboard form.
+   */
+  stills?: string[];
   createdAt: string;
   updatedAt: string;
 }

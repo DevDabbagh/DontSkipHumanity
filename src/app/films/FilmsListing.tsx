@@ -287,10 +287,14 @@ export default function FilmsListing({ films, header }: { films: Film[]; header?
       {/* ═══════════════════════════════════════
           CINEMATIC EDITORIAL BANNER
          ═══════════════════════════════════════ */}
-      <section className="relative overflow-hidden h-[260px] sm:h-[320px] lg:h-[380px] flex items-center">
-        {/* Background photograph — very faint (5% opacity) */}
+      {/* Height per Figma 641:253 (h 280) and Tiago's comment #51:
+          "container ≈280px height, padding top/bottom 100px". */}
+      <section className="relative overflow-hidden h-[200px] sm:h-[240px] lg:h-[280px] flex items-center">
+        {/* Background photograph — very faint (5% opacity).
+            Uses this page's own hero image; it was hardcoded to the Studio
+            photo (/images/studio.jpg) by copy-paste. */}
         <img
-          src="/images/studio.jpg"
+          src={heroImage}
           alt=""
           className="absolute inset-0 w-full h-full object-cover object-center"
           style={{ filter: "grayscale(1)", opacity: 0.05 }}
