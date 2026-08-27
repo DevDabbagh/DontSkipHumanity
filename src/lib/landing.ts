@@ -212,6 +212,33 @@ export interface FilmsHeader {
   description?: string;
 }
 
+/* ── Studio page header (editable from the dashboard → Studio → Header) ──
+   The studio headline is split in three because the gradient sits in the
+   middle of the sentence ("Bold, / independent media / that strengthens
+   movements."), unlike the films one where it closes it. */
+export interface StudioHeader {
+  imageSrc?: string;
+  titleNormal?: string;
+  titleColored?: string;
+  titleAfter?: string;
+  description?: string;
+}
+
+export async function getStudioHeader(): Promise<StudioHeader> {
+  try {
+    const { data, error } = await supabase
+      .from("site_settings")
+      .select("value")
+      .eq("key", "studio_header")
+      .single();
+    if (error || !data?.value) return {};
+    const v = typeof data.value === "string" ? JSON.parse(data.value) : data.value;
+    return (v as StudioHeader) ?? {};
+  } catch {
+    return {};
+  }
+}
+
 export async function getFilmsHeader(): Promise<FilmsHeader> {
   try {
     const { data, error } = await supabase

@@ -1,4 +1,5 @@
 import { getStudioProjects } from "@/lib/api";
+import { getStudioHeader } from "@/lib/landing";
 
 export const dynamic = "force-dynamic";
 import StudioListing from "./StudioListing";
@@ -9,6 +10,6 @@ export const metadata = {
 };
 
 export default async function StudioPage() {
-  const projects = await getStudioProjects();
-  return <StudioListing projects={projects} />;
+  const [projects, header] = await Promise.all([getStudioProjects(), getStudioHeader()]);
+  return <StudioListing projects={projects} header={header} />;
 }

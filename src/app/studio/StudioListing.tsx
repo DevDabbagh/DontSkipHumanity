@@ -8,6 +8,7 @@ import SupportCTA from "@/components/SupportCTA";
 import Footer from "@/components/Footer";
 import type { StudioProject } from "@/lib/types";
 import { useScrollColorize } from "@/hooks/useScrollColorize";
+import type { StudioHeader } from "@/lib/landing";
 
 /* ═══════════════════════════════════════════════════════════════
    DSH – Studio Landing
@@ -114,7 +115,25 @@ function StepMarker({ n }: { n: string }) {
 
 /* ── Component ── */
 
-export default function StudioListing({ projects }: { projects: StudioProject[] }) {
+export default function StudioListing({
+  projects,
+  header,
+}: {
+  projects: StudioProject[];
+  header?: StudioHeader;
+}) {
+  /* Header copy is editable from the dashboard; the literals below are the
+     Figma defaults and are what shows until someone overrides them. */
+  const h = {
+    imageSrc: header?.imageSrc?.trim() || "/images/studio-hero-mosaic.png",
+    titleNormal: header?.titleNormal?.trim() || "Bold,",
+    titleColored: header?.titleColored?.trim() || "independent media",
+    titleAfter: header?.titleAfter?.trim() || "that strengthens movements.",
+    description:
+      header?.description?.trim() ||
+      "Not every story fits a film. Studio is DSH’s production arm for the rest: docuseries, videocasts, podcasts, and series that stay with a subject over time, plus the work we develop and co-produce with partners and movements. The cinema slate has its own section; this is everything else we make.",
+  };
+
   /* Scroll-linked black-and-white → colour, as on the detail pages. Drives
      the featured cover and the project cards; the hero mosaic and the 5%
      luminosity washes are deliberately left out. */
@@ -169,7 +188,7 @@ export default function StudioListing({ projects }: { projects: StudioProject[] 
         {/* Photo mosaic — exported Figma asset (Frame 563, 1920×645) */}
         <HeroMosaic
           mode="sheet"
-          src="/images/studio-hero-mosaic.png"
+          src={h.imageSrc}
           sheetWidth={1920}
           sheetHeight={645}
           dim={0.55}
@@ -184,7 +203,7 @@ export default function StudioListing({ projects }: { projects: StudioProject[] 
               <h1
                 className="font-semibold text-[38px] leading-[40px] sm:text-[50px] sm:leading-[52px] tracking-[-1px] text-[#F0F0F0] xl:w-[489px]"
               >
-                Bold,
+                {h.titleNormal}
                 <br />
                 <span
                   style={{
@@ -194,20 +213,14 @@ export default function StudioListing({ projects }: { projects: StudioProject[] 
                     backgroundClip: "text",
                   }}
                 >
-                  independent media
+                  {h.titleColored}
                 </span>{" "}
-                that strengthens movements.
+                {h.titleAfter}
               </h1>
             </div>
 
             {/* Description — Source Sans 3, 16/24 */}
-            <p className={BODY}>
-              Not every story fits a film. Studio is DSH&rsquo;s production arm for the
-              rest: docuseries, videocasts, podcasts, and series that stay with a
-              subject over time, plus the work we develop and co-produce with
-              partners and movements. The cinema slate has its own section; this is
-              everything else we make.
-            </p>
+            <p className={BODY}>{h.description}</p>
 
             {/* CTAs — gap 24 */}
             <div className="flex flex-wrap items-center gap-[24px]">
