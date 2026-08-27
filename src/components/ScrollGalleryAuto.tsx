@@ -73,14 +73,16 @@ export default function ScrollGalleryAuto({
 
   return (
     <section className="relative overflow-hidden bg-[#0A0A0A] py-1">
-      <div ref={trackRef} className="flex items-center gap-px w-max will-change-transform">
+      {/* gap-4 and rounded tiles are the branch's look (6b4c48f), which is
+          the one Ahmed asked for — main had them flush (gap-px, square). */}
+      <div ref={trackRef} className="flex items-center gap-4 w-max will-change-transform">
         {looped.map((src, i) => (
           <div
             key={i}
             ref={(el) => {
               itemRefs.current[i] = el;
             }}
-            className={`relative shrink-0 ${WIDTHS[(i % N) % WIDTHS.length]} h-[240px] sm:h-[300px] lg:h-[340px] overflow-hidden`}
+            className={`relative shrink-0 ${WIDTHS[(i % N) % WIDTHS.length]} h-[240px] sm:h-[300px] lg:h-[340px] overflow-hidden rounded-[4px]`}
             style={{ filter: "grayscale(1) contrast(1.02)", opacity: 0.1 }}
           >
             <img src={src} alt="" className="absolute inset-0 w-full h-full object-cover" />

@@ -3,10 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useReveal } from "@/hooks/useReveal";
+import { useScrollColorize } from "@/hooks/useScrollColorize";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Newsletter from "@/components/Newsletter";
-import ScrollGallery from "@/components/ScrollGallery";
+import ScrollGalleryAuto from "@/components/ScrollGalleryAuto";
 import TrailerModal from "@/components/TrailerModal";
 import type { Film } from "@/lib/types";
 
@@ -37,6 +38,10 @@ export default function FilmContent({
   relatedFilms: Film[];
 }) {
   const sectionRef = useReveal();
+  /* Same scroll-linked black-and-white → colour as the studio pages: images
+     start desaturated and develop as they rise up the viewport. Drives every
+     `[data-colorize]` descendant. */
+  const colorizeRef = useScrollColorize<HTMLElement>();
   const [trailerOpen, setTrailerOpen] = useState(false);
   const formLabel = film.credits.form === "documentary" ? "Documentary" : "Fiction";
   const formatLabel =
@@ -86,7 +91,7 @@ export default function FilmContent({
     .filter(Boolean);
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A] text-white">
+    <main ref={colorizeRef} className="min-h-screen bg-[#0A0A0A] text-white">
       <Navbar />
 
       {/* ═══════════════════════════════════════
@@ -177,6 +182,7 @@ export default function FilmContent({
             <div className="reveal-left shrink-0 w-full md:w-[320px]">
               <div className="relative aspect-[3/4] overflow-hidden rounded-[4px] border border-white/[0.06]">
                 <img
+                  data-colorize
                   src={film.posterUrl || film.thumbnailUrl}
                   alt={film.title}
                   className="w-full h-full object-cover"
@@ -254,7 +260,11 @@ export default function FilmContent({
       {/* ═══════════════════════════════════════
           SCROLL GALLERY — pinned horizontal, colour-on-focus
          ═══════════════════════════════════════ */}
-      <ScrollGallery images={film.detailsSliders} />
+      {/* The auto-drifting marquee from `feature/gallery-autoscroll`
+          (6b4c48f), which Ahmed built and preferred over the pinned
+          ScrollGallery that main was still rendering here. The component
+          already existed on main but nothing used it. */}
+      <ScrollGalleryAuto images={film.detailsSliders} />
 
       <div>
         {/* ═══════════════════════════════════════
@@ -400,6 +410,7 @@ export default function FilmContent({
                 <Link href={`/film/${rf.slug}`} className="shrink-0 w-full sm:w-[200px]">
                   <div className="relative aspect-[3/4] overflow-hidden rounded-[4px] border border-white/[0.06]">
                     <img
+                      data-colorize
                       src={rf.posterUrl || rf.thumbnailUrl}
                       alt={rf.title}
                       className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700"
