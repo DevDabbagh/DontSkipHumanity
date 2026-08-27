@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 
 export const runtime = "nodejs";
 
@@ -79,7 +79,7 @@ export async function POST(req: Request) {
       : "One-time support — Don't Skip Humanity";
 
   try {
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripe().checkout.sessions.create({
       mode: mode === "monthly" ? "subscription" : "payment",
       line_items: [
         {
