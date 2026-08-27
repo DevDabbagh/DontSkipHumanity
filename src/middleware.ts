@@ -19,10 +19,28 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const LOCALE_PREFIXES = ["ar", "pt", "es", "fr", "de"];
 
+/**
+ * The default language has no prefix, so `/en/studio` is not a real page.
+ * People type it anyway — it's the obvious guess once they've seen `/ar/studio`
+ * — so it redirects to `/studio` instead of 404ing. A 301 rather than a rewrite:
+ * one canonical URL per page, no duplicate for search engines.
+ *
+ * "en" is hard-coded because middleware can't reach the database. If English
+ * ever stops being the default, this line changes with it.
+ */
+const DEFAULT_PREFIX = "en";
+
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   const seg = pathname.split("/")[1];
+
+  if (seg === DEFAULT_PREFIX) {
+    const url = req.nextUrl.clone();
+    url.pathname = pathname.slice(seg.length + 1) || "/";
+    return NextResponse.redirect(url, 301);
+  }
+
   const locale = LOCALE_PREFIXES.includes(seg) ? seg : null;
 
   const headers = new Headers(req.headers);
