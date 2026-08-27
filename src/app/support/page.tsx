@@ -4,7 +4,8 @@ import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import DriftingGrid from "@/components/DriftingGrid";
+import HeroMosaic from "@/components/HeroMosaic";
+import { HERO_TILES } from "@/components/heroTiles";
 import { useReveal } from "@/hooks/useReveal";
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -110,7 +111,19 @@ function SupportPageContent() {
         className="relative flex flex-col items-center justify-center text-center px-8 overflow-hidden"
         style={{ minHeight: "100vh", paddingTop: 120, paddingBottom: 80 }}
       >
-        <DriftingGrid />
+        {/* Same drifting band as the Studio hero — rows alternate
+            left / right / left. No centre panel: this headline is centred. */}
+        <HeroMosaic
+          mode="tiles"
+          tiles={HERO_TILES}
+          rows={6}
+          rowHeight={215}
+          dim={0.62}
+          falloff={220}
+          panel={false}
+          speed={90}
+          tileFilter="grayscale(1) brightness(0.5)"
+        />
 
         <div className="relative" style={{ zIndex: 1, marginBottom: 48 }}>
           <p

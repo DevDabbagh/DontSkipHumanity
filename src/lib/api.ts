@@ -14,6 +14,7 @@
 import type { Film, AcademyProgram, Article, DSHEvent, StudioProject } from "./types";
 import { supabase } from "./supabase";
 import { mapFilm, mapStudioProject, mapAcademyProgram, mapArticle, mapEvent } from "./mappers";
+import { setMapperLocale } from "./mappers";
 import {
   MOCK_FILMS,
   MOCK_PROGRAMS,
@@ -109,7 +110,25 @@ async function isModuleLive(module: ContentModule): Promise<boolean> {
 
 // ─── Films ──────────────────────────────────────────────────────
 
+/**
+ * Tell the mappers which language to read before any of them run.
+ *
+ * Called at the top of every reader. Cheap, and it keeps the locale out of two
+ * dozen function signatures — see the note on `setMapperLocale`.
+ */
+async function useRequestLocale() {
+  try {
+    const { getRequestLocale } = await import("./locale-server");
+    const { locale, defaultLocale } = await getRequestLocale();
+    setMapperLocale(locale.code, defaultLocale.code);
+  } catch {
+    /* Called outside a request (a build-time page, a script): the mappers keep
+       their default and the site renders the default language. */
+  }
+}
+
 export async function getFilms(): Promise<Film[]> {
+  await useRequestLocale();
   if (await isModuleLive("films")) {
     try {
       const { data, error } = await supabase
@@ -126,6 +145,7 @@ export async function getFilms(): Promise<Film[]> {
 }
 
 export async function getFeaturedFilms(): Promise<Film[]> {
+  await useRequestLocale();
   if (await isModuleLive("films")) {
     try {
       const { data, error } = await supabase
@@ -142,6 +162,7 @@ export async function getFeaturedFilms(): Promise<Film[]> {
 }
 
 export async function getFilmBySlug(slug: string): Promise<Film | null> {
+  await useRequestLocale();
   if (await isModuleLive("films")) {
     try {
       const { data, error } = await supabase
@@ -158,12 +179,14 @@ export async function getFilmBySlug(slug: string): Promise<Film | null> {
 }
 
 export async function getAllFilms(): Promise<Film[]> {
+  await useRequestLocale();
   return getFilms();
 }
 
 // ─── Studio ─────────────────────────────────────────────────────
 
 export async function getStudioProjects(): Promise<StudioProject[]> {
+  await useRequestLocale();
   if (await isModuleLive("studio")) {
     try {
       const { data, error } = await supabase
@@ -181,6 +204,7 @@ export async function getStudioProjects(): Promise<StudioProject[]> {
 export async function getStudioProjectBySlug(
   slug: string
 ): Promise<StudioProject | null> {
+  await useRequestLocale();
   if (await isModuleLive("studio")) {
     try {
       const { data, error } = await supabase
@@ -199,6 +223,7 @@ export async function getStudioProjectBySlug(
 // ─── Academy Programs ───────────────────────────────────────────
 
 export async function getPrograms(): Promise<AcademyProgram[]> {
+  await useRequestLocale();
   if (await isModuleLive("academy")) {
     try {
       const { data, error } = await supabase
@@ -214,6 +239,7 @@ export async function getPrograms(): Promise<AcademyProgram[]> {
 }
 
 export async function getProgramBySlug(slug: string): Promise<AcademyProgram | null> {
+  await useRequestLocale();
   if (await isModuleLive("academy")) {
     try {
       const { data, error } = await supabase
@@ -232,6 +258,7 @@ export async function getProgramBySlug(slug: string): Promise<AcademyProgram | n
 // ─── Articles ───────────────────────────────────────────────────
 
 export async function getArticles(): Promise<Article[]> {
+  await useRequestLocale();
   if (await isModuleLive("articles")) {
     try {
       const { data, error } = await supabase
@@ -247,6 +274,7 @@ export async function getArticles(): Promise<Article[]> {
 }
 
 export async function getArticleBySlug(slug: string): Promise<Article | null> {
+  await useRequestLocale();
   if (await isModuleLive("articles")) {
     try {
       const { data, error } = await supabase
@@ -265,6 +293,7 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
 // ─── Events ─────────────────────────────────────────────────────
 
 export async function getEvents(): Promise<DSHEvent[]> {
+  await useRequestLocale();
   if (await isModuleLive("events")) {
     try {
       const { data, error } = await supabase
@@ -279,6 +308,7 @@ export async function getEvents(): Promise<DSHEvent[]> {
 }
 
 export async function getUpcomingEvents(): Promise<DSHEvent[]> {
+  await useRequestLocale();
   if (await isModuleLive("events")) {
     try {
       const { data, error } = await supabase
@@ -294,6 +324,7 @@ export async function getUpcomingEvents(): Promise<DSHEvent[]> {
 }
 
 export async function getEventBySlug(slug: string): Promise<DSHEvent | null> {
+  await useRequestLocale();
   if (await isModuleLive("events")) {
     try {
       const { data, error } = await supabase
@@ -311,6 +342,7 @@ export async function getEventBySlug(slug: string): Promise<DSHEvent | null> {
 // ─── Dashboard Stats (for impact section) ───────────────────────
 
 export async function getDashboardStats() {
+  await useRequestLocale();
   if (await isModuleLive("impact")) {
     try {
       const { data, error } = await supabase

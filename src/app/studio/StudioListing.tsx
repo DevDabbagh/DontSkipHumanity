@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/contexts/LocaleContext";
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
@@ -122,6 +123,7 @@ export default function StudioListing({
   projects: StudioProject[];
   header?: StudioHeader;
 }) {
+  const t = useT();
   /* Header copy is editable from the dashboard; the literals below are the
      Figma defaults and are what shows until someone overrides them. */
   const h = {
@@ -199,7 +201,7 @@ export default function StudioListing({
           <div className="absolute top-[124px] left-5 sm:left-8 xl:left-0 flex flex-col gap-[60px] w-full max-w-[496px] pr-5 sm:pr-8 xl:pr-0">
             {/* Eyebrow + headline — gap 14 */}
             <div className="flex flex-col gap-[14px] items-start">
-              <p className={EYEBROW}>studio</p>
+              <p className={EYEBROW}>{t("studio.eyebrow")}</p>
               <h1
                 className="font-semibold text-[38px] leading-[40px] sm:text-[50px] sm:leading-[52px] tracking-[-1px] text-[#F0F0F0] xl:w-[489px]"
               >
@@ -228,10 +230,10 @@ export default function StudioListing({
                 onClick={jumpToList}
                 className={`${GLASS_BTN} px-[14px] py-[12px]`}
               >
-                Explore the work
+                {t("studio.exploreWork")}
               </button>
               <Link href="/about" className={`${GLASS_BTN} px-[14px] py-[12px]`}>
-                Get in touch
+                {t("common.getInTouch")}
               </Link>
             </div>
           </div>
@@ -377,14 +379,14 @@ export default function StudioListing({
                   href={`/studio/${featured.slug}`}
                   className={`${GLASS_BTN} px-[14px] py-[12px]`}
                 >
-                  View all episodes
+                  {t("studio.viewAllEpisodes")}
                   <PlayArrow />
                 </Link>
                 <Link
                   href={`/studio/${featured.slug}`}
                   className="text-[13px] font-medium text-[rgba(240,240,240,0.3)] hover:text-[rgba(240,240,240,0.5)] transition-colors"
                 >
-                  Know more
+                  {t("common.knowMore")}
                 </Link>
               </div>
             </div>
@@ -568,6 +570,7 @@ function ImagePlate({
 /* ── Project row — Figma 710:1629 ──
    plate 600×322 (luminosity 30%) + copy column 591 (gap 36) */
 function ProjectRow({ project, flip }: { project: StudioProject; flip: boolean }) {
+  const t = useT();
   const format = FORMAT_LABELS[project.format] ?? project.format;
   const status = STATUS_LABELS[project.status] ?? project.status;
 
@@ -646,14 +649,14 @@ function ProjectRow({ project, flip }: { project: StudioProject; flip: boolean }
             href={`/studio/${project.slug}`}
             className={`${GLASS_BTN} px-[20px] py-[12px]`}
           >
-            View all episodes
+            {t("studio.viewAllEpisodes")}
             <PlayArrow />
           </Link>
           <Link
             href={`/studio/${project.slug}`}
             className="text-[13px] font-medium text-[rgba(240,240,240,0.3)] hover:text-[rgba(240,240,240,0.5)] transition-colors"
           >
-            Know more
+            {t("common.knowMore")}
           </Link>
         </div>
       </div>

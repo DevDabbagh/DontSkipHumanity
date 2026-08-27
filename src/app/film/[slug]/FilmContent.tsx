@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/contexts/LocaleContext";
 import { useState } from "react";
 import Link from "next/link";
 import { useReveal } from "@/hooks/useReveal";
@@ -37,6 +38,7 @@ export default function FilmContent({
   film: Film;
   relatedFilms: Film[];
 }) {
+  const t = useT();
   const sectionRef = useReveal();
   /* Same scroll-linked black-and-white → colour as the studio pages: images
      start desaturated and develop as they rise up the viewport. Drives every
@@ -134,7 +136,7 @@ export default function FilmContent({
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
-            Back
+            {t("common.back")}
           </Link>
 
           {/* Category + year */}

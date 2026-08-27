@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/contexts/LocaleContext";
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
@@ -135,6 +136,7 @@ function PullQuote({ text }: { text: string }) {
 /* ── Glossary / recommendation entry — Figma 715:214 ──
    221×288 still, 40px gap, 318px text column. */
 function EntryCard({ entry }: { entry: GlossaryEntry }) {
+  const t = useT();
   return (
     <div className="flex flex-col sm:flex-row gap-[40px] items-start">
       {entry.imageUrl && (
@@ -159,7 +161,7 @@ function EntryCard({ entry }: { entry: GlossaryEntry }) {
         </div>
         {entry.source && (
           <p className="flex gap-[5px] items-start text-[12px] leading-[16px] tracking-[-0.06px]">
-            <span className="text-[#595C5C] shrink-0">Source:</span>
+            <span className="text-[#595C5C] shrink-0">{t("episode.source")}</span>
             <span className="text-[#363636]">{entry.source}</span>
           </p>
         )}
@@ -182,6 +184,7 @@ function EntryFooter({
   onShare: () => void;
   shareLabel: string;
 }) {
+  const t = useT();
   return (
     <div className="flex flex-col gap-[30px] items-start pb-[130px]">
       {/* justify-between, not a fixed gap.
@@ -200,11 +203,11 @@ function EntryFooter({
         {/* flex-nowrap: side by side as in Frame 618, never stacked. */}
         <div className="flex flex-nowrap gap-[24px] items-center shrink-0">
           <button type="button" onClick={onDownload} className={GLASS_BTN}>
-            Download Documentation
+            {t("episode.download")}
             <ArrowGlyph />
           </button>
           <button type="button" onClick={onShare} className={GLASS_BTN}>
-            Share Documentation
+            {t("episode.shareDoc")}
             <ArrowGlyph />
           </button>
         </div>
@@ -237,6 +240,7 @@ export default function EpisodeContent({
   episode: Episode;
   suggestions: StudioProject[];
 }) {
+  const t = useT();
   const colorizeRef = useScrollColorize<HTMLElement>();
 
   const heroImage = episode.imageUrl || project.coverUrl || project.thumbnailUrl;
@@ -344,7 +348,7 @@ export default function EpisodeContent({
               <span aria-hidden className="rotate-180 inline-flex">
                 <PlayArrow />
               </span>
-              Back
+              {t("common.back")}
             </Link>
           </div>
 
@@ -373,7 +377,7 @@ export default function EpisodeContent({
               </div>
               {episode.guest && (
                 <p className="flex gap-[7px] items-end">
-                  <span className="text-[12px] font-medium text-[#363636]">Guest</span>
+                  <span className="text-[12px] font-medium text-[#363636]">{t("episode.guest")}</span>
                   <span className="text-[14px] font-semibold text-[#8665A7]">
                     {episode.guest}
                   </span>
@@ -389,12 +393,12 @@ export default function EpisodeContent({
                   <div className="flex flex-wrap gap-[18px] items-center pb-[30px]">
                     {episode.number != null && (
                       <span className="bg-[#8665A7] rounded-[3px] px-[10px] py-[8px] text-[14px] font-semibold text-[#F0F0F0]">
-                        Episode {episode.number}
+                        {t("episode.episode")} {episode.number}
                       </span>
                     )}
                     <span className="flex gap-[10px] items-center text-[12px] font-medium">
                       {episode.season != null && (
-                        <span className="text-[#8665A7]">Season {episode.season}</span>
+                        <span className="text-[#8665A7]">{t("episode.season")} {episode.season}</span>
                       )}
                       {(episode.year || project.credits.year) && (
                         <span className="text-[#595C5C]">
@@ -430,7 +434,7 @@ export default function EpisodeContent({
                   onClick={() => setWatchOpen(true)}
                   className={GLASS_BTN}
                 >
-                  View episode
+                  {t("episode.view")}
                   <PlayArrow />
                 </button>
               ) : (
@@ -441,7 +445,7 @@ export default function EpisodeContent({
                     rel="noopener noreferrer"
                     className={GLASS_BTN}
                   >
-                    View episode
+                    {t("episode.view")}
                     <PlayArrow />
                   </a>
                 )
@@ -491,7 +495,7 @@ export default function EpisodeContent({
             onDownload={() =>
               download(
                 episode.glossary!,
-                "Glossary",
+                t("episode.glossary"),
                 `${project.slug}-glossary.txt`
               )
             }
@@ -511,7 +515,7 @@ export default function EpisodeContent({
       {episode.recommendations && episode.recommendations.length > 0 && (
         <section className="max-w-[1224px] mx-auto px-5 sm:px-8 xl:px-0">
           <SectionHeading
-            eyebrow="Guest Recommendations"
+            eyebrow={t("episode.recommendations")}
             title={episode.recommendationsIntro}
           />
           <div className="flex flex-col gap-[104px] pb-[104px]">
@@ -556,7 +560,7 @@ export default function EpisodeContent({
       {gallery.length > 0 && (
         <section>
           <div className="max-w-[1224px] mx-auto px-5 sm:px-8 xl:px-0">
-            <SectionHeading eyebrow="Episode gallery" title={episode.galleryIntro} />
+            <SectionHeading eyebrow={t("episode.gallery")} title={episode.galleryIntro} />
           </div>
 
           {/* items-start, not items-center.
@@ -718,7 +722,7 @@ export default function EpisodeContent({
          ═══════════════════════════════════════════════════════════ */}
       {suggestions.length > 0 && (
         <section className="max-w-[1224px] mx-auto px-5 sm:px-8 xl:px-0 pt-[180px]">
-          <p className={`${EYEBROW} pb-[64px]`}>other suggestions</p>
+          <p className={`${EYEBROW} pb-[64px]`}>{t("studio.otherSuggestions")}</p>
           <div className="grid lg:grid-cols-2 gap-[24px] pb-[180px]">
             {/* Card — Figma 726:477. The whole card used to be one <Link>,
                 which meant the frame's own two controls (Frame 459: "View all
@@ -755,14 +759,14 @@ export default function EpisodeContent({
                         frame's 14/11, and re-stating py-12 here is what kept
                         this one button 2px taller than the rest. */}
                     <Link href={`/studio/${s.slug}`} className={GLASS_BTN}>
-                      View all episodes
+                      {t("studio.viewAllEpisodes")}
                       <PlayArrow />
                     </Link>
                     <Link
                       href={`/studio/${s.slug}`}
                       className="text-[13px] font-medium text-[rgba(240,240,240,0.3)] hover:text-[rgba(240,240,240,0.5)] transition-colors"
                     >
-                      Know more
+                      {t("common.knowMore")}
                     </Link>
                   </div>
                 </div>
@@ -790,7 +794,7 @@ export default function EpisodeContent({
                       credit, rather than leaving a stranded label. */}
                   {s.credits.production && (
                     <div className="flex flex-col gap-[6px] items-start">
-                      <p className="text-[14px] leading-[21px] text-[#363636]">Produced by</p>
+                      <p className="text-[14px] leading-[21px] text-[#363636]">{t("studio.producedBy")}</p>
                       <p className="text-[14px] leading-[21px] text-[#9D9C9C]">
                         {s.credits.production}
                       </p>

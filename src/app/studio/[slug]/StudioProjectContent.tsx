@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/contexts/LocaleContext";
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
@@ -168,6 +169,7 @@ export default function StudioProjectContent({
   project: StudioProject;
   suggestions: StudioProject[];
 }) {
+  const t = useT();
   const format = FORMAT_LABELS[project.format] ?? project.format;
   const status = STATUS_LABELS[project.status] ?? project.status;
 
@@ -320,7 +322,7 @@ export default function StudioProjectContent({
                 strokeLinejoin="round"
               />
             </svg>
-            Back
+            {t("common.back")}
           </Link>
 
           {/* Chip + title + logline — Frame 479: pt 200 / pb 90, gap 30 */}
@@ -350,15 +352,15 @@ export default function StudioProjectContent({
                 onClick={jumpToEpisodes}
                 className={`${GLASS_BTN} px-[16px] py-[12px] self-start`}
               >
-                View all episodes
+                {t("studio.viewAllEpisodes")}
                 <PlayArrow />
               </button>
               <div className="flex flex-wrap items-center gap-[24px]">
                 <Link href="/about" className={QUIET_LINK}>
-                  Request a screener
+                  {t("studio.requestScreener")}
                 </Link>
                 <Link href="/about" className={QUIET_LINK}>
-                  Request a screening
+                  {t("studio.requestScreening")}
                 </Link>
                 <Link href="/about" className={QUIET_LINK}>
                   Request a quotation
@@ -496,7 +498,7 @@ export default function StudioProjectContent({
             {project.editorialContext && (
               <>
                 <div className="flex flex-col gap-[14px] items-start">
-                  <p className={EYEBROW}>Editorial Context</p>
+                  <p className={EYEBROW}>{t("studio.editorialContext")}</p>
                   <p className={BODY}>{project.editorialContext}</p>
                 </div>
                 <div className="h-px w-full bg-[rgba(240,240,240,0.1)] my-[60px]" />
@@ -504,14 +506,14 @@ export default function StudioProjectContent({
             )}
 
             {/* Credits — label + Frame 521 (gap 40, rows gap 14) */}
-            <p className={`${EYEBROW} mb-[45px]`}>Credits</p>
+            <p className={`${EYEBROW} mb-[45px]`}>{t("studio.credits")}</p>
             <div className="flex flex-col gap-[40px] items-start pb-[150px]">
               <div className="flex flex-col gap-[14px] items-start">
                 <CreditRow
                   label="Directed by"
                   value={project.credits.direction || project.credits.hosts.join(", ")}
                 />
-                <CreditRow label="Produced by" value={project.credits.production} />
+                <CreditRow label={t("studio.producedBy")} value={project.credits.production} />
                 <CreditRow
                   label="Co-Production"
                   value={project.credits.coProduction}
@@ -574,7 +576,7 @@ export default function StudioProjectContent({
                   aria-pressed={season === s}
                   className={season === s ? PILL_ON : PILL_OFF}
                 >
-                  Season {s}
+                  {t("episode.season")} {s}
                 </button>
               ))}
             </div>
@@ -612,18 +614,18 @@ export default function StudioProjectContent({
             onClick={share}
             className={`${GLASS_BTN} px-[16px] py-[12px] self-start`}
           >
-            {shared ? "Link copied" : "Share this project"}
+            {shared ? t("common.linkCopied") : t("common.share")}
             <span className="w-[6px] h-[6px] rounded-full bg-[#8665A7] shrink-0" />
           </button>
           <div className="flex flex-wrap items-center gap-[24px]">
             <Link href="/about" className={QUIET_LINK}>
-              Request a screener
+              {t("studio.requestScreener")}
             </Link>
             <Link href="/about" className={QUIET_LINK}>
-              Request a screening
+              {t("studio.requestScreening")}
             </Link>
             <Link href="/about" className={QUIET_LINK}>
-              Contact for distribution
+              {t("studio.contactDistribution")}
             </Link>
           </div>
         </div>
@@ -703,7 +705,7 @@ export default function StudioProjectContent({
          ═══════════════════════════════════════════════════════════ */}
       {suggestions.length > 0 && (
         <section className="max-w-[1224px] mx-auto px-5 sm:px-8 xl:px-0 pt-[180px] pb-[180px]">
-          <p className={`${EYEBROW} mb-[64px]`}>other suggestions</p>
+          <p className={`${EYEBROW} mb-[64px]`}>{t("studio.otherSuggestions")}</p>
           <div className="grid md:grid-cols-2 gap-x-[24px] gap-y-[80px]">
             {suggestions.map((s) => (
               <SuggestionCard key={s.slug} project={s} />
@@ -749,6 +751,7 @@ function EpisodeRow({
   /** Opens the watch lightbox. Absent when the episode has no video. */
   onWatch?: () => void;
 }) {
+  const t = useT();
   const number = ep.number ?? index + 1;
 
   /* The episode-details page (Figma `714:3643`) isn't built yet, so an
@@ -779,7 +782,7 @@ function EpisodeRow({
         </div>
         {ep.guest && (
           <div className="flex gap-[7px] items-end">
-            <span className="text-[12px] font-medium text-[#363636]">Guest</span>
+            <span className="text-[12px] font-medium text-[#363636]">{t("episode.guest")}</span>
             <span className="text-[14px] font-semibold text-[#8665A7]">
               {ep.guest}
             </span>
@@ -834,7 +837,7 @@ function EpisodeRow({
               the old link behaviour so nothing becomes a dead end. */}
           {onWatch ? (
             <button onClick={onWatch} className={`${GLASS_BTN} px-[14px] py-[12px]`}>
-              View episode
+              {t("episode.view")}
               <PlayArrow />
             </button>
           ) : href ? (
@@ -845,12 +848,12 @@ function EpisodeRow({
                 rel="noopener noreferrer"
                 className={`${GLASS_BTN} px-[14px] py-[12px]`}
               >
-                View episode
+                {t("episode.view")}
                 <PlayArrow />
               </a>
             ) : (
               <Link href={href} className={`${GLASS_BTN} px-[14px] py-[12px]`}>
-                View episode
+                {t("episode.view")}
                 <PlayArrow />
               </Link>
             )
@@ -859,7 +862,7 @@ function EpisodeRow({
               className={`${GLASS_BTN} px-[14px] py-[12px] opacity-50 cursor-default`}
               title="Episode page coming soon"
             >
-              View episode
+              {t("episode.view")}
               <PlayArrow />
             </span>
           )}
@@ -868,7 +871,7 @@ function EpisodeRow({
               href={ep.slug ? `/studio/${projectSlug}/${ep.slug}` : `/studio/${projectSlug}`}
               className="text-[13px] font-medium text-[rgba(240,240,240,0.3)] hover:text-[rgba(240,240,240,0.5)] transition-colors"
             >
-              Know more
+              {t("common.knowMore")}
             </Link>
           )}
         </div>
@@ -880,6 +883,7 @@ function EpisodeRow({
 /* ── Suggestion card — Figma 709:1513 ──
    Poster 221×288 left + copy 338 right, mirroring the landing rows */
 function SuggestionCard({ project }: { project: StudioProject }) {
+  const t = useT();
   const format = FORMAT_LABELS[project.format] ?? project.format;
   const status = STATUS_LABELS[project.status] ?? project.status;
 
@@ -903,7 +907,7 @@ function SuggestionCard({ project }: { project: StudioProject }) {
             href={`/studio/${project.slug}`}
             className={`${GLASS_BTN} px-[14px] py-[12px]`}
           >
-            View all episodes
+            {t("studio.viewAllEpisodes")}
             <PlayArrow />
           </Link>
         </div>
@@ -933,7 +937,7 @@ function SuggestionCard({ project }: { project: StudioProject }) {
         </div>
 
         <div className="flex flex-col gap-[6px]">
-          <p className={CAT_LABEL}>Produced by</p>
+          <p className={CAT_LABEL}>{t("studio.producedBy")}</p>
           <p className="text-[15px] leading-[18px] text-[#F0F0F0]">
             {[project.credits.production, project.credits.coProduction]
               .filter(Boolean)

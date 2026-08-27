@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/contexts/LocaleContext";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -79,6 +80,7 @@ export default function EpisodeLightbox({
   episodes: LightboxEpisode[];
   initialIndex?: number;
 }) {
+  const t = useT();
   const [mounted, setMounted] = useState(false);
   const [index, setIndex] = useState(initialIndex);
   const [playing, setPlaying] = useState(false);
@@ -360,7 +362,7 @@ export default function EpisodeLightbox({
             onClick={onClose}
             className="group flex items-center gap-[7px] text-[13px] font-medium text-[#9D9C9C] hover:text-[#F0F0F0] transition-colors"
           >
-            Close
+            {t("common.close")}
             <svg width="9" height="9" viewBox="0 0 9 9" fill="none" aria-hidden="true">
               <path
                 d="M1 1L8 8M8 1L1 8"
@@ -442,7 +444,7 @@ export default function EpisodeLightbox({
               )}
               <div className="absolute inset-0 flex items-center justify-center px-6 text-center">
                 <p className="text-[14px] leading-[22px] text-[#9D9C9C] max-w-[420px]">
-                  This episode has no video yet.
+                  {t("episode.noVideo")}
                 </p>
               </div>
             </>
@@ -453,7 +455,7 @@ export default function EpisodeLightbox({
           {failed && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-[10px] px-6 text-center bg-black/70">
               <p className="text-[14px] leading-[22px] text-[#F0F0F0] max-w-[460px]">
-                This episode couldn&rsquo;t be played.
+                {t("episode.playFailed")}
               </p>
               <p className="text-[12px] leading-[18px] text-[#9D9C9C] max-w-[460px]">{failed}</p>
             </div>
@@ -686,7 +688,7 @@ export default function EpisodeLightbox({
           >
             <div className="flex items-center justify-between px-[18px] pt-[16px] pb-[12px]">
               <p className="text-[10px] leading-[24px] tracking-[1.6px] uppercase text-[#363636]">
-                Episodes
+                {t("episode.episodes")}
               </p>
               <button
                 onClick={() => setDrawer(false)}
@@ -716,7 +718,7 @@ export default function EpisodeLightbox({
                         : "bg-[rgba(240,240,240,0.06)] text-[#9D9C9C] hover:text-[#F0F0F0]"
                     }`}
                   >
-                    Season {s}
+                    {t("episode.season")} {s}
                   </button>
                 ))}
               </div>

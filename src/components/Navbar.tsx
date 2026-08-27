@@ -3,8 +3,9 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import LoginModal from "./LoginModal";
+import LanguageSwitcher from "./LanguageSwitcher";
+import { useLocale, useLocaleHref, useT } from "@/contexts/LocaleContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 
@@ -16,13 +17,15 @@ function isNavLinkActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
+/* `key` is what gets translated; the English word is only the React key and a
+   last-resort label if the strings row is unreachable. */
 const NAV_LINKS = [
-  { label: "Films", href: "/films", hover: "hover:text-[#B23495]" },
-  { label: "Studio", href: "/studio", hover: "hover:text-[#8665A7]" },
-  { label: "Academy", href: "/academy", hover: "hover:text-[#32C6CC]" },
-  { label: "Read", href: "/read", hover: "hover:text-[#5D94B9]" },
-  { label: "About", href: "/about", hover: "hover:text-[#9D9C9C]" },
-  { label: "Support", href: "/support", hover: "hover:text-[#9D9C9C]" },
+  { key: "nav.films", label: "Films", href: "/films", hover: "hover:text-[#B23495]" },
+  { key: "nav.studio", label: "Studio", href: "/studio", hover: "hover:text-[#8665A7]" },
+  { key: "nav.academy", label: "Academy", href: "/academy", hover: "hover:text-[#32C6CC]" },
+  { key: "nav.read", label: "Read", href: "/read", hover: "hover:text-[#5D94B9]" },
+  { key: "nav.about", label: "About", href: "/about", hover: "hover:text-[#9D9C9C]" },
+  { key: "nav.support", label: "Support", href: "/support", hover: "hover:text-[#9D9C9C]" },
 ];
 
 const MENU_LINKS = NAV_LINKS;
@@ -42,9 +45,11 @@ const SOCIAL_KEY_TO_LABEL: Record<string, string> = {
 };
 
 export default function Navbar() {
-  const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const { locale, locales, defaultCode, pathname: localePath } = useLocale();
+  const href = useLocaleHref();
+  const t = useT();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -125,7 +130,7 @@ export default function Navbar() {
       }`}>
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 h-[128px] grid grid-cols-[auto_1fr_auto] items-center">
           {/* Logo — fixed 127x52 SVG, no shrink on scroll */}
-          <Link href="/" className="flex items-center shrink-0">
+          <Link href={href("/")} className="flex items-center shrink-0">
             <Image
               src="/images/ic_logo_navbar.svg"
               alt="Don't Skip Humanity"
@@ -140,23 +145,29 @@ export default function Navbar() {
           {/* Desktop Nav — centered */}
           <div className="hidden lg:flex items-center justify-center gap-7">
             {NAV_LINKS.map((link) => {
-              const active = isNavLinkActive(pathname, link.href);
+              const active = isNavLinkActive(localePath, link.href);
               return (
                 <Link
-                  key={link.label}
-                  href={link.href}
+                  key={link.key}
+                  href={href(link.href)}
                   className={`text-[13px] font-medium tracking-wide transition-colors ${active ? "" : `text-dsh-nav ${link.hover}`}`}
                   style={active ? { color: NAV_ACTIVE_COLOR } : undefined}
                 >
-                  {link.label}
+                  {t(link.key) || link.label}
                 </Link>
               );
             })}
           </div>
           <div className="lg:hidden" />
 
-          {/* Right side — Auth + Hamburger */}
+          {/* Right side — Language + Auth + Hamburger */}
           <div className="flex items-center gap-2 sm:gap-4">
+            <LanguageSwitcher
+              locales={locales}
+              current={locale.code}
+              pathname={localePath}
+              defaultCode={defaultCode}
+            />
             {loading ? (
               <div className="w-8 h-8 rounded-full bg-white/10 animate-pulse" />
             ) : !isLoggedIn ? (
@@ -164,7 +175,7 @@ export default function Navbar() {
                 onClick={() => setIsLoginModalOpen(true)}
                 className="text-[13px] font-medium tracking-wide text-dsh-nav hover:text-dsh-nav-hover transition-colors"
               >
-                Login
+                {t("nav.login")}
               </button>
             ) : (
               <div className="relative" ref={dropdownRef}>
@@ -186,14 +197,14 @@ export default function Navbar() {
                       <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                     </div>
                     <Link href="/profile" className="block px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors" onClick={() => setDropdownOpen(false)}>
-                      Profile
+                      {t("nav.profile")}
                     </Link>
                     <Link href="/academy" className="block px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-colors" onClick={() => setDropdownOpen(false)}>
                       Academy
                     </Link>
                     <div className="h-px bg-white/5 my-1" />
                     <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-[#E74C3C] hover:bg-white/5 transition-colors">
-                      Log out
+                      {t("nav.logout")}
                     </button>
                   </div>
                 )}
@@ -204,7 +215,7 @@ export default function Navbar() {
             <button
               className="p-2 opacity-90 hover:opacity-100 transition-opacity"
               onClick={() => setMenuOpen(!menuOpen)}
-              aria-label="Toggle menu"
+              aria-label={t("nav.menu")}
             >
               <Image src="/images/ic_menu.svg" alt="Menu" width={24} height={24} className="w-6 h-6" unoptimized />
             </button>
@@ -241,16 +252,16 @@ export default function Navbar() {
           {/* Center: nav links */}
           <div className="hidden lg:flex items-center justify-center gap-7">
             {NAV_LINKS.map((link) => {
-              const active = isNavLinkActive(pathname, link.href);
+              const active = isNavLinkActive(localePath, link.href);
               return (
                 <Link
-                  key={link.label}
-                  href={link.href}
+                  key={link.key}
+                  href={href(link.href)}
                   className={`text-[13px] font-medium tracking-wide transition-colors ${active ? "" : `text-dsh-nav ${link.hover}`}`}
                   style={active ? { color: NAV_ACTIVE_COLOR } : undefined}
                   onClick={() => setMenuOpen(false)}
                 >
-                  {link.label}
+                  {t(link.key) || link.label}
                 </Link>
               );
             })}
@@ -263,7 +274,7 @@ export default function Navbar() {
               onClick={() => setMenuOpen(false)}
               className="flex items-center gap-2 text-dsh-nav hover:text-dsh-nav-hover transition-colors"
             >
-              <span className="text-xs tracking-widest uppercase hidden sm:inline">Close</span>
+              <span className="text-xs tracking-widest uppercase hidden sm:inline">{t("common.close")}</span>
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -276,11 +287,11 @@ export default function Navbar() {
           {/* Large navigation links */}
           <nav className="flex flex-col gap-1 pt-8 sm:pt-16">
             {MENU_LINKS.map((link, i) => {
-              const active = isNavLinkActive(pathname, link.href);
+              const active = isNavLinkActive(localePath, link.href);
               return (
                 <Link
-                  key={link.label}
-                  href={link.href}
+                  key={link.key}
+                  href={href(link.href)}
                   onClick={() => setMenuOpen(false)}
                   className={`font-bold leading-none hover:text-[#B23495] transition-colors duration-300 ${
                     active ? "" : "text-dsh-nav-hover"
@@ -293,7 +304,7 @@ export default function Navbar() {
                     ...(active ? { color: NAV_ACTIVE_COLOR } : {}),
                   }}
                 >
-                  {link.label}
+                  {t(link.key) || link.label}
                 </Link>
               );
             })}
@@ -314,7 +325,7 @@ export default function Navbar() {
                   paddingBottom: "0.22em",
                 }}
               >
-                Login
+                {t("nav.login")}
               </button>
             )}
           </nav>

@@ -26,6 +26,7 @@
 
 const ROW_H = 215; // 646 band ÷ 3 rows, per Figma
 const ROWS = 3;
+const FALLOFF = 90;
 
 type Common = {
   /** Flat dim over the photos. Higher = darker. */
@@ -34,6 +35,22 @@ type Common = {
   tint?: string;
   /** Seconds for one full loop. Higher = slower drift. */
   speed?: number;
+  /**
+   * The solid `Rectangle 727` block behind the headline. It exists to protect
+   * a LEFT-aligned headline on Films/Studio; a centred headline (About,
+   * Support) sits half on it and half off, which reads as a mistake.
+   * Default true so Films and Studio are untouched.
+   */
+  panel?: boolean;
+  /**
+   * Number of drifting rows. Films/Studio use the Figma band of 3×215px.
+   * A full-viewport hero needs more rows to reach the bottom.
+   */
+  rows?: number;
+  /** Row height in px. Defaults to the Figma 215. */
+  rowHeight?: number;
+  /** Bottom fade height in px. */
+  falloff?: number;
 };
 
 type SheetProps = Common & {
@@ -67,16 +84,24 @@ type TilesProps = Common & {
 export type HeroMosaicProps = SheetProps | TilesProps;
 
 export default function HeroMosaic(props: HeroMosaicProps) {
-  const { dim = 0.55, tint, speed = 90 } = props;
+  const {
+    dim = 0.55,
+    tint,
+    speed = 90,
+    panel = true,
+    rows: rowCount = ROWS,
+    rowHeight = ROW_H,
+    falloff = FALLOFF,
+  } = props;
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none select-none">
       {/* ── Drifting rows ── */}
-      {Array.from({ length: ROWS }).map((_, row) => {
+      {Array.from({ length: rowCount }).map((_, row) => {
         const dir = row % 2 === 0 ? "left" : "right";
-        /* Offset the third row so it doesn't march in lockstep with the
-           first (both drift the same way). */
-        const delay = row === 2 ? `-${speed / 3}s` : undefined;
+        /* Offset every third row so same-direction rows don't march in
+           lockstep with each other. */
+        const delay = row % 3 === 2 ? `-${speed / 3}s` : undefined;
 
         if (props.mode === "sheet") {
           return (
@@ -84,8 +109,8 @@ export default function HeroMosaic(props: HeroMosaicProps) {
               key={row}
               className={`absolute left-0 w-full studio-mosaic-row studio-mosaic-row--${dir}`}
               style={{
-                top: row * ROW_H,
-                height: ROW_H,
+                top: row * rowHeight,
+                height: rowHeight,
                 backgroundImage: `url(${props.src})`,
                 backgroundSize: `${props.sheetWidth}px ${props.sheetHeight}px`,
                 backgroundPositionY: `${-row * ROW_H}px`,
@@ -100,7 +125,7 @@ export default function HeroMosaic(props: HeroMosaicProps) {
           <div
             key={row}
             className="absolute left-0 w-full overflow-hidden"
-            style={{ top: row * ROW_H, height: ROW_H }}
+            style={{ top: row * rowHeight, height: rowHeight }}
           >
             <MarqueeRow
               tiles={props.tiles}
@@ -129,18 +154,29 @@ export default function HeroMosaic(props: HeroMosaicProps) {
              frame, i.e. 116px left of the centred 1224 container.
              A solid rectangle with HARD edges, exactly as in the design —
              not a feathered gradient. Everything left of it is the narrow
-             photo strip; everything right of it is the photo block. ── */}
-      <div className="hidden xl:block absolute inset-y-0 left-1/2 -translate-x-1/2 w-[1224px]">
-        <div className="absolute inset-y-0 left-[-116px] w-[728px] bg-[#0D0D0D]" />
-      </div>
+             photo strip; everything right of it is the photo block.
 
-      {/* Below xl the fixed offset can't hold its position — fall back to a
-          solid block anchored to the left edge, still hard-edged. */}
-      <div className="xl:hidden absolute inset-y-0 left-0 w-[68%] bg-[#0D0D0D]" />
+             Skipped for centred headlines (About, Support): the block is
+             offset to the left, so centred text would straddle its edge. ── */}
+      {panel && (
+        <>
+          <div className="hidden xl:block absolute inset-y-0 left-1/2 -translate-x-1/2 w-[1224px]">
+            <div className="absolute inset-y-0 left-[-116px] w-[728px] bg-[#0D0D0D]" />
+          </div>
 
-      {/* ── Bottom falloff into the page background. Short, so the band still
-             reads as a crisp horizontal strip. ── */}
-      <div className="absolute inset-x-0 bottom-0 h-[90px] bg-gradient-to-t from-[#0D0D0D] to-transparent" />
+          {/* Below xl the fixed offset can't hold its position — fall back to a
+              solid block anchored to the left edge, still hard-edged. */}
+          <div className="xl:hidden absolute inset-y-0 left-0 w-[68%] bg-[#0D0D0D]" />
+        </>
+      )}
+
+      {/* ── Bottom falloff into the page background. Short on the Figma band so
+             it still reads as a crisp horizontal strip; taller on a
+             full-viewport hero so the rows dissolve into the page. ── */}
+      <div
+        className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#0D0D0D] to-transparent"
+        style={{ height: falloff }}
+      />
     </div>
   );
 }

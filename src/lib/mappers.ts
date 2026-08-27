@@ -26,11 +26,34 @@ function arr<T>(v: unknown): T[] | undefined {
   return v as T[];
 }
 
+/**
+ * The locale the mappers should read.
+ *
+ * Module-level rather than a parameter threaded through every mapper: these
+ * run inside one server request, `lib/api.ts` sets it before mapping, and the
+ * alternative was changing the signature of two dozen functions. It is reset
+ * per request, never read on the client.
+ */
+let activeLocale = "en";
+let activeDefault = "en";
+
+export function setMapperLocale(locale: string, defaultLocale: string) {
+  activeLocale = locale;
+  activeDefault = defaultLocale;
+}
+
 function str(v: unknown, fallback = ""): string {
   if (typeof v === "string") return v;
   if (typeof v === "object" && v !== null) {
-    // multilang JSONB — return first non-empty value
-    const vals = Object.values(v as Record<string, string>);
+    /* Asked-for locale, then the default, then anything with text.
+       This used to return whichever language happened to come first in the
+       object, so the site showed a language nobody had chosen. */
+    const map = v as Record<string, string>;
+    const asked = map[activeLocale]?.trim();
+    if (asked) return asked;
+    const fallbackLang = map[activeDefault]?.trim();
+    if (fallbackLang) return fallbackLang;
+    const vals = Object.values(map);
     return vals.find((s) => s?.trim()) || fallback;
   }
   return fallback;

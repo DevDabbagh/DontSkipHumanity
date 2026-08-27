@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/contexts/LocaleContext";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -19,6 +20,7 @@ export default function InternalNav({
   backLabel?: string;
   backHref?: string;
 }) {
+  const t = useT();
   return (
     <div className="fixed top-0 left-0 right-0 z-40 bg-[#0D0D0D]/90 backdrop-blur-md border-b border-white/5">
       <div className="max-w-[1400px] mx-auto px-5 sm:px-8 h-14 flex items-center justify-between">
@@ -75,7 +77,7 @@ export default function InternalNav({
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
-          Back
+          {t("common.back")}
         </Link>
       </div>
     </div>

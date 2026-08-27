@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import DriftingGrid from "@/components/DriftingGrid";
+import HeroMosaic from "@/components/HeroMosaic";
+import { HERO_TILES } from "@/components/heroTiles";
 import SecondaryBtn from "@/components/SecondaryBtn";
 import AboutSections from "./AboutSections";
 
@@ -22,7 +23,20 @@ export default function AboutPage() {
         className="flex flex-col items-center justify-center text-center px-8 relative overflow-hidden"
         style={{ height: "100vh" }}
       >
-        <DriftingGrid />
+        {/* Same drifting band as the Studio hero — rows alternate
+            left / right / left. No centre panel here: this headline is
+            centred, and the panel is offset to the left. */}
+        <HeroMosaic
+          mode="tiles"
+          tiles={HERO_TILES}
+          rows={6}
+          rowHeight={215}
+          dim={0.62}
+          falloff={220}
+          panel={false}
+          speed={90}
+          tileFilter="grayscale(1) brightness(0.5)"
+        />
         <div className="relative" style={{ zIndex: 1 }}>
           <h1
             style={{

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useReveal } from "@/hooks/useReveal";
+import { useT } from "@/contexts/LocaleContext";
 import type { LandingSectionText } from "@/lib/landing";
 
 interface NewsletterConfig extends LandingSectionText {
@@ -9,6 +10,7 @@ interface NewsletterConfig extends LandingSectionText {
 }
 
 export default function Newsletter({ config }: { config?: NewsletterConfig }) {
+  const t = useT();
   const [email, setEmail] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
@@ -68,20 +70,20 @@ export default function Newsletter({ config }: { config?: NewsletterConfig }) {
       <div className="relative max-w-[559px] mx-auto px-5 sm:px-8 text-center">
         {/* H2_Desktop_DSH — Inter SemiBold 38/40, letter-spacing -1.5% (= -0.57px) */}
         <h2 className="reveal text-[28px] sm:text-[32px] md:text-[38px] leading-[32px] sm:leading-[36px] md:leading-[40px] tracking-[-0.57px] font-semibold text-white">
-          {config?.heading || "Don't look away."}
+          {config?.heading || t("newsletter.heading")}
         </h2>
 
         {/* Body-Medium_Desktop_DSH — Source Sans 3 16/24, letter-spacing -0.5% (= -0.08px) */}
         <p className="reveal stagger-1 font-[family-name:var(--font-source-sans)] text-[15px] md:text-[16px] leading-[24px] tracking-[-0.08px] text-[#595C5C] mt-10 md:mt-[60px]">
           {config?.description ||
-            "One email when something matters — a new film, a piece, a screening, an open call. Work that names what power tries to hide. No noise."}
+            t("newsletter.description")}
         </p>
 
         {/* Form column — 500px wide, input + button stacked with a 20px gap */}
         <div className="reveal stagger-2 max-w-[500px] mx-auto mt-10 md:mt-[60px] flex flex-col gap-5">
           <input
             type="email"
-            placeholder="Email address"
+            placeholder={t("newsletter.email")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full h-[44px] p-[14px] rounded-[3px] text-white text-[13px] font-medium focus:outline-none transition-colors"
@@ -106,23 +108,22 @@ export default function Newsletter({ config }: { config?: NewsletterConfig }) {
             style={{ backgroundImage: "linear-gradient(95.17deg, #32C6CC 0.11%, #B23495 100.11%)" }}
           >
             {state === "sending"
-              ? "Sending…"
+              ? t("newsletter.sending")
               : state === "done"
-                ? "Check your inbox"
-                : config?.cta || "Subscribe our newsletter"}
+                ? t("newsletter.checkInbox")
+                : config?.cta || t("newsletter.subscribe")}
             <img src="/images/ic_newsletter_btn.png" alt="" className="w-4 h-3 object-contain" />
           </button>
 
           {/* Never says "subscribed" — they aren't, until they confirm. */}
           {state === "done" && (
             <p className="text-[13px] leading-[20px] text-[#F0F0F0]" role="status">
-              Almost there — we&rsquo;ve sent you a link to confirm. You&rsquo;ll only start
-              receiving emails once you click it.
+              {t("newsletter.confirmSent")}
             </p>
           )}
           {state === "error" && (
             <p className="text-[13px] leading-[20px] text-[#E06B6B]" role="alert">
-              That didn&rsquo;t go through. Check the address and try again.
+              {t("newsletter.error")}
             </p>
           )}
         </div>
@@ -136,7 +137,7 @@ export default function Newsletter({ config }: { config?: NewsletterConfig }) {
             onChange={(e) => setAgreed(e.target.checked)}
             className="h-4 w-4 shrink-0 accent-[#8665A7]"
           />
-          <span>{config?.subtitle || "I agree to receive emails from DSH. We don't share your data."}</span>
+          <span>{config?.subtitle || t("newsletter.consent")}</span>
         </label>
       </div>
     </section>
