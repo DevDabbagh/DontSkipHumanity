@@ -9,6 +9,7 @@ import SupportCTA from "@/components/SupportCTA";
 import Footer from "@/components/Footer";
 import type { Film, FilmStage } from "@/lib/types";
 import type { FilmsHeader } from "@/lib/landing";
+import { useScrollColorize } from "@/hooks/useScrollColorize";
 
 /* ── Constants ── */
 
@@ -39,6 +40,11 @@ const FILTER_BTN_ACTIVE =
 /* ── Component ── */
 
 export default function FilmsListing({ films, header }: { films: Film[]; header?: FilmsHeader }) {
+  /* Scroll-linked black-and-white → colour, as on the detail pages. Drives
+     the featured poster and the film cards; the hero and the decorative
+     luminosity washes are deliberately left out. */
+  const colorizeRef = useScrollColorize<HTMLElement>();
+
   /* Header (from dashboard, with fallbacks) */
   const heroImage = header?.imageSrc || HERO_IMAGE;
   const headerTitleNormal = header?.titleNormal?.trim();
@@ -94,7 +100,7 @@ export default function FilmsListing({ films, header }: { films: Film[]; header?
   }
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A] text-white">
+    <main ref={colorizeRef} className="min-h-screen bg-[#0A0A0A] text-white">
       <Navbar />
 
       {/* ═══════════════════════════════════════
@@ -199,6 +205,7 @@ export default function FilmsListing({ films, header }: { films: Film[]; header?
                   }}
                 >
                   <img
+                    data-colorize
                     src={featured.posterUrl || featured.thumbnailUrl}
                     alt={featured.title}
                     className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-700"
@@ -416,10 +423,15 @@ function FilmRow({ film }: { film: Film }) {
             style={{ boxShadow: "0 6px 20px 2px rgba(0,0,0,0.5)" }}
           >
             <div className="absolute inset-0 bg-[#0D0D0D] rounded-[6px]" />
+            {/* `mix-blend-luminosity` removed on purpose: it strips colour
+                permanently, so the scroll effect had nothing to reveal. The
+                card still starts monochrome — that is now grayscale(1) from
+                `useScrollColorize` — and develops into colour as it rises. */}
             <img
+              data-colorize
               src={film.posterUrl || film.thumbnailUrl}
               alt={film.title}
-              className="absolute inset-0 w-full h-full object-cover rounded-[6px] mix-blend-luminosity opacity-50 group-hover:opacity-70 transition-opacity duration-500"
+              className="absolute inset-0 w-full h-full object-cover rounded-[6px] opacity-50 group-hover:opacity-70 transition-opacity duration-500"
             />
           </div>
         </Link>

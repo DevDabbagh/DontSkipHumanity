@@ -98,15 +98,48 @@ export function useScrollColorize<T extends HTMLElement = HTMLDivElement>(
       }
     };
 
+    /* Seed every target grey BEFORE the first pass.
+     *
+     * `update()` skips anything more than two viewports down to save work,
+     * which meant those images carried no filter at all until the first
+     * scroll event — so they sat in full colour until you touched the wheel,
+     * the opposite of the intended resting state. On a listing page most
+     * cards start below that line, so most of the page was wrong at rest.
+     * Seeding costs one style write per image and guarantees the page starts
+     * monochrome and develops from there. */
+    targets.forEach((el) => {
+      el.style.filter = "grayscale(1)";
+    });
+
     update();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll, { passive: true });
     reduced.addEventListener("change", onReducedChange);
 
+    /* Recompute once the document's real height is known.
+     *
+     * The first pass runs at hydration, when images have no dimensions yet
+     * and the document is barely taller than the viewport. `maxScroll` is
+     * then <= 0, the "page can't scroll, so show it in colour" shortcut
+     * fires, and every image is stamped full colour — permanently, because
+     * nothing recomputes until a scroll event. On a listing page that is the
+     * whole grid, which is exactly how /studio and /films ended up ignoring
+     * the effect entirely.
+     *
+     * Watching the body covers images loading, fonts swapping and any late
+     * layout shift, so the values correct themselves without waiting for the
+     * reader to scroll. */
+    const ro =
+      typeof ResizeObserver !== "undefined" ? new ResizeObserver(onScroll) : null;
+    ro?.observe(document.body);
+    window.addEventListener("load", onScroll);
+
     return () => {
       if (frame) cancelAnimationFrame(frame);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
+      window.removeEventListener("load", onScroll);
+      ro?.disconnect();
       reduced.removeEventListener("change", onReducedChange);
       clear();
     };

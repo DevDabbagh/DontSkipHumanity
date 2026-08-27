@@ -7,6 +7,7 @@ import HeroMosaic from "@/components/HeroMosaic";
 import SupportCTA from "@/components/SupportCTA";
 import Footer from "@/components/Footer";
 import type { StudioProject } from "@/lib/types";
+import { useScrollColorize } from "@/hooks/useScrollColorize";
 
 /* ═══════════════════════════════════════════════════════════════
    DSH – Studio Landing
@@ -114,6 +115,11 @@ function StepMarker({ n }: { n: string }) {
 /* ── Component ── */
 
 export default function StudioListing({ projects }: { projects: StudioProject[] }) {
+  /* Scroll-linked black-and-white → colour, as on the detail pages. Drives
+     the featured cover and the project cards; the hero mosaic and the 5%
+     luminosity washes are deliberately left out. */
+  const colorizeRef = useScrollColorize<HTMLElement>();
+
   /* Featured — first project, or the first marked ongoing */
   const featured = projects[0] ?? null;
   const rest = featured ? projects.filter((p) => p.id !== featured.id) : projects;
@@ -151,7 +157,7 @@ export default function StudioListing({ projects }: { projects: StudioProject[] 
   });
 
   return (
-    <main className="min-h-screen bg-[#0D0D0D] text-white overflow-x-hidden">
+    <main ref={colorizeRef} className="min-h-screen bg-[#0D0D0D] text-white overflow-x-hidden">
       <Navbar />
 
       {/* ═══════════════════════════════════════════════════════════
@@ -301,6 +307,7 @@ export default function StudioListing({ projects }: { projects: StudioProject[] 
                 style={{ boxShadow: CARD_SHADOW_0, backgroundColor: C.bg }}
               >
                 <img
+                  data-colorize
                   src={featured.coverUrl || featured.thumbnailUrl}
                   alt={featured.title}
                   className="absolute inset-0 w-full h-full object-cover rounded-[6px] opacity-80 group-hover:opacity-95 transition-opacity duration-500"
@@ -561,10 +568,15 @@ function ProjectRow({ project, flip }: { project: StudioProject; flip: boolean }
         }`}
         style={{ boxShadow: CARD_SHADOW_2, backgroundColor: C.bg }}
       >
+        {/* `mix-blend-luminosity` removed on purpose: it strips colour
+            permanently, so the scroll effect had nothing to reveal. The card
+            still starts monochrome — that is now grayscale(1) from
+            `useScrollColorize` — and develops into colour as it rises. */}
         <img
+          data-colorize
           src={project.thumbnailUrl || project.coverUrl}
           alt={project.title}
-          className="absolute inset-0 w-full h-full object-cover rounded-[6px] mix-blend-luminosity opacity-30 group-hover:opacity-45 transition-opacity duration-500"
+          className="absolute inset-0 w-full h-full object-cover rounded-[6px] opacity-30 group-hover:opacity-45 transition-opacity duration-500"
         />
       </Link>
 
