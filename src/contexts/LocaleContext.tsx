@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
 
 /**
  * The request's locale, handed down from the server layout.
@@ -56,6 +57,25 @@ export function LocaleProvider({
 
 export function useLocale() {
   return useContext(Ctx);
+}
+
+/**
+ * The current path with the locale prefix removed — `/ar/films` → `/films`.
+ *
+ * Read live from the router, NOT from the `pathname` the server layout passes
+ * down. Next reuses the shared root layout across client-side navigations
+ * instead of re-rendering it, so the server value freezes at whichever page was
+ * first loaded — which left the navbar highlighting Studio on every page after
+ * a visitor arrived at /studio. Anything that has to track the current page
+ * belongs here; the context's `pathname` is only a first-paint seed.
+ */
+export function useCurrentPath() {
+  const { locale, defaultCode } = useLocale();
+  const path = usePathname() || "/";
+  if (locale.code === defaultCode) return path;
+  const prefix = `/${locale.code}`;
+  if (path === prefix) return "/";
+  return path.startsWith(`${prefix}/`) ? path.slice(prefix.length) : path;
 }
 
 /**

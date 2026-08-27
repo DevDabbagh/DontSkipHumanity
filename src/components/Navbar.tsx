@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import LoginModal from "./LoginModal";
 import LanguageSwitcher from "./LanguageSwitcher";
-import { useLocale, useLocaleHref, useT } from "@/contexts/LocaleContext";
+import { useLocale, useLocaleHref, useCurrentPath, useT } from "@/contexts/LocaleContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 
@@ -47,7 +47,10 @@ const SOCIAL_KEY_TO_LABEL: Record<string, string> = {
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const { locale, locales, defaultCode, pathname: localePath } = useLocale();
+  const { locale, locales, defaultCode } = useLocale();
+  /* Live, prefix-stripped path — the server-supplied one goes stale as soon as
+     the visitor navigates without a reload. */
+  const localePath = useCurrentPath();
   const href = useLocaleHref();
   const t = useT();
   const [dropdownOpen, setDropdownOpen] = useState(false);
