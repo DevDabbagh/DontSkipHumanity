@@ -97,6 +97,8 @@ export interface StudioProject {
     imageUrl?: string;
     /** Deep link to the episode details page ("Know more") */
     slug?: string;
+    /** draft episodes are filtered out before they reach the page. */
+    status?: "draft" | "published";
     /**
      * Playback source for the watch lightbox. Empty means the episode has no
      * video yet — "View episode" then falls back to the details page instead

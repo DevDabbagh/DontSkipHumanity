@@ -107,6 +107,9 @@ export function mapStudioProject(row: any): StudioProject {
     synopsisLong: str(row.synopsis_long),
     episodes: Array.isArray(row.studio_episodes)
       ? row.studio_episodes
+          /* A draft episode is one being written; it must not reach the site
+             even when its parent item is published. */
+          .filter((e: any) => (e.status || "published") !== "draft")
           .map((e: any) => ({
             title: str(e.title),
             description: str(e.description),
@@ -118,6 +121,7 @@ export function mapStudioProject(row: any): StudioProject {
             guest: e.guest || undefined,
             imageUrl: e.image_url || undefined,
             slug: e.slug || undefined,
+            status: e.status || "published",
             videoUrl: e.video_url || undefined,
             videoProvider: e.video_provider || undefined,
             /* Editorial half of the details page (Figma 714:3643). Each is
