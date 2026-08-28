@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { pickLang } from "./i18n";
 import type { AcademyProgram } from "./types";
 
 /**
@@ -54,8 +55,29 @@ interface LandingConfigRow {
   } | null;
 }
 
+/* Every text field a section or a slot can carry. Anything not listed — image
+   URLs, CTA destinations, flags — is passed through untouched, because a URL is
+   not language-dependent. */
+const SECTION_TEXT_FIELDS = ["heading", "description", "cta", "subtitle", "meta", "personName"] as const;
+const SLOT_TEXT_FIELDS = ["cardType", "cardTitle", "title", "description", "badge", "duration", "whoLeads"] as const;
+
+function resolveText<T extends object>(obj: T, fields: readonly string[], locale: string, def: string): T {
+  const src = obj as Record<string, unknown>;
+  const out: Record<string, unknown> = { ...src };
+  for (const f of fields) {
+    if (f in src) out[f] = pickLang(src[f], locale, def);
+  }
+  return out as T;
+}
+
 export async function getLandingConfig(): Promise<LandingConfig> {
   try {
+    const { getRequestLocale } = await import("./locale-server");
+    const { locale, defaultLocale } = await getRequestLocale().catch(() => ({
+      locale: { code: "en" },
+      defaultLocale: { code: "en" },
+    }));
+
     const { data, error } = await supabase
       .from("landing_page_config")
       .select("section_key, enabled, config");
@@ -64,11 +86,17 @@ export async function getLandingConfig(): Promise<LandingConfig> {
 
     const config: LandingConfig = {};
     for (const row of data as LandingConfigRow[]) {
+      const slots = row.config?.slots ?? {};
+      const localised: Record<string, LandingSlot> = {};
+      for (const [id, slot] of Object.entries(slots)) {
+        localised[id] = resolveText(slot, SLOT_TEXT_FIELDS, locale.code, defaultLocale.code);
+      }
+
       config[row.section_key] = {
         enabled: row.enabled,
-        text: row.config?.text ?? {},
+        text: resolveText(row.config?.text ?? {}, SECTION_TEXT_FIELDS, locale.code, defaultLocale.code),
         slotIds: row.config?.slotIds ?? [],
-        slots: row.config?.slots ?? {},
+        slots: localised,
       };
     }
     return config;
@@ -224,32 +252,55 @@ export interface StudioHeader {
   description?: string;
 }
 
-export async function getStudioHeader(): Promise<StudioHeader> {
+/**
+ * Read a header row in the request's language.
+ *
+ * Each text field may hold either a plain string (how these rows were written
+ * before translations existed) or `{ en, pt, ar }`. `pickLang` accepts both, so
+ * an untranslated row keeps rendering instead of going blank — and a row
+ * translated into Arabic only for the headline falls back per field, not
+ * per row.
+ *
+ * `imageSrc` is deliberately not translated: it is a URL, not language.
+ */
+async function readHeader<T>(
+  key: string,
+  textFields: readonly string[]
+): Promise<T> {
   try {
+    const { getRequestLocale } = await import("./locale-server");
+    const { locale, defaultLocale } = await getRequestLocale().catch(() => ({
+      locale: { code: "en" },
+      defaultLocale: { code: "en" },
+    }));
+
     const { data, error } = await supabase
       .from("site_settings")
       .select("value")
-      .eq("key", "studio_header")
+      .eq("key", key)
       .single();
-    if (error || !data?.value) return {};
-    const v = typeof data.value === "string" ? JSON.parse(data.value) : data.value;
-    return (v as StudioHeader) ?? {};
+    if (error || !data?.value) return {} as T;
+
+    const raw = typeof data.value === "string" ? JSON.parse(data.value) : data.value;
+    if (!raw || typeof raw !== "object") return {} as T;
+
+    const out: Record<string, unknown> = { ...raw };
+    for (const field of textFields) {
+      if (field in raw) out[field] = pickLang(raw[field], locale.code, defaultLocale.code);
+    }
+    return out as T;
   } catch {
-    return {};
+    return {} as T;
   }
 }
 
+const STUDIO_HEADER_TEXT = ["titleNormal", "titleColored", "titleAfter", "description"] as const;
+const FILMS_HEADER_TEXT = ["titleNormal", "titleColored", "description"] as const;
+
+export async function getStudioHeader(): Promise<StudioHeader> {
+  return readHeader<StudioHeader>("studio_header", STUDIO_HEADER_TEXT);
+}
+
 export async function getFilmsHeader(): Promise<FilmsHeader> {
-  try {
-    const { data, error } = await supabase
-      .from("site_settings")
-      .select("value")
-      .eq("key", "films_header")
-      .single();
-    if (error || !data?.value) return {};
-    const v = typeof data.value === "string" ? JSON.parse(data.value) : data.value;
-    return (v as FilmsHeader) ?? {};
-  } catch {
-    return {};
-  }
+  return readHeader<FilmsHeader>("films_header", FILMS_HEADER_TEXT);
 }
