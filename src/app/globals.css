@@ -515,3 +515,31 @@ html {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ── Arabic text inside a left-to-right layout ─────────────────────────────
+ *
+ * The page's layout axis stays LTR in every language: putting dir="rtl" on
+ * <html> mirrored all nine sections, swapping every image to the other side of
+ * the screen. The design places those images deliberately and that composition
+ * doesn't change with language.
+ *
+ * Text still has to read correctly, so each text block gets its own direction
+ * here. `unicode-bidi: plaintext` resolves direction per block from its first
+ * strong character — so an Arabic heading reads right-to-left, and an English
+ * one still waiting to be translated keeps its full stop at the end instead of
+ * rendering as ".that name power".
+ *
+ * `text-align: right` is scoped away from anything Tailwind has already
+ * aligned, so centred headings stay centred.
+ */
+html[lang="ar"] :is(h1, h2, h3, h4, h5, h6, p, li, blockquote, figcaption, label, dt, dd) {
+  unicode-bidi: plaintext;
+}
+
+html[lang="ar"]
+  :is(h1, h2, h3, h4, h5, h6, p, li, blockquote, figcaption, label, dt, dd):not([class*="text-center"]):not([class*="text-right"]):not([class*="text-left"]) {
+  text-align: right;
+}
+
+/* Latin runs (brand names, film titles, DSH) inside Arabic copy keep their own
+   direction automatically under plaintext; nothing else needed for them. */

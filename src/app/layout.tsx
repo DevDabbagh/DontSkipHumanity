@@ -50,10 +50,19 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  /* `lang` and `dir` come from the request's locale. `dir` is what flips the
-     whole layout for Arabic — every logical property (ms-, me-, ps-, pe-,
-     start/end) mirrors off this one attribute, which is why the CSS uses them
-     rather than left/right. */
+  /*
+   * `lang` follows the locale. `dir` deliberately does NOT.
+   *
+   * Setting `dir="rtl"` here mirrored the entire page: every image swapped
+   * sides, because a 50%-wide block in normal flow starts from the right under
+   * RTL. Measuring the rendered boxes on /ar against / showed all nine sections
+   * flipped, including the hero and the footer logo.
+   *
+   * The design places those images deliberately, and that composition is the
+   * same in every language, so the layout axis stays left-to-right. Arabic TEXT
+   * is still right-to-left — globals.css gives it `direction: rtl` per text
+   * block under `html[lang="ar"]`. Layout frozen, text free.
+   */
   const { locale, locales, defaultLocale, pathname } = await getRequestLocale();
 
   /* Resolved once per request and handed down: the navbar, the footer and every
@@ -68,7 +77,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale.code}
-      dir={locale.direction}
+      dir="ltr"
       className={`${inter.variable} ${sourceSans3.variable} antialiased`}
     >
       <body className="min-h-screen bg-[#0D0D0D] text-white font-[var(--font-inter)]">
