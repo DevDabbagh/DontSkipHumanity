@@ -59,6 +59,32 @@ function str(v: unknown, fallback = ""): string {
   return fallback;
 }
 
+/**
+ * Glossary and recommendation cards, resolved to the request's language.
+ *
+ * Each card's `term`, `definition` and `source` may be a plain string (written
+ * before translations existed) or `{ en, ar, … }`; `str` accepts both. The
+ * image is a URL and is passed through untouched.
+ */
+function entriesFor(list: unknown[] | undefined) {
+  if (!list) return undefined;
+  const out = list
+    .map((raw) => {
+      const e = (raw ?? {}) as Record<string, unknown>;
+      return {
+        term: str(e.term),
+        definition: str(e.definition),
+        source: str(e.source) || undefined,
+        imageUrl: typeof e.imageUrl === "string" ? e.imageUrl : undefined,
+      };
+    })
+    /* A card with nothing in this language and nothing to fall back to would
+       render as an empty box, so drop it. */
+    .filter((e) => e.term || e.definition);
+  return out.length ? out : undefined;
+}
+
+
 // ── Films ──────────────────────────────────────────────────────
 
 export function mapFilm(row: any): Film {
@@ -141,7 +167,7 @@ export function mapStudioProject(row: any): StudioProject {
             number: e.episode ?? undefined,
             season: e.season ?? undefined,
             year: e.year || undefined,
-            guest: e.guest || undefined,
+            guest: str(e.guest) || undefined,
             imageUrl: e.image_url || undefined,
             slug: e.slug || undefined,
             status: e.status || "published",
@@ -150,15 +176,20 @@ export function mapStudioProject(row: any): StudioProject {
             /* Editorial half of the details page (Figma 714:3643). Each is
                left undefined when empty so the section keeps hiding itself
                rather than rendering an empty heading. */
-            quotes: arr(e.quotes),
-            glossary: arr(e.glossary),
-            glossaryIntro: e.glossary_intro || undefined,
-            glossaryNote: e.glossary_note || undefined,
-            recommendations: arr(e.recommendations),
-            recommendationsIntro: e.recommendations_intro || undefined,
-            recommendationsNote: e.recommendations_note || undefined,
+            /* `arr` returns undefined for an empty list, and the section hides
+               itself on undefined — so resolve first, then collapse back. */
+            quotes: (() => {
+              const list = arr<unknown>(e.quotes)?.map((q) => str(q)).filter(Boolean);
+              return list?.length ? list : undefined;
+            })(),
+            glossary: entriesFor(arr(e.glossary)),
+            glossaryIntro: str(e.glossary_intro) || undefined,
+            glossaryNote: str(e.glossary_note) || undefined,
+            recommendations: entriesFor(arr(e.recommendations)),
+            recommendationsIntro: str(e.recommendations_intro) || undefined,
+            recommendationsNote: str(e.recommendations_note) || undefined,
             gallery: arr(e.gallery),
-            galleryIntro: e.gallery_intro || undefined,
+            galleryIntro: str(e.gallery_intro) || undefined,
           }))
           // Supabase returns joined rows unordered; the details page lists
           // episodes in running order.
