@@ -32,6 +32,9 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...but the example carries only variable NAMES, no values. It is the
+# reference for local setup and for filling in Vercel, so it must be tracked.
+!.env.example
 
 # vercel
 .vercel

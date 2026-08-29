@@ -116,6 +116,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(s?.user ?? null);
       if (s?.user) {
         loadProfile(s.user);
+        /* Attach any guest donations made with this same email, so someone
+           who donated before signing up finds their history already there.
+           The function takes no arguments and only ever claims rows matching
+           the caller's own verified email (migration 020). Best-effort:
+           a failure here must never block signing in. */
+        supabase.rpc("link_my_donations").then(({ error }) => {
+          if (error) console.warn("[auth] link_my_donations", error.message);
+        });
       } else {
         setProfile(null);
       }

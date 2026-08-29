@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
+import { recordDonation } from "@/lib/donations";
 
 export const runtime = "nodejs";
 
@@ -38,6 +39,9 @@ export async function POST(req: Request) {
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object;
+      /* Source of truth for recording — fires even if the donor closes the
+         tab before being redirected back. Idempotent via stripe_session_id. */
+      await recordDonation(session);
       /* TODO: persist to Supabase — amount, currency, and the project_* keys
          from metadata, so the dashboard can report who funded what. */
       console.log("[stripe] checkout completed", {

@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import HeroMosaic from "@/components/HeroMosaic";
 import { HERO_TILES } from "@/components/heroTiles";
+import DonationSuccessDialog from "@/components/DonationSuccessDialog";
 import { useReveal } from "@/hooks/useReveal";
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -92,11 +93,77 @@ export default function SupportPage() {
 function SupportPageContent() {
   // "Give monthly" / "Support our work" on the landing page arrive here as
   // /support?type=monthly | one-time, so the right option is already selected.
-  const initialType = useSearchParams().get("type") === "one-time" ? "One-time" : "Monthly";
+  const params = useSearchParams();
+  const initialType = params.get("type") === "one-time" ? "One-time" : "Monthly";
+
+  /* Stripe sends the donor back here with ?status=success&session_id=cs_...
+     Dismissing clears the query so a refresh doesn't reopen the dialog. */
+  const [dismissedSession, setDismissedSession] = useState<string | null>(null);
+  const successSession =
+    params.get("status") === "success" ? params.get("session_id") : null;
+  const showThanks = successSession && successSession !== dismissedSession;
 
   const [donationType, setDonationType] = useState<"Monthly" | "One-time">(initialType);
   const [amount, setAmount] = useState("€25");
   const [customAmount, setCustomAmount] = useState("");
+  const [checkoutBusy, setCheckoutBusy] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+
+  /* Arriving from a "Support this project" button on a film / studio / academy
+     page. Named `fund*` rather than `type`/`slug` because `?type=` is already
+     taken by the monthly-vs-one-time toggle above. The server re-validates
+     these; here they only decide what the donor is told they're funding. */
+  const fundType = params.get("fundType");
+  const fundSlug = params.get("fundSlug");
+  const fundTitle = params.get("fundTitle");
+  const funding =
+    (fundType === "film" || fundType === "studio" || fundType === "academy") &&
+    fundSlug &&
+    fundTitle
+      ? { type: fundType, slug: fundSlug, title: fundTitle }
+      : null;
+
+  /* The preset labels carry the € sign, so strip it before sending a number.
+     `null` means "nothing valid chosen" and disables the button — better than
+     letting someone click through to a checkout that will 400. */
+  const selectedAmount: number | null = (() => {
+    const raw = amount === "Custom" ? customAmount : amount.replace(/[^\d.]/g, "");
+    const n = Number(raw);
+    return Number.isFinite(n) && n > 0 ? n : null;
+  })();
+
+  /* Amount and currency are settled server-side; this only says how much and
+     which mode. Currency is deliberately not sent — the route pins it to EUR. */
+  const startCheckout = async () => {
+    if (selectedAmount === null || checkoutBusy) return;
+    setCheckoutBusy(true);
+    setCheckoutError(null);
+    try {
+      const r = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mode: donationType === "Monthly" ? "monthly" : "one_time",
+          amount: selectedAmount,
+          ...(funding && {
+            projectType: funding.type,
+            projectSlug: funding.slug,
+            projectTitle: funding.title,
+          }),
+        }),
+      });
+      const j = await r.json();
+      if (!r.ok || !j.url) {
+        setCheckoutError(j.error ?? "Could not start checkout. Please try again.");
+        return;
+      }
+      window.location.href = j.url;
+    } catch {
+      setCheckoutError("Could not reach the payment service. Please try again.");
+    } finally {
+      setCheckoutBusy(false);
+    }
+  };
   const r2 = useReveal();
   const r3 = useReveal();
   const r4 = useReveal();
@@ -105,6 +172,18 @@ function SupportPageContent() {
     <main className="relative bg-[#0D0D0D]">
       <div className="film-grain" />
       <Navbar />
+
+      {showThanks && successSession && (
+        <DonationSuccessDialog
+          sessionId={successSession}
+          onClose={() => {
+            setDismissedSession(successSession);
+            /* Drop the query params without a navigation, so a refresh
+               doesn't pop the dialog again. */
+            window.history.replaceState(null, "", "/support");
+          }}
+        />
+      )}
 
       {/* S1 — Hero + donation card over drifting grid */}
       <div
@@ -306,12 +385,19 @@ function SupportPageContent() {
                   {donationType === "Monthly" ? "/ month" : "one-time"}
                 </span>
               </p>
-              <p style={{ fontSize: 11, color: "#3A3A3A" }}>Films · Academy · Fellows</p>
+              {/* When the donor arrived from a project page, name it — they
+                  clicked "Support this project", so the page shouldn't then
+                  look like a generic donation. */}
+              <p style={{ fontSize: 11, color: funding ? "#8665A7" : "#3A3A3A" }}>
+                {funding ? funding.title : "Films · Academy · Fellows"}
+              </p>
             </div>
 
             {/* CTA */}
             <div style={{ padding: "16px 28px 26px" }}>
               <button
+                onClick={startCheckout}
+                disabled={checkoutBusy || selectedAmount === null}
                 className="gradient-fill-btn"
                 style={{
                   width: "100%",
@@ -321,12 +407,19 @@ function SupportPageContent() {
                   fontWeight: 600,
                   color: "#FFFFFF",
                   border: "none",
-                  cursor: "pointer",
+                  cursor:
+                    checkoutBusy || selectedAmount === null ? "not-allowed" : "pointer",
+                  opacity: checkoutBusy || selectedAmount === null ? 0.55 : 1,
                   letterSpacing: "0.02em",
                 }}
               >
-                Support now →
+                {checkoutBusy ? "Taking you to checkout…" : "Support now →"}
               </button>
+              {checkoutError && (
+                <p style={{ marginTop: 10, fontSize: 12, color: "#B23495", textAlign: "center" }}>
+                  {checkoutError}
+                </p>
+              )}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 16, marginTop: 14 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
                   <ShieldIcon />

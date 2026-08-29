@@ -16,6 +16,15 @@ export const runtime = "nodejs";
  * browser — a client can post any number it likes.
  */
 
+/**
+ * DSH collects in euro, full stop. Decided here rather than accepted from the
+ * browser: the client used to be able to post any three-letter code, so a
+ * donation could arrive in a currency nobody chose — Stripe would then convert
+ * it into the account's currency and charge a conversion fee, and the
+ * dashboard would show "25" of something that isn't €25.
+ */
+const CURRENCY = "eur";
+
 const MIN_CENTS = 100; // €1
 const MAX_CENTS = 5_000_00; // €5,000 — raise deliberately, not by accident
 
@@ -23,7 +32,6 @@ type Body = {
   mode?: "one_time" | "monthly";
   /** Major units, e.g. 25 for €25 */
   amount?: number;
-  currency?: string;
   /** Optional attribution — shown on the checkout and kept on the session */
   projectType?: "film" | "studio" | "academy";
   projectSlug?: string;
@@ -39,11 +47,6 @@ export async function POST(req: Request) {
   }
 
   const mode = body.mode === "monthly" ? "monthly" : "one_time";
-  const currency = (body.currency ?? "eur").toLowerCase();
-
-  if (!/^[a-z]{3}$/.test(currency)) {
-    return NextResponse.json({ error: "Invalid currency." }, { status: 400 });
-  }
 
   const amount = Number(body.amount);
   if (!Number.isFinite(amount) || amount <= 0) {
@@ -85,7 +88,7 @@ export async function POST(req: Request) {
         {
           quantity: 1,
           price_data: {
-            currency,
+            currency: CURRENCY,
             unit_amount: cents,
             product_data: {
               name: productName,

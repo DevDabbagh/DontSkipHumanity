@@ -687,8 +687,12 @@ export default function StudioProjectContent({
               </p>
             </div>
 
+            {/* Carries the project through to checkout so the gift is
+                attributed to it, instead of landing in the general fund. */}
             <Link
-              href="/support"
+              href={`/support?fundType=studio&fundSlug=${encodeURIComponent(
+                project.slug
+              )}&fundTitle=${encodeURIComponent(project.title)}`}
               className="h-[44px] w-full rounded-[3px] border border-[rgba(240,240,240,0.2)] bg-[rgba(54,54,54,0.1)] flex items-center justify-center gap-[7px] text-[13px] font-medium text-[#F0F0F0] hover:bg-[rgba(54,54,54,0.25)] transition-colors"
             >
               Support this project

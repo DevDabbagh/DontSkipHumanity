@@ -390,8 +390,12 @@ export default function FilmContent({
             <p className="text-[14px] text-white/40 mt-2 leading-relaxed">
               A single contribution, an amount, your project of choice.
             </p>
+            {/* Was pointing at the landing page anchor, which lost the film
+                entirely. Now goes to checkout carrying the attribution. */}
             <Link
-              href="/#support"
+              href={`/support?fundType=film&fundSlug=${encodeURIComponent(
+                film.slug
+              )}&fundTitle=${encodeURIComponent(film.title)}`}
               className="mt-6 w-full inline-flex items-center justify-center gradient-fill-btn px-5 py-3 rounded-[3px] text-sm font-medium"
             >
               Support this project
