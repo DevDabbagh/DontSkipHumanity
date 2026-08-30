@@ -280,9 +280,14 @@ function SupportPageContent() {
           beside the amount, where it explains what the money is for.
          ═══════════════════════════════════════════════════════════ */}
       <section className="relative overflow-hidden" style={{ paddingTop: 128 }}>
-        {/* Rows alternate left / right / left. No centre panel — that block
-            exists to protect a headline sitting over photos, and here the
-            headline column is narrow enough not to need it. */}
+        {/* Rows alternate left / right / left, with Studio's solid panel
+            (`Rectangle 727`) behind the copy: hard-edged, 728 wide, sitting
+            116px left of the centred 1224 container. Photos stay visible in
+            the narrow strip on the far left and the block on the right.
+
+            An earlier version used a soft directional scrim instead. It read
+            as a different treatment next to Studio — the design's edge is a
+            hard one, and a feathered gradient is not the same thing. */}
         <HeroMosaic
           mode="tiles"
           tiles={HERO_TILES}
@@ -290,26 +295,8 @@ function SupportPageContent() {
           rowHeight={215}
           dim={0.66}
           falloff={260}
-          panel={false}
           speed={90}
           tileFilter="grayscale(1) brightness(0.5)"
-        />
-
-        {/* Studio protects its headline with a solid rectangle behind it.
-            That block is positioned for the Figma frame and would cut across
-            this layout, so the same job is done with a scrim anchored to the
-            reading edge: dark where the copy is, gone by the time it reaches
-            the card. Without it the body copy and the bullets sit on faces
-            and are genuinely hard to read. */}
-        <div
-          aria-hidden
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(100deg, rgba(13,13,13,0.96) 0%, rgba(13,13,13,0.9) 32%, rgba(13,13,13,0.5) 56%, rgba(13,13,13,0.25) 100%)",
-            pointerEvents: "none",
-          }}
         />
 
         <div
@@ -317,8 +304,11 @@ function SupportPageContent() {
           style={{ zIndex: 1, paddingTop: 96, paddingBottom: 110 }}
         >
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_460px] gap-x-[64px] gap-y-[56px] items-start">
-            {/* ── Left: the argument ── */}
-            <div className="lg:pt-[18px]">
+            {/* ── Left: the argument ──
+                Capped at 496 like Studio's hero copy. The panel behind it
+                ends 612px into the container, so anything wider would run
+                off its hard right edge and sit half on photos. */}
+            <div className="lg:pt-[18px] w-full max-w-[496px]">
               <p
                 style={{
                   fontSize: 11,
@@ -601,25 +591,26 @@ function SupportPageContent() {
 
             {/* CTA */}
             <div style={{ padding: "16px 28px 26px" }}>
+              {/* Test mode still has to be said — in test mode Stripe accepts
+                  a real card, this page says thank you, and no money moves.
+                  A donor who is not told believes they gave.
+
+                  But it does not need a boxed panel to say it. One quiet line
+                  keeps the warning while letting the page be judged as it will
+                  look live, which is the whole point of a design review. */}
               {stripeMode === "test" && (
-                <div
+                <p
                   role="status"
                   style={{
-                    marginBottom: 14,
-                    padding: "10px 12px",
-                    borderRadius: 6,
-                    border: "1px solid rgba(178,52,149,0.4)",
-                    background: "rgba(178,52,149,0.08)",
+                    marginBottom: 12,
+                    fontSize: 11,
+                    lineHeight: "16px",
+                    color: "#B23495",
+                    textAlign: "center",
                   }}
                 >
-                  <p style={{ fontSize: 12, fontWeight: 600, color: "#B23495" }}>
-                    Test mode — no payment will be taken
-                  </p>
-                  <p style={{ fontSize: 11, color: "#8A8A8A", marginTop: 3 }}>
-                    Donations are disabled while we finish setting up. Please
-                    check back shortly.
-                  </p>
-                </div>
+                  Test mode — no payment will be taken
+                </p>
               )}
               <button
                 onClick={startCheckout}
