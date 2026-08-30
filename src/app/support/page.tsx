@@ -19,7 +19,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 function ShieldIcon() {
   return (
-    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#2A2A2A" strokeWidth={1.8}>
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#595C5C" strokeWidth={1.8}>
       <path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5l8-3z" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -226,8 +226,9 @@ function SupportPageContent() {
           <p
             style={{
               fontSize: 11,
-              color: "#B23495",
-              letterSpacing: "0.3em",
+              lineHeight: "24px",
+              color: "#8665A7",
+              letterSpacing: "1.76px",
               textTransform: "uppercase",
               marginBottom: 20,
               animation: "heroLine 900ms cubic-bezier(0.16,1,0.3,1) 100ms both",
@@ -263,7 +264,7 @@ function SupportPageContent() {
           <p
             style={{
               fontSize: "clamp(0.95rem, 1.4vw, 1.05rem)",
-              color: "rgba(200,200,200,0.6)",
+              color: "#9D9C9C",
               maxWidth: 480,
               lineHeight: 1.75,
               marginTop: 24,
@@ -283,44 +284,52 @@ function SupportPageContent() {
           className="relative w-full"
           style={{ zIndex: 1, maxWidth: 560, animation: "heroLine 900ms cubic-bezier(0.16,1,0.3,1) 900ms both" }}
         >
+          {/* Card chrome matches the support cards on Studio / Films:
+              rgba(19,19,19,·), a 1.5px smokewhite hairline and a 6px radius.
+              The old 22px radius and white-alpha borders were this page's own
+              invention and read as a different product. */}
           <div
+            className="dsh-card-surface"
             style={{
-              background: "rgba(10,10,10,0.88)",
-              backdropFilter: "blur(40px)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              borderRadius: 22,
+              background: "rgba(19,19,19,0.88)",
+              backdropFilter: "blur(14px)",
+              WebkitBackdropFilter: "blur(14px)",
+              border: "1.5px solid rgba(240,240,240,0.12)",
+              borderRadius: 6,
               overflow: "hidden",
-              boxShadow: "0 48px 120px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.03) inset",
+              boxShadow: "0 24px 70px 0 rgba(0,0,0,0.6)",
             }}
           >
-            <div style={{ height: 2, background: "linear-gradient(90deg, transparent 0%, #B23495 35%, #B23495 65%, transparent 100%)" }} />
+            {/* Same drifting brand hairline as the thank-you dialog */}
+            <div className="dsh-sheen" style={{ height: 2 }} />
 
             {/* Type toggle */}
             <div style={{ padding: "24px 28px 0" }}>
-              <div style={{ display: "flex", background: "#060606", borderRadius: 10, padding: 4, border: "1px solid rgba(255,255,255,0.06)" }}>
+              {/* Selected pill uses the grape-dark fill from the Studio
+                  filters (PILL_ON), not an off-black tint. */}
+              <div style={{ display: "flex", background: "rgba(13,13,13,0.6)", borderRadius: 3, padding: 4, border: "1px solid rgba(240,240,240,0.08)" }}>
                 {(["Monthly", "One-time"] as const).map((t) => (
                   <button
                     key={t}
                     onClick={() => setDonationType(t)}
                     style={{
                       flex: 1,
-                      padding: "10px 0",
+                      padding: "11px 0",
                       fontSize: 13,
                       fontWeight: 500,
-                      borderRadius: 8,
-                      transition: "all 250ms cubic-bezier(0.22,1,0.36,1)",
-                      background: donationType === t ? "#181818" : "transparent",
-                      color: donationType === t ? "#F0F0F0" : "#444",
-                      boxShadow: donationType === t ? "0 2px 12px rgba(0,0,0,0.5)" : "none",
-                      border: donationType === t ? "1px solid rgba(255,255,255,0.08)" : "1px solid transparent",
+                      borderRadius: 3,
+                      transition: "all 220ms cubic-bezier(0.22,1,0.36,1)",
+                      background: donationType === t ? "#573377" : "transparent",
+                      color: donationType === t ? "#F0F0F0" : "#595C5C",
+                      border: "1px solid transparent",
                     }}
                   >
                     {t === "Monthly" && (
-                      <span style={{ marginRight: 6, fontSize: 11, color: donationType === t ? "#B23495" : "#444" }}>↻</span>
+                      <span style={{ marginRight: 6, fontSize: 11, color: donationType === t ? "#F0F0F0" : "#595C5C" }}>↻</span>
                     )}
                     {t}
                     {t === "Monthly" && donationType === t && (
-                      <span style={{ marginLeft: 8, fontSize: 10, color: "#B23495", background: "rgba(178,52,149,0.12)", padding: "1px 6px", borderRadius: 4 }}>
+                      <span style={{ marginLeft: 8, fontSize: 10, letterSpacing: "0.08em", color: "#F0F0F0", background: "rgba(240,240,240,0.14)", padding: "1px 6px", borderRadius: 3 }}>
                         BEST
                       </span>
                     )}
@@ -337,20 +346,25 @@ function SupportPageContent() {
                     key={a}
                     onClick={() => setAmount(a)}
                     style={{
-                      padding: "14px 0",
-                      borderRadius: 8,
+                      padding: "15px 0",
+                      borderRadius: 3,
                       fontSize: 17,
                       fontWeight: 600,
-                      background: amount === a ? "rgba(178,52,149,0.12)" : "rgba(255,255,255,0.04)",
-                      color: amount === a ? "#B23495" : "#666",
-                      border: amount === a ? "1px solid rgba(178,52,149,0.4)" : "1px solid rgba(255,255,255,0.07)",
+                      /* Grape for the chosen amount — the same accent the rest
+                         of the site uses for "this one is selected". */
+                      background: amount === a ? "rgba(134,101,167,0.16)" : "rgba(27,27,27,0.4)",
+                      color: amount === a ? "#F0F0F0" : "#595C5C",
+                      border:
+                        amount === a
+                          ? "1px solid rgba(134,101,167,0.65)"
+                          : "1px solid rgba(240,240,240,0.1)",
                       transition: "all 200ms",
                       position: "relative",
                     }}
                   >
                     {a}
                     {a === "€25" && donationType === "Monthly" && (
-                      <span style={{ position: "absolute", top: -8, right: -6, fontSize: 9, background: "#B23495", color: "#fff", padding: "2px 5px", borderRadius: 4 }}>
+                      <span style={{ position: "absolute", top: -8, right: -6, fontSize: 9, letterSpacing: "0.06em", background: "#B23495", color: "#F0F0F0", padding: "2px 6px", borderRadius: 3 }}>
                         popular
                       </span>
                     )}
@@ -362,15 +376,18 @@ function SupportPageContent() {
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  padding: "12px 16px",
-                  borderRadius: 8,
-                  background: amount === "Custom" ? "rgba(178,52,149,0.06)" : "rgba(255,255,255,0.03)",
-                  border: amount === "Custom" ? "1px solid rgba(178,52,149,0.35)" : "1px solid rgba(255,255,255,0.06)",
+                  padding: "13px 16px",
+                  borderRadius: 3,
+                  background: amount === "Custom" ? "rgba(134,101,167,0.12)" : "rgba(27,27,27,0.4)",
+                  border:
+                    amount === "Custom"
+                      ? "1px solid rgba(134,101,167,0.55)"
+                      : "1px solid rgba(240,240,240,0.1)",
                   cursor: "text",
                   transition: "all 200ms",
                 }}
               >
-                <span style={{ fontSize: 15, color: amount === "Custom" ? "#B23495" : "#444", marginRight: 8 }}>€</span>
+                <span style={{ fontSize: 15, color: amount === "Custom" ? "#F0F0F0" : "#595C5C", marginRight: 8 }}>€</span>
                 <input
                   value={amount === "Custom" ? customAmount : ""}
                   onChange={(e) => {
@@ -388,25 +405,25 @@ function SupportPageContent() {
             <div
               style={{
                 margin: "18px 28px 0",
-                padding: "14px 18px",
-                background: "rgba(255,255,255,0.03)",
-                borderRadius: 10,
-                border: "1px solid rgba(255,255,255,0.05)",
+                padding: "16px 18px",
+                background: "rgba(13,13,13,0.55)",
+                borderRadius: 3,
+                border: "1px solid rgba(240,240,240,0.08)",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
               }}
             >
-              <p style={{ fontSize: 22, fontWeight: 700, color: "#F0F0F0" }}>
+              <p style={{ fontSize: 24, fontWeight: 600, color: "#F0F0F0", letterSpacing: "-0.5px" }}>
                 {amount === "Custom" ? (customAmount ? `€${customAmount}` : "€—") : amount}
-                <span style={{ fontSize: 13, fontWeight: 400, color: "#444", marginLeft: 6 }}>
+                <span style={{ fontSize: 13, fontWeight: 400, color: "#595C5C", marginLeft: 8 }}>
                   {donationType === "Monthly" ? "/ month" : "one-time"}
                 </span>
               </p>
               {/* When the donor arrived from a project page, name it — they
                   clicked "Support this project", so the page shouldn't then
                   look like a generic donation. */}
-              <p style={{ fontSize: 11, color: funding ? "#8665A7" : "#3A3A3A" }}>
+              <p style={{ fontSize: 11, color: funding ? "#8665A7" : "#595C5C" }}>
                 {funding ? funding.title : "Films · Academy · Fellows"}
               </p>
             </div>
@@ -436,15 +453,22 @@ function SupportPageContent() {
               <button
                 onClick={startCheckout}
                 disabled={checkoutBusy || selectedAmount === null}
-                className="gradient-fill-btn"
+                className="transition-opacity hover:opacity-90"
                 style={{
                   width: "100%",
                   padding: "16px",
-                  borderRadius: 10,
+                  borderRadius: 3,
                   fontSize: 15,
                   fontWeight: 600,
-                  color: "#FFFFFF",
-                  border: "none",
+                  color: "#F0F0F0",
+                  border: "1px solid rgba(240,240,240,0.20)",
+                  /* The brand gradient from Figma (303:567) — the same one the
+                     newsletter button uses. The shared .gradient-fill-btn class
+                     is still on the old #9B59B6→#1ABC9C pair, which is not a DSH
+                     colour; used inline here rather than changed globally,
+                     because that class is on 12 other buttons. */
+                  backgroundImage:
+                    "linear-gradient(95.17deg, #32C6CC 0.11%, #B23495 100.11%)",
                   cursor:
                     checkoutBusy || selectedAmount === null ? "not-allowed" : "pointer",
                   opacity: checkoutBusy || selectedAmount === null ? 0.55 : 1,
@@ -461,12 +485,12 @@ function SupportPageContent() {
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 16, marginTop: 14 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
                   <ShieldIcon />
-                  <span style={{ fontSize: 11, color: "#2A2A2A" }}>Stripe-secured</span>
+                  <span style={{ fontSize: 11, color: "#595C5C" }}>Stripe-secured</span>
                 </div>
-                <span style={{ color: "#1A1A1A" }}>·</span>
-                <span style={{ fontSize: 11, color: "#2A2A2A" }}>Cancel anytime</span>
-                <span style={{ color: "#1A1A1A" }}>·</span>
-                <span style={{ fontSize: 11, color: "#2A2A2A" }}>No fees</span>
+                <span style={{ color: "#363636" }}>·</span>
+                <span style={{ fontSize: 11, color: "#595C5C" }}>Cancel anytime</span>
+                <span style={{ color: "#363636" }}>·</span>
+                <span style={{ fontSize: 11, color: "#595C5C" }}>No fees</span>
               </div>
             </div>
           </div>
@@ -479,7 +503,7 @@ function SupportPageContent() {
       <div style={{ padding: "80px 32px" }}>
         <div ref={r2} className="reveal" style={{ maxWidth: 1200, margin: "0 auto" }}>
           <SectionLabel>The work you make possible</SectionLabel>
-          <p style={{ fontSize: 15, color: "#3A3A3A", marginTop: 12, maxWidth: 480, lineHeight: 1.7, marginBottom: 48 }}>
+          <p style={{ fontSize: 15, color: "#9D9C9C", marginTop: 12, maxWidth: 480, lineHeight: 1.7, marginBottom: 48 }}>
             These stories exist because people decided they should.
           </p>
 
