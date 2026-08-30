@@ -374,6 +374,61 @@ export const DEFAULT_UI_STRINGS: UiStringMap = {
     "en": "That didn't go through. Check the address and try again.",
     "pt": "Não foi possível concluir. Verifique o endereço e tente novamente.",
     "ar": "لم تنجح العملية. راجع العنوان وحاول مرة أخرى."
+  },
+  "academy.eyebrow": {
+    "en": "Academy",
+    "pt": "Academia",
+    "ar": "الأكاديمية"
+  },
+  "academy.discoverCourses": {
+    "en": "Discover our courses",
+    "pt": "Descobrir os cursos",
+    "ar": "استكشف الدورات"
+  },
+  "academy.whatWeOffer": {
+    "en": "What we offer",
+    "pt": "O que oferecemos",
+    "ar": "ما نقدّمه"
+  },
+  "academy.whatWeAim": {
+    "en": "What we aim",
+    "pt": "O que procuramos",
+    "ar": "ما نسعى إليه"
+  },
+  "academy.featured": {
+    "en": "Featured course",
+    "pt": "Curso em destaque",
+    "ar": "دورة مختارة"
+  },
+  "academy.ledBy": {
+    "en": "Led by",
+    "pt": "Orientado por",
+    "ar": "بإشراف"
+  },
+  "academy.enroll": {
+    "en": "Enroll now",
+    "pt": "Inscrever-se",
+    "ar": "سجّل الآن"
+  },
+  "academy.free": {
+    "en": "Free",
+    "pt": "Gratuito",
+    "ar": "مجاني"
+  },
+  "academy.paid": {
+    "en": "Paid",
+    "pt": "Pago",
+    "ar": "مدفوع"
+  },
+  "academy.freeByPrinciple": {
+    "en": "free by principle",
+    "pt": "gratuito por princípio",
+    "ar": "مجاني من حيث المبدأ"
+  },
+  "academy.noneMatch": {
+    "en": "No programs match these filters yet.",
+    "pt": "Nenhum programa corresponde a estes filtros.",
+    "ar": "لا توجد برامج تطابق هذه الفلاتر بعد."
   }
 };
 

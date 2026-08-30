@@ -294,8 +294,21 @@ async function readHeader<T>(
   }
 }
 
+/* ── Academy page header (dashboard → Settings) ──
+   Three headline parts like the studio one: the Figma headline is
+   "Knowledge / is power. / Education is resistance." with the second and
+   third lines carrying the gradient. */
+export interface AcademyHeader {
+  imageSrc?: string;
+  titleNormal?: string;
+  titleColored?: string;
+  titleAfter?: string;
+  description?: string;
+}
+
 const STUDIO_HEADER_TEXT = ["titleNormal", "titleColored", "titleAfter", "description"] as const;
 const FILMS_HEADER_TEXT = ["titleNormal", "titleColored", "description"] as const;
+const ACADEMY_HEADER_TEXT = STUDIO_HEADER_TEXT;
 
 export async function getStudioHeader(): Promise<StudioHeader> {
   return readHeader<StudioHeader>("studio_header", STUDIO_HEADER_TEXT);
@@ -303,4 +316,8 @@ export async function getStudioHeader(): Promise<StudioHeader> {
 
 export async function getFilmsHeader(): Promise<FilmsHeader> {
   return readHeader<FilmsHeader>("films_header", FILMS_HEADER_TEXT);
+}
+
+export async function getAcademyHeader(): Promise<AcademyHeader> {
+  return readHeader<AcademyHeader>("academy_header", ACADEMY_HEADER_TEXT);
 }
