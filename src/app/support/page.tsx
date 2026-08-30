@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import HeroMosaic from "@/components/HeroMosaic";
@@ -23,6 +24,67 @@ function ShieldIcon() {
       <path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5l8-3z" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   The project a donor arrived to fund.
+
+   The URL carries only type + slug + title, because a URL is a bad place
+   to keep an image: it makes the link unreadable and pins the poster to
+   whatever it was the day the link was made. So the title is used
+   immediately (it is already on screen from the URL) and the real record
+   is fetched by slug for the picture and the sub-line.
+
+   The lookup goes through /api/project rather than importing lib/api
+   directly: that module reaches next/headers to pick the locale, which
+   makes it server-only, and this page is a client component. The route
+   still reads through lib/api, so the module's own mock/live switch is
+   respected either way.
+   ═══════════════════════════════════════════════════════════════ */
+type FundType = "film" | "studio" | "academy";
+
+type FundedProject = {
+  image: string | null;
+  meta: string | null;
+  href: string;
+};
+
+function useFundedProject(
+  funding: { type: FundType; slug: string } | null
+): FundedProject | null {
+  const [project, setProject] = useState<FundedProject | null>(null);
+
+  const type = funding?.type ?? null;
+  const slug = funding?.slug ?? null;
+
+  useEffect(() => {
+    if (!type || !slug) {
+      setProject(null);
+      return;
+    }
+    let alive = true;
+
+    fetch(`/api/project?type=${type}&slug=${encodeURIComponent(slug)}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => {
+        if (!alive || !j) return;
+        setProject({
+          image: typeof j.image === "string" ? j.image : null,
+          meta: typeof j.meta === "string" ? j.meta : null,
+          href: typeof j.href === "string" ? j.href : "#",
+        });
+      })
+      .catch(() => {
+        /* The card degrades to the title alone, which the URL already gave
+           us. A failed lookup must not block someone from donating. */
+      });
+
+    return () => {
+      alive = false;
+    };
+  }, [type, slug]);
+
+  return project;
 }
 
 const IMPACT_CARDS = [
@@ -134,12 +196,17 @@ function SupportPageContent() {
   const fundType = params.get("fundType");
   const fundSlug = params.get("fundSlug");
   const fundTitle = params.get("fundTitle");
-  const funding =
+  const funding: { type: FundType; slug: string; title: string } | null =
     (fundType === "film" || fundType === "studio" || fundType === "academy") &&
     fundSlug &&
     fundTitle
       ? { type: fundType, slug: fundSlug, title: fundTitle }
       : null;
+
+  /* Poster and sub-line for that project, fetched by slug. Null until it
+     arrives (or forever, if the lookup fails) — the card still shows the
+     title, which came in on the URL. */
+  const fundedProject = useFundedProject(funding);
 
   /* The preset labels carry the € sign, so strip it before sending a number.
      `null` means "nothing valid chosen" and disables the button — better than
@@ -203,105 +270,209 @@ function SupportPageContent() {
         />
       )}
 
-      {/* S1 — Hero + donation card over drifting grid */}
-      <div
-        className="relative flex flex-col items-center justify-center text-center px-8 overflow-hidden"
-        style={{ minHeight: "100vh", paddingTop: 120, paddingBottom: 80 }}
-      >
-        {/* Same drifting band as the Studio hero — rows alternate
-            left / right / left. No centre panel: this headline is centred. */}
+      {/* ═══════════════════════════════════════════════════════════
+          S1 — HERO
+          Built on the Studio hero construction (467:112): a drifting
+          mosaic band with the copy held in a left column. The donation
+          card takes the right column instead of sitting centred below
+          the fold, so the first screen carries both the argument and the
+          thing it is arguing for — and a funded project's card lands
+          beside the amount, where it explains what the money is for.
+         ═══════════════════════════════════════════════════════════ */}
+      <section className="relative overflow-hidden" style={{ paddingTop: 128 }}>
+        {/* Rows alternate left / right / left. No centre panel — that block
+            exists to protect a headline sitting over photos, and here the
+            headline column is narrow enough not to need it. */}
         <HeroMosaic
           mode="tiles"
           tiles={HERO_TILES}
           rows={6}
           rowHeight={215}
-          dim={0.62}
-          falloff={220}
+          dim={0.66}
+          falloff={260}
           panel={false}
           speed={90}
           tileFilter="grayscale(1) brightness(0.5)"
         />
 
-        <div className="relative" style={{ zIndex: 1, marginBottom: 48 }}>
-          <p
-            style={{
-              fontSize: 11,
-              lineHeight: "24px",
-              color: "#8665A7",
-              letterSpacing: "1.76px",
-              textTransform: "uppercase",
-              marginBottom: 20,
-              animation: "heroLine 900ms cubic-bezier(0.16,1,0.3,1) 100ms both",
-            }}
-          >
-            Independent · Ad-free · Reader-supported
-          </p>
-          <h1
-            style={{
-              fontSize: "clamp(2.4rem, 5.5vw, 4.5rem)",
-              fontWeight: 700,
-              color: "#FFFFFF",
-              lineHeight: 1.0,
-              letterSpacing: "-0.03em",
-              animation: "heroLine 900ms cubic-bezier(0.16,1,0.3,1) 300ms both",
-            }}
-          >
-            Fund the work
-          </h1>
-          <h1
-            className="shimmer-text"
-            style={{
-              fontSize: "clamp(2.4rem, 5.5vw, 4.5rem)",
-              fontWeight: 700,
-              lineHeight: 1.0,
-              letterSpacing: "-0.03em",
-              marginTop: 6,
-              animation: "heroLine 900ms cubic-bezier(0.16,1,0.3,1) 500ms both",
-            }}
-          >
-            that names power.
-          </h1>
-          <p
-            style={{
-              fontSize: "clamp(0.95rem, 1.4vw, 1.05rem)",
-              color: "#9D9C9C",
-              maxWidth: 480,
-              lineHeight: 1.75,
-              marginTop: 24,
-              marginLeft: "auto",
-              marginRight: "auto",
-              animation: "heroLine 900ms cubic-bezier(0.16,1,0.3,1) 700ms both",
-            }}
-          >
-            No ads. No algorithms. No sponsors shaping what gets told.
-            <br />
-            This work exists because people like you make it possible.
-          </p>
-        </div>
-
-        {/* Donation card */}
+        {/* Studio protects its headline with a solid rectangle behind it.
+            That block is positioned for the Figma frame and would cut across
+            this layout, so the same job is done with a scrim anchored to the
+            reading edge: dark where the copy is, gone by the time it reaches
+            the card. Without it the body copy and the bullets sit on faces
+            and are genuinely hard to read. */}
         <div
-          className="relative w-full"
-          style={{ zIndex: 1, maxWidth: 560, animation: "heroLine 900ms cubic-bezier(0.16,1,0.3,1) 900ms both" }}
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(100deg, rgba(13,13,13,0.96) 0%, rgba(13,13,13,0.9) 32%, rgba(13,13,13,0.5) 56%, rgba(13,13,13,0.25) 100%)",
+            pointerEvents: "none",
+          }}
+        />
+
+        <div
+          className="relative mx-auto max-w-[1224px] px-5 sm:px-8 xl:px-0"
+          style={{ zIndex: 1, paddingTop: 96, paddingBottom: 110 }}
         >
-          {/* Card chrome matches the support cards on Studio / Films:
-              rgba(19,19,19,·), a 1.5px smokewhite hairline and a 6px radius.
-              The old 22px radius and white-alpha borders were this page's own
-              invention and read as a different product. */}
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_460px] gap-x-[64px] gap-y-[56px] items-start">
+            {/* ── Left: the argument ── */}
+            <div className="lg:pt-[18px]">
+              <p
+                style={{
+                  fontSize: 11,
+                  lineHeight: "24px",
+                  color: "#8665A7",
+                  letterSpacing: "1.76px",
+                  textTransform: "uppercase",
+                  marginBottom: 14,
+                  animation: "heroLine 900ms cubic-bezier(0.16,1,0.3,1) 100ms both",
+                }}
+              >
+                Independent · Ad-free · Reader-supported
+              </p>
+              <h1
+                className="font-semibold text-[38px] leading-[40px] sm:text-[50px] sm:leading-[52px]"
+                style={{
+                  color: "#F0F0F0",
+                  letterSpacing: "-1px",
+                  animation: "heroLine 900ms cubic-bezier(0.16,1,0.3,1) 300ms both",
+                }}
+              >
+                Fund the work
+                <br />
+                <span
+                  style={{
+                    background: "linear-gradient(90deg, #32C6CC, #B23495)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                  }}
+                >
+                  that names power.
+                </span>
+              </h1>
+              <p
+                style={{
+                  fontSize: 16,
+                  lineHeight: "24px",
+                  letterSpacing: "-0.08px",
+                  color: "#9D9C9C",
+                  maxWidth: 440,
+                  marginTop: 24,
+                  animation: "heroLine 900ms cubic-bezier(0.16,1,0.3,1) 500ms both",
+                }}
+              >
+                No ads. No algorithms. No sponsors shaping what gets told. This
+                work exists because people like you make it possible.
+              </p>
+
+              {/* Three plain facts, not a feature grid. Sits under the copy on
+                  desktop and collapses above the card on mobile. */}
+              <ul
+                style={{
+                  marginTop: 36,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 12,
+                  animation: "heroLine 900ms cubic-bezier(0.16,1,0.3,1) 700ms both",
+                }}
+              >
+                {[
+                  "Every euro funds films, free courses and fellowships.",
+                  "No paywall, ever — the work stays open to everyone.",
+                  "Cancel a monthly gift yourself, at any time.",
+                ].map((line) => (
+                  <li key={line} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                    <span
+                      aria-hidden
+                      style={{
+                        marginTop: 8,
+                        width: 4,
+                        height: 4,
+                        flexShrink: 0,
+                        background: "#8665A7",
+                      }}
+                    />
+                    <span style={{ fontSize: 14, lineHeight: "22px", color: "#595C5C" }}>
+                      {line}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* ── Right: the donation card ── */}
+            <div
+              className="relative w-full"
+              style={{ animation: "heroLine 900ms cubic-bezier(0.16,1,0.3,1) 900ms both" }}
+            >
           <div
             className="dsh-card-surface"
             style={{
-              background: "rgba(19,19,19,0.88)",
+              background: "rgba(19,19,19,0.92)",
               backdropFilter: "blur(14px)",
               WebkitBackdropFilter: "blur(14px)",
-              border: "1.5px solid rgba(240,240,240,0.12)",
+              border: "1px solid rgba(240,240,240,0.10)",
               borderRadius: 6,
               overflow: "hidden",
               boxShadow: "0 24px 70px 0 rgba(0,0,0,0.6)",
             }}
           >
-            {/* Same drifting brand hairline as the thank-you dialog */}
-            <div className="dsh-sheen" style={{ height: 2 }} />
+            {/* The funded project, when there is one. Poster first: someone
+                who clicked "Support this project" should see the project,
+                not read its name in a caption. */}
+            {funding && (
+              <Link
+                href={fundedProject?.href ?? "#"}
+                style={{ display: "block", position: "relative" }}
+              >
+                <div style={{ position: "relative", height: 132, background: "#131313", overflow: "hidden" }}>
+                  {fundedProject?.image && (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={fundedProject.image}
+                      alt=""
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                  )}
+                  {/* Heavy enough that the eyebrow and title hold up over a
+                      pale poster — the first version washed out on a bright
+                      still, which is exactly the frame a film is likely to
+                      lead with. */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      background:
+                        "linear-gradient(to top, rgba(13,13,13,0.98) 0%, rgba(13,13,13,0.88) 45%, rgba(13,13,13,0.55) 78%, rgba(13,13,13,0.3) 100%)",
+                    }}
+                  />
+                  <div style={{ position: "absolute", left: 22, right: 22, bottom: 14 }}>
+                    <p
+                      style={{
+                        fontSize: 10,
+                        letterSpacing: "1.6px",
+                        textTransform: "uppercase",
+                        color: "#8665A7",
+                        marginBottom: 5,
+                      }}
+                    >
+                      You&apos;re supporting
+                    </p>
+                    <p style={{ fontSize: 17, fontWeight: 600, color: "#F0F0F0", lineHeight: "22px" }}>
+                      {funding.title}
+                    </p>
+                    {fundedProject?.meta && (
+                      <p style={{ fontSize: 11, color: "#9D9C9C", marginTop: 3, textTransform: "capitalize" }}>
+                        {fundedProject.meta}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            )}
 
             {/* Type toggle */}
             <div style={{ padding: "24px 28px 0" }}>
@@ -420,11 +591,11 @@ function SupportPageContent() {
                   {donationType === "Monthly" ? "/ month" : "one-time"}
                 </span>
               </p>
-              {/* When the donor arrived from a project page, name it — they
-                  clicked "Support this project", so the page shouldn't then
-                  look like a generic donation. */}
-              <p style={{ fontSize: 11, color: funding ? "#8665A7" : "#595C5C" }}>
-                {funding ? funding.title : "Films · Academy · Fellows"}
+              {/* Where the money goes. When a project is being funded its
+                  name is already the headline of the card above, so repeating
+                  it here would just be noise. */}
+              <p style={{ fontSize: 11, color: "#595C5C" }}>
+                {funding ? "Goes to this project" : "Films · Academy · Fellows"}
               </p>
             </div>
 
@@ -494,8 +665,10 @@ function SupportPageContent() {
               </div>
             </div>
           </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
 
       <div style={{ height: 1, background: "#161616" }} />
 
