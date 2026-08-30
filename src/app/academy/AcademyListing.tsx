@@ -278,9 +278,10 @@ export default function AcademyListing({
               {featured.thumbnailUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
+                  data-colorize
                   src={featured.thumbnailUrl}
                   alt=""
-                  className="colorize absolute inset-0 w-full h-full object-cover"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
               )}
             </div>
@@ -586,9 +587,10 @@ function ProgramCard({
         {program.thumbnailUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
+            data-colorize
             src={program.thumbnailUrl}
             alt=""
-            className="colorize absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
           />
         )}
       </div>
