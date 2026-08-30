@@ -417,8 +417,17 @@ input:-webkit-autofill:active{
 }
 
 /* Gradient text */
+/* The highlighted phrase in a page heading — Films, Read, About, Agenda and
+   the error pages all use this.
+
+   It used to be `135deg, #9B59B6 -> #1ABC9C`: purple into teal, which is the
+   brand gradient backwards and in colours that aren't DSH's. Next to the home
+   hero (which uses .gradient-text-static) the two read as different products.
+   Same values as that class now, so every gradient phrase on the site runs
+   teal -> pink in the same direction. */
 .gradient-text {
-  background: linear-gradient(135deg, #9B59B6, #1ABC9C);
+  /* Figma 303:92 — teal → DSH pink (not purple). */
+  background: linear-gradient(90deg, #32C6CC, #B23495);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
