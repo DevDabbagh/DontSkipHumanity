@@ -26,8 +26,18 @@ export const runtime = "nodejs";
  */
 const CURRENCY = "eur";
 
-const MIN_CENTS = 100; // €1
-const MAX_CENTS = 5_000_00; // €5,000 — raise deliberately, not by accident
+/**
+ * No upper limit: a supporter gives what they choose, and a cap that silently
+ * rejects a large gift is worse than any problem it prevents.
+ *
+ * A floor still exists, because it isn't a policy — it's arithmetic. Stripe
+ * rejects charges under its own minimum outright, and card fees would eat a
+ * 10-cent donation whole, so anything below €1 costs DSH money to accept.
+ *
+ * Stripe's own ceiling (999,999.99 in the account currency per charge) still
+ * applies above this; it returns a clear error of its own if anyone reaches it.
+ */
+const MIN_CENTS = 100; // €1 — the point below which fees exceed the gift
 
 type Body = {
   mode?: "one_time" | "monthly";
@@ -55,9 +65,9 @@ export async function POST(req: Request) {
   }
 
   const cents = Math.round(amount * 100);
-  if (cents < MIN_CENTS || cents > MAX_CENTS) {
+  if (cents < MIN_CENTS) {
     return NextResponse.json(
-      { error: `Amount must be between ${MIN_CENTS / 100} and ${MAX_CENTS / 100}.` },
+      { error: `The smallest amount we can accept is €${MIN_CENTS / 100}.` },
       { status: 400 }
     );
   }

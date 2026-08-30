@@ -578,8 +578,22 @@ html {
  * one still waiting to be translated keeps its full stop at the end instead of
  * rendering as ".that name power".
  *
- * `text-align: right` is scoped away from anything Tailwind has already
- * aligned, so centred headings stay centred.
+ * Alignment does NOT follow that direction. Ahmed's call: a block sits where
+ * the English page puts it, whatever language is in it, so the composition
+ * reads the same in both. This is a deliberate choice against the usual
+ * convention — an Arabic reader would normally expect flush right.
+ *
+ * The `left` has to be written out. `plaintext` changes the paragraph
+ * direction, and the initial `text-align: start` resolves against *that*, so
+ * an Arabic block goes flush right on its own with no rule at all: measured
+ * at 392px into a 400px box. Leaving this out would silently do the opposite
+ * of what it says.
+ *
+ * The previous rule here said `right`, which also fired on English copy not
+ * yet translated — that is what made the Arabic home page look broken.
+ *
+ * Scoped away from anything Tailwind has already aligned on the element
+ * itself, so centred headings stay centred.
  */
 html[lang="ar"] :is(h1, h2, h3, h4, h5, h6, p, li, blockquote, figcaption, label, dt, dd) {
   unicode-bidi: plaintext;
@@ -587,7 +601,7 @@ html[lang="ar"] :is(h1, h2, h3, h4, h5, h6, p, li, blockquote, figcaption, label
 
 html[lang="ar"]
   :is(h1, h2, h3, h4, h5, h6, p, li, blockquote, figcaption, label, dt, dd):not([class*="text-center"]):not([class*="text-right"]):not([class*="text-left"]) {
-  text-align: right;
+  text-align: left;
 }
 
 /* Latin runs (brand names, film titles, DSH) inside Arabic copy keep their own
