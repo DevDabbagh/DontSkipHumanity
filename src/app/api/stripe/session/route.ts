@@ -70,7 +70,7 @@ export async function GET(req: Request) {
   }
 
   try {
-    const session = await getStripe().checkout.sessions.retrieve(id);
+    const session = await (await getStripe()).checkout.sessions.retrieve(id);
 
     if (session.payment_status !== "paid") {
       return NextResponse.json({ paid: false }, { status: 200 });

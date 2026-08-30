@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
+import { resolveSiteUrl } from "@/lib/site-url";
 
 export const runtime = "nodejs";
 
@@ -73,7 +74,10 @@ export async function POST(req: Request) {
       ? body.projectType
       : undefined;
 
-  const site = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  /* Explicit env var if set, otherwise the domain this request came in on —
+     so moving to DSH's own domain needs no configuration change, and a stale
+     value can't silently return donors to the old address. */
+  const site = resolveSiteUrl(req);
 
   const productName = projectTitle
     ? `Support: ${projectTitle}`
@@ -82,7 +86,7 @@ export async function POST(req: Request) {
       : "One-time support — Don't Skip Humanity";
 
   try {
-    const session = await getStripe().checkout.sessions.create({
+    const session = await (await getStripe()).checkout.sessions.create({
       mode: mode === "monthly" ? "subscription" : "payment",
       line_items: [
         {

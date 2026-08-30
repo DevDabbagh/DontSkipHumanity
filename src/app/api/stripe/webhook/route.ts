@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, getStripeMode, webhookSecretFor } from "@/lib/stripe";
 import { recordDonation } from "@/lib/donations";
 
 export const runtime = "nodejs";
@@ -15,9 +15,15 @@ export const runtime = "nodejs";
  *   stripe listen --forward-to localhost:3000/api/stripe/webhook
  */
 export async function POST(req: Request) {
-  const secret = process.env.STRIPE_WEBHOOK_SECRET;
+  /* Test and live have separate signing secrets, so this has to follow the
+     same mode as the checkout routes — a live secret cannot verify a test
+     event, and the failure looks identical to a forged request. */
+  const mode = await getStripeMode();
+  const secret = webhookSecretFor(mode);
   if (!secret) {
-    console.error("[stripe/webhook] STRIPE_WEBHOOK_SECRET is not set");
+    console.error(
+      `[stripe/webhook] no signing secret for ${mode} mode — set STRIPE_WEBHOOK_SECRET_${mode.toUpperCase()}`
+    );
     return NextResponse.json({ error: "Not configured." }, { status: 500 });
   }
 
@@ -30,7 +36,7 @@ export async function POST(req: Request) {
 
   let event;
   try {
-    event = getStripe().webhooks.constructEvent(raw, signature, secret);
+    event = (await getStripe()).webhooks.constructEvent(raw, signature, secret);
   } catch (err) {
     console.error("[stripe/webhook] signature verification failed", err);
     return NextResponse.json({ error: "Invalid signature." }, { status: 400 });

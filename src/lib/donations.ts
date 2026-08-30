@@ -56,6 +56,9 @@ export async function recordDonation(
     currency: session.currency ?? "eur",
     support_mode: md.support_mode === "monthly" ? "monthly" : "one_time",
     status: "paid",
+    /* Stripe's own flag. Recorded so sandbox payments made during
+       development can be kept out of reported totals (migration 022). */
+    livemode: session.livemode === true,
     is_guest: true,
     project_type: md.project_type ?? null,
     project_slug: md.project_slug ?? null,

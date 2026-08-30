@@ -57,7 +57,7 @@ export async function POST(req: Request) {
 
   /* The session must really exist and really be paid. */
   try {
-    const session = await getStripe().checkout.sessions.retrieve(sessionId);
+    const session = await (await getStripe()).checkout.sessions.retrieve(sessionId);
     if (session.payment_status !== "paid") {
       return NextResponse.json({ error: "That payment is not complete." }, { status: 400 });
     }

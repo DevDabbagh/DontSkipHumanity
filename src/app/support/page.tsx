@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -108,6 +108,24 @@ function SupportPageContent() {
   const [customAmount, setCustomAmount] = useState("");
   const [checkoutBusy, setCheckoutBusy] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+
+  /* Warn the visitor BEFORE they enter a card if the site is in test mode.
+     Without this, Stripe accepts a real card, the page says thank you, and no
+     money moves — the donor believes they gave and there is no error anywhere
+     to say otherwise. This banner is what makes a runtime switch acceptable. */
+  const [stripeMode, setStripeMode] = useState<"test" | "live" | null>(null);
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/stripe/mode")
+      .then((r) => r.json())
+      .then((j) => alive && setStripeMode(j.mode === "live" ? "live" : "test"))
+      .catch(() => {
+        /* Unknown mode: say nothing rather than cry wolf on a live site. */
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   /* Arriving from a "Support this project" button on a film / studio / academy
      page. Named `fund*` rather than `type`/`slug` because `?type=` is already
@@ -395,6 +413,26 @@ function SupportPageContent() {
 
             {/* CTA */}
             <div style={{ padding: "16px 28px 26px" }}>
+              {stripeMode === "test" && (
+                <div
+                  role="status"
+                  style={{
+                    marginBottom: 14,
+                    padding: "10px 12px",
+                    borderRadius: 6,
+                    border: "1px solid rgba(178,52,149,0.4)",
+                    background: "rgba(178,52,149,0.08)",
+                  }}
+                >
+                  <p style={{ fontSize: 12, fontWeight: 600, color: "#B23495" }}>
+                    Test mode — no payment will be taken
+                  </p>
+                  <p style={{ fontSize: 11, color: "#8A8A8A", marginTop: 3 }}>
+                    Donations are disabled while we finish setting up. Please
+                    check back shortly.
+                  </p>
+                </div>
+              )}
               <button
                 onClick={startCheckout}
                 disabled={checkoutBusy || selectedAmount === null}
