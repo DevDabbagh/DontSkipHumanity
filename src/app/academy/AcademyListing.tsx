@@ -110,15 +110,12 @@ export default function AcademyListing({
   /* Header copy is editable from the dashboard; the literals are the Figma
      defaults and are what shows until someone overrides them. */
   const h = {
-    /* STAND-IN. The Academy frame has its own mosaic — Figma `710:1691`
-       (Frame 563), a 1920×645 wall of studio portraits — but it was never
-       exported, so `/images/academy-hero-mosaic.png` 404'd and both the hero
-       and the mid-page band rendered as flat black.
-
-       Studio's wall is used until that export lands. It is the wrong photos,
-       so this is a placeholder, not the design: replace the file at
-       /images/academy-hero-mosaic.png and point this back at it. */
-    imageSrc: header?.imageSrc?.trim() || "/images/studio-hero-mosaic.png",
+    /* The file exists (1920×645, the mosaic sheet size HeroMosaic expects) but
+       it is currently a copy of Studio's wall — the Academy frame's own mosaic,
+       Figma `710:1691`, was never exported. Same photos, right dimensions, so
+       the hero renders correctly; swapping in the real export later is a
+       file replacement and nothing else. The dashboard can override it today. */
+    imageSrc: header?.imageSrc?.trim() || "/images/academy-hero-mosaic.png",
     titleNormal: header?.titleNormal?.trim() || "Knowledge",
     titleColored: header?.titleColored?.trim() || "is power.",
     titleAfter: header?.titleAfter?.trim() || "Education is resistance.",

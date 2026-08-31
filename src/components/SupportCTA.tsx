@@ -47,10 +47,15 @@ export default function SupportCTA() {
             <p className="text-xs tracking-[0.25em] text-dsh-label uppercase mb-4">
               Support
             </p>
+            {/* Second line written here, not designed: the frame carried
+                Tiago's note "Lorem ipsum new line please." — a request to the
+                copywriter, which shipped to production as-is. Replaced with a
+                line in the section's own voice; Carolina should still get the
+                final word on the wording. */}
             <h2 className="text-[26px] sm:text-[32px] md:text-[38px] leading-tight md:leading-[40px] tracking-[-0.57px] font-semibold text-[#FFFFFF]">
               Not pity — solidarity.
               <br />
-              Lorem ipsum new line please.
+              Not charity — shared work.
             </h2>
             <p className="font-[family-name:var(--font-source-sans)] text-[15px] text-[#595C5C] mt-6 leading-[24px] max-w-lg">
               Independent political film, journalism, and education don&apos;t pay for
