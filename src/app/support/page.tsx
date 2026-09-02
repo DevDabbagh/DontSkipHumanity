@@ -271,7 +271,7 @@ function SupportPageContent() {
      layouts and a hard-coded centre would sit in the wrong place on a phone. */
   const cardRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
-  const [pool, setPool] = useState({ x: 0, y: 0 });
+  const [win, setWin] = useState({ x: 0, y: 0, w: 0, h: 0 });
 
   useEffect(() => {
     const measure = () => {
@@ -280,40 +280,23 @@ function SupportPageContent() {
       if (!card || !sec) return;
       const c = card.getBoundingClientRect();
       const s = sec.getBoundingClientRect();
-      setPool({
-        x: Math.round(c.left - s.left + c.width / 2),
-        y: Math.round(c.top - s.top + c.height / 2),
+      setWin({
+        x: Math.round(c.left - s.left),
+        y: Math.round(c.top - s.top),
+        w: Math.round(c.width),
+        h: Math.round(c.height),
       });
     };
     measure();
     const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : null;
     if (sectionRef.current) ro?.observe(sectionRef.current);
+    if (cardRef.current) ro?.observe(cardRef.current);
     window.addEventListener("resize", measure);
     return () => {
       ro?.disconnect();
       window.removeEventListener("resize", measure);
     };
   }, [typedDone]);
-
-  /* How far the colour reaches. €0 lights only the card; the ramp is
-     deliberately generous early — the difference between giving nothing and
-     giving something should be the most visible step, not the difference
-     between €200 and €300. Beyond €250 the whole screen is in colour. */
-  const colourReach = (() => {
-    const amt = selectedAmount ?? 0;
-    const base = 300; // the card's own pool, always lit
-    const full = 1900; // comfortably past the diagonal of a wide screen
-    const t = Math.min(1, Math.sqrt(amt / 250));
-    return Math.round(base + t * (full - base));
-  })();
-
-  /* Transparent in the middle (no overlay ⇒ colour), opaque outside (overlay
-     paints ⇒ grey), with a soft edge between so the boundary is a bloom
-     rather than a cut. */
-  const colourMask =
-    `radial-gradient(circle at ${pool.x}px ${pool.y}px, ` +
-    `rgba(0,0,0,0) 0px, rgba(0,0,0,0) ${Math.round(colourReach * 0.55)}px, ` +
-    `rgba(0,0,0,1) ${colourReach}px)`;
 
   return (
     <main className="relative bg-[#0D0D0D]">
@@ -370,14 +353,24 @@ function SupportPageContent() {
           tileFilter="brightness(0.62)"
         />
 
-        {/* The grey. Everything the mask paints black gets desaturated; the
-            transparent circle around the donation card is left alone, so the
-            card sits over live colour while the rest of the page stays
-            monochrome — the card reads as a lens.
+        {/* The grey. This overlay desaturates the wall everywhere it paints;
+            a rectangle exactly the size of the donation card is cut out of it,
+            so the strip of photographs travelling *under* the card is the only
+            thing in colour on the page.
 
-            The circle's radius grows with the amount entered: a small gift
-            lights the card, a large one carries colour to the edges of the
-            screen. The donation literally brings the work into colour. */}
+            A tile drifts in from the right in black and white, picks up its
+            colour the instant it crosses the card's edge, carries it across,
+            and loses it again at the far edge. The card is a window, and the
+            boundary is the card's own stroke.
+
+            The cut is a hard rectangle, not a soft pool: the effect only reads
+            if the edge is exactly where the border is. An earlier version used
+            a radial bloom and the boundary sat nowhere in particular.
+
+            Two mask layers composited with `exclude` — full-bleed black, minus
+            the card's box — which is how you punch a hole rather than draw
+            one. Inset 1px on each side so the card's own 1px border sits over
+            the seam and hides any half-pixel. */}
         <div
           aria-hidden
           style={{
@@ -385,12 +378,19 @@ function SupportPageContent() {
             inset: 0,
             /* Colour only. Brightness is applied to the tiles themselves so
                it stays uniform across the boundary — dimming here as well
-               would make the pool visibly brighter, not just more colourful. */
+               would make the window read as a bright patch, not a colour one. */
             backdropFilter: "grayscale(1)",
             WebkitBackdropFilter: "grayscale(1)",
-            maskImage: colourMask,
-            WebkitMaskImage: colourMask,
-            transition: "mask-image 700ms cubic-bezier(0.22,1,0.36,1)",
+            maskImage: "linear-gradient(#000,#000), linear-gradient(#000,#000)",
+            WebkitMaskImage: "linear-gradient(#000,#000), linear-gradient(#000,#000)",
+            maskPosition: `0 0, ${win.x + 1}px ${win.y + 1}px`,
+            WebkitMaskPosition: `0 0, ${win.x + 1}px ${win.y + 1}px`,
+            maskSize: `100% 100%, ${Math.max(0, win.w - 2)}px ${Math.max(0, win.h - 2)}px`,
+            WebkitMaskSize: `100% 100%, ${Math.max(0, win.w - 2)}px ${Math.max(0, win.h - 2)}px`,
+            maskRepeat: "no-repeat, no-repeat",
+            WebkitMaskRepeat: "no-repeat, no-repeat",
+            maskComposite: "exclude",
+            WebkitMaskComposite: "xor",
             pointerEvents: "none",
             zIndex: 0,
           }}
@@ -526,13 +526,18 @@ function SupportPageContent() {
           <div
             className="dsh-card-surface"
             style={{
-              /* Lower opacity than the production card on purpose: this one is
-                 a window onto the colour behind it, so it has to let more of
-                 the photograph through while still holding the type. */
-              background: "rgba(19,19,19,0.72)",
-              backdropFilter: "blur(10px) saturate(1.25)",
-              WebkitBackdropFilter: "blur(10px) saturate(1.25)",
-              border: "1px solid rgba(240,240,240,0.14)",
+              /* Genuinely see-through — the point of the card is that the
+                 colour strip behind it is visible. The production card sits at
+                 0.92 and shows nothing.
+                 The blur is small and there is no dark tint beyond this fill:
+                 more blur would turn the photograph into a smear and there
+                 would be nothing to recognise moving past. Saturation is
+                 lifted slightly so the window reads as *more* alive than the
+                 grey around it, not merely un-greyed. */
+              background: "rgba(13,13,13,0.55)",
+              backdropFilter: "blur(3px) saturate(1.35)",
+              WebkitBackdropFilter: "blur(3px) saturate(1.35)",
+              border: "1px solid rgba(240,240,240,0.22)",
               borderRadius: 6,
               overflow: "hidden",
               boxShadow: "0 24px 70px 0 rgba(0,0,0,0.6)",
