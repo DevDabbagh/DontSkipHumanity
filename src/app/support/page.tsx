@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
@@ -9,6 +9,7 @@ import HeroMosaic from "@/components/HeroMosaic";
 import { HERO_TILES } from "@/components/heroTiles";
 import DonationSuccessDialog from "@/components/DonationSuccessDialog";
 import { useReveal } from "@/hooks/useReveal";
+import { useTypewriter } from "@/hooks/useTypewriter";
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -253,6 +254,67 @@ function SupportPageContent() {
   const r3 = useReveal();
   const r4 = useReveal();
 
+  /* ═══════════════════════════════════════════════════════════════
+     EXPERIMENT — "your gift brings the work into colour"
+     Branch: support-colour-experiment
+     ═══════════════════════════════════════════════════════════════ */
+
+  /* The headline writes itself, then the card arrives. */
+  const HEADLINE = "Fund the work that names power.";
+  const { shown: typed, done: typedDone } = useTypewriter(HEADLINE, {
+    speed: 32,
+    startDelay: 320,
+  });
+
+  /* Where to centre the pool of colour: the donation card. Measured rather
+     than assumed, because the card moves between the one- and two-column
+     layouts and a hard-coded centre would sit in the wrong place on a phone. */
+  const cardRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const [pool, setPool] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const measure = () => {
+      const card = cardRef.current;
+      const sec = sectionRef.current;
+      if (!card || !sec) return;
+      const c = card.getBoundingClientRect();
+      const s = sec.getBoundingClientRect();
+      setPool({
+        x: Math.round(c.left - s.left + c.width / 2),
+        y: Math.round(c.top - s.top + c.height / 2),
+      });
+    };
+    measure();
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : null;
+    if (sectionRef.current) ro?.observe(sectionRef.current);
+    window.addEventListener("resize", measure);
+    return () => {
+      ro?.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [typedDone]);
+
+  /* How far the colour reaches. €0 lights only the card; the ramp is
+     deliberately generous early — the difference between giving nothing and
+     giving something should be the most visible step, not the difference
+     between €200 and €300. Beyond €250 the whole screen is in colour. */
+  const colourReach = (() => {
+    const amt = selectedAmount ?? 0;
+    const base = 300; // the card's own pool, always lit
+    const full = 1900; // comfortably past the diagonal of a wide screen
+    const t = Math.min(1, Math.sqrt(amt / 250));
+    return Math.round(base + t * (full - base));
+  })();
+
+  /* Transparent in the middle (no overlay ⇒ colour), opaque outside (overlay
+     paints ⇒ grey), with a soft edge between so the boundary is a bloom
+     rather than a cut. */
+  const colourMask =
+    `radial-gradient(circle at ${pool.x}px ${pool.y}px, ` +
+    `rgba(0,0,0,0) 0px, rgba(0,0,0,0) ${Math.round(colourReach * 0.55)}px, ` +
+    `rgba(0,0,0,1) ${colourReach}px)`;
+
   return (
     <main className="relative bg-[#0D0D0D]">
       <div className="film-grain" />
@@ -279,7 +341,7 @@ function SupportPageContent() {
           thing it is arguing for — and a funded project's card lands
           beside the amount, where it explains what the money is for.
          ═══════════════════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden" style={{ paddingTop: 128 }}>
+      <section ref={sectionRef} className="relative overflow-hidden" style={{ paddingTop: 128 }}>
         {/* Rows alternate left / right / left, with Studio's solid panel
             (`Rectangle 727`) behind the copy: hard-edged, 728 wide, sitting
             116px left of the centred 1224 container. Photos stay visible in
@@ -288,6 +350,10 @@ function SupportPageContent() {
             An earlier version used a soft directional scrim instead. It read
             as a different treatment next to Studio — the design's edge is a
             hard one, and a feathered gradient is not the same thing. */}
+        {/* EXPERIMENT — the wall is rendered in COLOUR and desaturated by the
+            overlay below, rather than being greyscale at source. That is what
+            lets a hole be punched in the grey: you cannot un-desaturate a
+            pixel that arrived grey, but you can decline to grey it. */}
         <HeroMosaic
           mode="tiles"
           tiles={HERO_TILES}
@@ -296,7 +362,38 @@ function SupportPageContent() {
           dim={0.66}
           falloff={260}
           speed={90}
-          tileFilter="grayscale(1) brightness(0.5)"
+          /* MUST be passed. `tileFilter` DEFAULTS to
+             "grayscale(1) brightness(0.5)", so omitting it leaves the wall
+             grey at source — and then the hole in the overlay reveals grey,
+             which looks like the effect is broken. Dimming stays here so it
+             is uniform; the overlay only removes colour. */
+          tileFilter="brightness(0.62)"
+        />
+
+        {/* The grey. Everything the mask paints black gets desaturated; the
+            transparent circle around the donation card is left alone, so the
+            card sits over live colour while the rest of the page stays
+            monochrome — the card reads as a lens.
+
+            The circle's radius grows with the amount entered: a small gift
+            lights the card, a large one carries colour to the edges of the
+            screen. The donation literally brings the work into colour. */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: 0,
+            /* Colour only. Brightness is applied to the tiles themselves so
+               it stays uniform across the boundary — dimming here as well
+               would make the pool visibly brighter, not just more colourful. */
+            backdropFilter: "grayscale(1)",
+            WebkitBackdropFilter: "grayscale(1)",
+            maskImage: colourMask,
+            WebkitMaskImage: colourMask,
+            transition: "mask-image 700ms cubic-bezier(0.22,1,0.36,1)",
+            pointerEvents: "none",
+            zIndex: 0,
+          }}
         />
 
         <div
@@ -322,25 +419,44 @@ function SupportPageContent() {
               >
                 Independent · Ad-free · Reader-supported
               </p>
+              {/* Typed, not revealed.
+                  The headline is one string so the caret can walk across the
+                  line break; the gradient starts at "that names power." and is
+                  applied per-fragment as the characters arrive. Reserved height
+                  keeps the card and the copy below from jumping while it types. */}
               <h1
                 className="font-semibold text-[38px] leading-[40px] sm:text-[50px] sm:leading-[52px]"
-                style={{
-                  color: "#F0F0F0",
-                  letterSpacing: "-1px",
-                  animation: "heroLine 900ms cubic-bezier(0.16,1,0.3,1) 300ms both",
-                }}
+                style={{ color: "#F0F0F0", letterSpacing: "-1px", minHeight: "2.1em" }}
+                aria-label={HEADLINE}
               >
-                Fund the work
-                <br />
-                <span
-                  style={{
-                    background: "linear-gradient(90deg, #32C6CC, #B23495)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                  }}
-                >
-                  that names power.
+                <span aria-hidden>
+                  {typed.slice(0, Math.min(typed.length, 14))}
+                  {typed.length > 14 && <br />}
+                  {typed.length > 14 && (
+                    <span
+                      style={{
+                        background: "linear-gradient(90deg, #32C6CC, #B23495)",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }}
+                    >
+                      {typed.slice(14)}
+                    </span>
+                  )}
+                  {!typedDone && (
+                    <span
+                      style={{
+                        display: "inline-block",
+                        width: 3,
+                        height: "0.82em",
+                        marginLeft: 4,
+                        verticalAlign: "-0.06em",
+                        background: "#B23495",
+                        animation: "dshCaret 900ms steps(1) infinite",
+                      }}
+                    />
+                  )}
                 </span>
               </h1>
               <p
@@ -393,18 +509,30 @@ function SupportPageContent() {
               </ul>
             </div>
 
-            {/* ── Right: the donation card ── */}
+            {/* ── Right: the donation card ──
+                Waits for the sentence to finish. Until then it is not in the
+                layout's visual flow at all — the reader's attention is on the
+                line being written. */}
             <div
+              ref={cardRef}
               className="relative w-full"
-              style={{ animation: "heroLine 900ms cubic-bezier(0.16,1,0.3,1) 900ms both" }}
+              style={{
+                opacity: typedDone ? 1 : 0,
+                transform: typedDone ? "translateY(0)" : "translateY(22px)",
+                transition:
+                  "opacity 700ms cubic-bezier(0.16,1,0.3,1), transform 700ms cubic-bezier(0.16,1,0.3,1)",
+              }}
             >
           <div
             className="dsh-card-surface"
             style={{
-              background: "rgba(19,19,19,0.92)",
-              backdropFilter: "blur(14px)",
-              WebkitBackdropFilter: "blur(14px)",
-              border: "1px solid rgba(240,240,240,0.10)",
+              /* Lower opacity than the production card on purpose: this one is
+                 a window onto the colour behind it, so it has to let more of
+                 the photograph through while still holding the type. */
+              background: "rgba(19,19,19,0.72)",
+              backdropFilter: "blur(10px) saturate(1.25)",
+              WebkitBackdropFilter: "blur(10px) saturate(1.25)",
+              border: "1px solid rgba(240,240,240,0.14)",
               borderRadius: 6,
               overflow: "hidden",
               boxShadow: "0 24px 70px 0 rgba(0,0,0,0.6)",

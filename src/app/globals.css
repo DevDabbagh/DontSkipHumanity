@@ -615,3 +615,11 @@ html[lang="ar"]
 
 /* Latin runs (brand names, film titles, DSH) inside Arabic copy keep their own
    direction automatically under plaintext; nothing else needed for them. */
+
+/* Typewriter caret — Support hero experiment (branch: support-colour-experiment).
+   `steps(1)` so it blinks hard on/off like a terminal cursor rather than
+   fading, which reads as a text field rather than a decoration. */
+@keyframes dshCaret {
+  0%, 49%   { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
