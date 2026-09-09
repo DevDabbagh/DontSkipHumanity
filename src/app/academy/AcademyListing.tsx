@@ -10,7 +10,15 @@ import SupportCTA from "@/components/SupportCTA";
 import { useScrollColorize } from "@/hooks/useScrollColorize";
 import { useT } from "@/contexts/LocaleContext";
 import type { AcademyProgram } from "@/lib/types";
-import { resolveHeaderTiles, type AcademyHeader, type HeaderImagePools } from "@/lib/landing";
+/* The resolver comes from `header-mosaic`, not `landing`: this is a client
+   component, and `landing` reaches for `next/headers` through
+   `locale-server`. A *type* import from it is erased and harmless; a
+   value import pulls the whole module into the browser bundle. */
+import {
+  resolveHeaderTiles,
+  type HeaderImagePools,
+} from "@/lib/header-mosaic";
+import type { AcademyHeader } from "@/lib/landing";
 
 /**
  * Academy landing — Figma frame 710:1690 (1920 × 7574).

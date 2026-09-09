@@ -8,7 +8,15 @@ import Newsletter from "@/components/Newsletter";
 import SupportCTA from "@/components/SupportCTA";
 import Footer from "@/components/Footer";
 import type { Film, FilmStage } from "@/lib/types";
-import { resolveHeaderTiles, type FilmsHeader, type HeaderImagePools } from "@/lib/landing";
+/* The resolver comes from `header-mosaic`, not `landing`: this is a client
+   component, and `landing` reaches for `next/headers` through
+   `locale-server`. A *type* import from it is erased and harmless; a
+   value import pulls the whole module into the browser bundle. */
+import {
+  resolveHeaderTiles,
+  type HeaderImagePools,
+} from "@/lib/header-mosaic";
+import type { FilmsHeader } from "@/lib/landing";
 import { useScrollColorize } from "@/hooks/useScrollColorize";
 
 /* ── Constants ── */

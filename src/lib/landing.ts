@@ -242,26 +242,28 @@ export function buildHeroSlides(section?: LandingSection): HeroSlide[] | null {
  *
  * Absent means `content`, which is what Films has always done.
  */
-export type HeaderImageMode = "content" | "tiles";
+/* The mosaic types and the resolver live in `header-mosaic.ts`, which the
+   client components import. This module reaches for `next/headers` through
+   `locale-server`, so anything a client component needs must not live here —
+   that is what broke the build the first time. */
+export type {
+  HeaderImageMode,
+  HeaderSource,
+  HeaderImages,
+  HeaderImagePools,
+} from "./header-mosaic";
+export { MIN_HEADER_TILES, resolveHeaderTiles } from "./header-mosaic";
 
-/** The catalogues a header wall can import posters from. */
-export type HeaderSource = "films" | "studio" | "academy";
-
-interface HeaderImages {
-  imageMode?: HeaderImageMode;
-  /** Which catalogues `content` mode imports from. */
-  sources?: HeaderSource[];
-  /** Used when `imageMode` is "tiles". */
-  tiles?: string[];
-  /** The retired wide-sheet export. Kept on the row, no longer rendered. */
-  imageSrc?: string;
-}
-
-/** Posters available to a header wall, by catalogue. */
-export type HeaderImagePools = Record<HeaderSource, string[]>;
+/* Imported as well as re-exported: `export type { … } from` forwards a name
+   without binding it locally, so the three interfaces below had nothing to
+   extend and silently became empty. */
+import type {
+  HeaderImages as HeaderImagesShape,
+  HeaderImagePools as HeaderImagePoolsShape,
+} from "./header-mosaic";
 
 /* ── Films page header (editable from the dashboard → Films → Header) ── */
-export interface FilmsHeader extends HeaderImages {
+export interface FilmsHeader extends HeaderImagesShape {
   titleNormal?: string;
   titleColored?: string;
   description?: string;
@@ -271,7 +273,7 @@ export interface FilmsHeader extends HeaderImages {
    The studio headline is split in three because the gradient sits in the
    middle of the sentence ("Bold, / independent media / that strengthens
    movements."), unlike the films one where it closes it. */
-export interface StudioHeader extends HeaderImages {
+export interface StudioHeader extends HeaderImagesShape {
   titleNormal?: string;
   titleColored?: string;
   titleAfter?: string;
@@ -324,7 +326,7 @@ async function readHeader<T>(
    Three headline parts like the studio one: the Figma headline is
    "Knowledge / is power. / Education is resistance." with the second and
    third lines carrying the gradient. */
-export interface AcademyHeader extends HeaderImages {
+export interface AcademyHeader extends HeaderImagesShape {
   titleNormal?: string;
   titleColored?: string;
   titleAfter?: string;
@@ -350,19 +352,13 @@ export async function getAcademyHeader(): Promise<AcademyHeader> {
 /* ── The mosaic behind an inner-page header ────────────────────────────── */
 
 /**
- * The wall is three drifting rows. Below this the same photograph is visible
- * twice at once, which reads as a mistake rather than a pattern.
- */
-export const MIN_HEADER_TILES = 8;
-
-/**
  * Read every catalogue a header wall might import from.
  *
  * One query set for all three inner pages, so a header can mix them — an
  * Academy page with film posters behind it is a legitimate choice, and there
  * is no reason the editor should have to ask a developer for it.
  */
-export async function getHeaderImagePools(): Promise<HeaderImagePools> {
+export async function getHeaderImagePools(): Promise<HeaderImagePoolsShape> {
   const [films, studio, academy] = await Promise.all([
     supabase
       .from("films")
@@ -388,48 +384,4 @@ export async function getHeaderImagePools(): Promise<HeaderImagePools> {
     studio: pick(studio.data, ["thumbnail_url", "cover_url"]),
     academy: pick(academy.data, ["thumbnail_url"]),
   };
-}
-
-/**
- * Resolve the tiles for a section header.
- *
- * One function for Films, Studio and Academy so the three cannot drift again
- * — which they had: Films built its wall from the real stills, Studio showed
- * a Figma export, and Academy showed *Studio's* export because its own was
- * never made and nothing could change it.
- *
- * Uploaded images below MIN_HEADER_TILES are topped up from the catalogue
- * rather than left to repeat visibly. A short list is a warning in the
- * editor, never a broken wall on the page.
- */
-export function resolveHeaderTiles(
-  header: HeaderImages | undefined,
-  pools: HeaderImagePools
-): string[] {
-  const mode = header?.imageMode === "tiles" ? "tiles" : "content";
-
-  const fromSources = (header?.sources ?? [])
-    .flatMap((id) => pools[id] ?? [])
-    .filter(Boolean);
-
-  if (mode === "tiles") {
-    const chosen = (header?.tiles ?? [])
-      .map((t) => t?.trim())
-      .filter((t): t is string => Boolean(t));
-
-    if (chosen.length >= MIN_HEADER_TILES) return Array.from(new Set(chosen));
-
-    // Top up from every catalogue, not just the selected ones — at this
-    // point the editor has not chosen any, and a thin wall is the problem
-    // being solved.
-    const everything = [
-      ...pools.films,
-      ...pools.studio,
-      ...pools.academy,
-    ].filter(Boolean);
-
-    return Array.from(new Set([...chosen, ...everything]));
-  }
-
-  return Array.from(new Set(fromSources));
 }
