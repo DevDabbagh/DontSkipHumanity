@@ -255,13 +255,61 @@ export function mapAcademyProgram(row: any): AcademyProgram {
     howToJoin: str(row.how_to_join),
     thumbnailUrl: row.thumbnail_url || "",
     resources: Array.isArray(row.academy_resources)
-      ? row.academy_resources.map((r: any) => ({
-          id: r.id,
-          title: r.title || "",
-          type: r.type || "link",
-          url: r.url || "",
+      ? [...row.academy_resources]
+          .sort((a: any, b: any) => (a.position ?? 0) - (b.position ?? 0))
+          .map((r: any) => ({
+            id: r.id,
+            title: r.title || "",
+            type: r.type || "link",
+            url: r.url || "",
+            sizeLabel: r.size_label || "",
+            locked: Boolean(r.locked),
+          }))
+      : [],
+
+    /* The curriculum. Rows written before migration 031 have no `lessons`, so
+       their `objectives` are read as unlocked, untimed lessons — the page must
+       not go blank for a programme nobody has re-saved yet. */
+    lessons: (() => {
+      const rows = Array.isArray(row.lessons) ? row.lessons : [];
+      if (rows.length > 0) {
+        return rows.map((l: any) => ({
+          title: str(l?.title),
+          duration: typeof l?.duration === "string" ? l.duration : "",
+          locked: Boolean(l?.locked),
+          videoUrl: typeof l?.videoUrl === "string" ? l.videoUrl : "",
+        }));
+      }
+      const legacy = Array.isArray(row.objectives) ? row.objectives : [];
+      return legacy.map((title: string) => ({
+        title: title || "",
+        duration: "",
+        locked: false,
+        videoUrl: "",
+      }));
+    })(),
+
+    testimonials: Array.isArray(row.testimonials)
+      ? row.testimonials.map((t: any) => ({
+          quote: str(t?.quote),
+          author: typeof t?.author === "string" ? t.author : "",
         }))
       : [],
+
+    partnerships: Array.isArray(row.partnerships)
+      ? row.partnerships.map((x: any) => ({
+          label: str(x?.label),
+          title: str(x?.title),
+          body: str(x?.body),
+        }))
+      : [],
+
+    certification: {
+      label: str(row.certification?.label),
+      value: str(row.certification?.value),
+    },
+    year: row.year || "",
+    currency: row.currency || "EUR",
     relatedFilmIds: Array.isArray(row.related_film_ids) ? row.related_film_ids : [],
     relatedStudioIds: Array.isArray(row.related_studio_ids) ? row.related_studio_ids : [],
     enrolledCount: row.enrolled_count || 0,

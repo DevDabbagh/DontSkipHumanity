@@ -60,6 +60,13 @@ export async function recordDonation(
        development can be kept out of reported totals (migration 022). */
     livemode: session.livemode === true,
     is_guest: true,
+    /* Which surface the gift was made on (migration 033). Read from the
+       session rather than from the request, because this same function runs
+       for the webhook — a call from Stripe, with no client to ask. Re-checked
+       here as well as at checkout: the column has a CHECK constraint, and a
+       stray value would fail the whole write rather than one field. */
+    source:
+      md.source === "android" || md.source === "ios" ? md.source : "web",
     project_type: md.project_type ?? null,
     project_slug: md.project_slug ?? null,
     project_title: md.project_title ?? null,

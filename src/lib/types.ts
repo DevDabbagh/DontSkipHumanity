@@ -178,6 +178,22 @@ export interface StudioProject {
 export type AcademyType = "course" | "workshop" | "toolkit" | "resource" | "mentorship";
 export type AcademyFormat = "online" | "in_person" | "hybrid" | "self_paced" | "downloadable";
 
+/**
+ * One line of a programme's curriculum.
+ *
+ * Replaces the flat `objectives: string[]`: the lesson-details frame needs a
+ * running time and a locked state per line, and neither fits in a string.
+ * `objectives` is still carried below for rows written before migration 031.
+ */
+export interface AcademyLesson {
+  title: string;
+  /** As written by an editor — "32:11". Empty means the row shows no time. */
+  duration: string;
+  /** True when only a paying participant may open it. */
+  locked: boolean;
+  videoUrl: string;
+}
+
 export interface AcademyProgram {
   id: string;
   title: string;
@@ -195,7 +211,25 @@ export interface AcademyProgram {
   dates: string;
   howToJoin: string;
   thumbnailUrl: string;
-  resources: { id: string; title: string; type: "pdf" | "link" | "toolkit"; url: string }[];
+  resources: {
+    id: string;
+    title: string;
+    type: "pdf" | "link" | "toolkit";
+    url: string;
+    /** "420 KB", as the editor typed it — these files are not hosted by us. */
+    sizeLabel: string;
+    locked: boolean;
+  }[];
+  /** The curriculum. Falls back to `objectives` on rows that predate it. */
+  lessons: AcademyLesson[];
+  testimonials: { quote: string; author: string }[];
+  partnerships: { label: string; title: string; body: string }[];
+  /** The "Certification / Available after completion" pair in the meta row. */
+  certification: { label: string; value: string };
+  /** Shown beside the type chip in the hero — "Mentorships · 2026". */
+  year: string;
+  /** A price with no currency is not a price. */
+  currency: string;
   relatedFilmIds: string[];
   relatedStudioIds: string[];
   enrolledCount: number;

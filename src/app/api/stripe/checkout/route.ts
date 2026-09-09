@@ -47,7 +47,20 @@ type Body = {
   projectType?: "film" | "studio" | "academy";
   projectSlug?: string;
   projectTitle?: string;
+  /** Which surface this came from. Absent means the website. */
+  source?: "web" | "android" | "ios";
 };
+
+/**
+ * Where the donation was made. Kept on the session so the dashboard can
+ * report the site and the apps separately — see migration 033.
+ *
+ * Allow-listed rather than passed through: this is client-supplied text, and
+ * an unrecognised value would silently split the totals into a fourth bucket
+ * nobody is looking at. Anything unexpected is recorded as the website, which
+ * is where donations came from before the app existed.
+ */
+const SOURCES = new Set(["web", "android", "ios"]);
 
 export async function POST(req: Request) {
   let body: Body;
@@ -83,6 +96,11 @@ export async function POST(req: Request) {
     body.projectType === "film" || body.projectType === "studio" || body.projectType === "academy"
       ? body.projectType
       : undefined;
+
+  const source =
+    typeof body.source === "string" && SOURCES.has(body.source)
+      ? body.source
+      : "web";
 
   /* Explicit env var if set, otherwise the domain this request came in on —
      so moving to DSH's own domain needs no configuration change, and a stale
@@ -120,6 +138,7 @@ export async function POST(req: Request) {
         ...(projectSlug && { project_slug: projectSlug }),
         ...(projectTitle && { project_title: projectTitle }),
         support_mode: mode,
+        source,
       },
       success_url: `${site}/support?status=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${site}/support?status=cancelled`,
