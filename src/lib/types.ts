@@ -274,6 +274,21 @@ export interface Article {
   status: ArticleStatus;
   scheduledDate: string | null;
   seo: { metaDescription: string; socialShareImage: string };
+  /**
+   * Who may read the body (migration 034).
+   *
+   * This decides what the page renders. It is NOT access control on its own —
+   * the body must be withheld on the server for `subscription`, or the text
+   * ships to the browser regardless of what is drawn over it.
+   */
+  access: "free" | "subscription";
+  /** The second label on every card: which part of DSH this belongs to. */
+  section: string;
+  featured: boolean;
+  /** 0 means "not measured" — the page then shows no reading time. */
+  readMinutes: number;
+  relatedArticleIds: string[];
+  relatedFilmIds: string[];
   createdAt: string;
   updatedAt: string;
 }

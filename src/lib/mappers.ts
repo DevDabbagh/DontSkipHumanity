@@ -344,6 +344,14 @@ export function mapArticle(row: any): Article {
         }))
       : [],
     status: (row.status || "draft") as ArticleStatus,
+    /* Anything that is not exactly "subscription" reads as free. A typo in the
+       column must open an article, never paywall one by accident. */
+    access: row.access === "subscription" ? "subscription" : "free",
+    section: row.section || "",
+    featured: Boolean(row.featured),
+    readMinutes: Number(row.read_minutes) || 0,
+    relatedArticleIds: Array.isArray(row.related_article_ids) ? row.related_article_ids : [],
+    relatedFilmIds: Array.isArray(row.related_film_ids) ? row.related_film_ids : [],
     scheduledDate: row.scheduled_date || null,
     seo: {
       metaDescription: row.seo_meta_description || "",

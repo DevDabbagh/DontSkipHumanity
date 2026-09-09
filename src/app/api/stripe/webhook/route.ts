@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { getStripe, getStripeMode, webhookSecretFor } from "@/lib/stripe";
 import { recordDonation } from "@/lib/donations";
+import {
+  recordSubscription,
+  extendSubscription,
+  cancelSubscription,
+} from "@/lib/subscriptions";
 
 export const runtime = "nodejs";
 
@@ -48,6 +53,14 @@ export async function POST(req: Request) {
       /* Source of truth for recording — fires even if the donor closes the
          tab before being redirected back. Idempotent via stripe_session_id. */
       await recordDonation(session);
+
+      /* A monthly gift is also a subscription, and until now nothing wrote one
+         down — Stripe took the money and the site had no record that the payer
+         was a subscriber. Any paywall on top of that locks out the people who
+         paid for it. */
+      if (session.mode === "subscription") {
+        await recordSubscription(session);
+      }
       /* TODO: persist to Supabase — amount, currency, and the project_* keys
          from metadata, so the dashboard can report who funded what. */
       console.log("[stripe] checkout completed", {
@@ -58,11 +71,16 @@ export async function POST(req: Request) {
       });
       break;
     }
-    case "invoice.paid":
-    case "customer.subscription.deleted":
-      /* TODO: recurring support lifecycle. */
-      console.log("[stripe]", event.type);
+    case "invoice.paid": {
+      /* A renewal. Push the period forward so entitlement does not lapse on
+         someone who is still paying. */
+      await extendSubscription(event.data.object);
       break;
+    }
+    case "customer.subscription.deleted": {
+      await cancelSubscription(event.data.object);
+      break;
+    }
     default:
       break;
   }

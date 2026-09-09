@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getUserIdFromRequest } from "@/lib/reader";
 import { getStripe } from "@/lib/stripe";
 import { resolveSiteUrl } from "@/lib/site-url";
 
@@ -97,6 +98,8 @@ export async function POST(req: Request) {
       ? body.projectType
       : undefined;
 
+  const readerId = await getUserIdFromRequest(req);
+
   const source =
     typeof body.source === "string" && SOURCES.has(body.source)
       ? body.source
@@ -134,6 +137,12 @@ export async function POST(req: Request) {
       ],
       /* Kept on the session so the dashboard can report per-project totals. */
       metadata: {
+        /* Verified from the caller's own access token, never taken from the
+           request body — a `user_id` a client can type is a `user_id` anyone
+           can type, and this one decides who a subscription entitles. Absent
+           for a logged-out giver, which is allowed: the money is recorded and
+           the subscription simply belongs to nobody until it is claimed. */
+        ...(readerId && { user_id: readerId }),
         ...(projectType && { project_type: projectType }),
         ...(projectSlug && { project_slug: projectSlug }),
         ...(projectTitle && { project_title: projectTitle }),
