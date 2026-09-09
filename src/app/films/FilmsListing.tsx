@@ -8,7 +8,7 @@ import Newsletter from "@/components/Newsletter";
 import SupportCTA from "@/components/SupportCTA";
 import Footer from "@/components/Footer";
 import type { Film, FilmStage } from "@/lib/types";
-import { resolveHeaderMosaic, type FilmsHeader } from "@/lib/landing";
+import { resolveHeaderTiles, type FilmsHeader, type HeaderImagePools } from "@/lib/landing";
 import { useScrollColorize } from "@/hooks/useScrollColorize";
 
 /* ── Constants ── */
@@ -39,7 +39,16 @@ const FILTER_BTN_ACTIVE =
 
 /* ── Component ── */
 
-export default function FilmsListing({ films, header }: { films: Film[]; header?: FilmsHeader }) {
+export default function FilmsListing({
+  films,
+  header,
+  pools,
+}: {
+  films: Film[];
+  header?: FilmsHeader;
+  /** Every catalogue the header wall may import from. */
+  pools: HeaderImagePools;
+}) {
   /* Scroll-linked black-and-white → colour, as on the detail pages. Drives
      the featured poster and the film cards; the hero and the decorative
      luminosity washes are deliberately left out. */
@@ -55,14 +64,9 @@ export default function FilmsListing({ films, header }: { films: Film[]; header?
   /* The header wall. Films has always built this from the real slate; it now
      goes through the same resolver as Studio and Academy so an editor can
      choose otherwise, and so the three cannot drift apart again. */
-  const mosaic = useMemo(
-    () =>
-      resolveHeaderMosaic(
-        header,
-        films.map((f) => f.thumbnailUrl || f.posterUrl).filter(Boolean) as string[],
-        HERO_IMAGE
-      ),
-    [header, films]
+  const tiles = useMemo(
+    () => resolveHeaderTiles(header, pools),
+    [header, pools]
   );
 
   /* Featured */
@@ -119,28 +123,17 @@ export default function FilmsListing({ films, header }: { films: Film[]; header?
       <section className="relative h-[646px] mt-[128px]">
         {/* Drifting mosaic — built from the real film stills, so the wall is
             always the current slate. Rows alternate direction. */}
-        {mosaic.mode === "tiles" ? (
-          <HeroMosaic
+        <HeroMosaic
             mode="tiles"
-            tiles={mosaic.tiles}
+            tiles={tiles}
             tileWidth={330}
             dim={0.55}
             /* Tile mode gets raw photos, so match the knocked-back look the
-               Studio sheet arrives with from Figma. */
+               Studio sheet arrived with from Figma. */
             tileFilter="grayscale(1) brightness(0.42) contrast(1.05)"
             /* DSH pink wash entering from the right, as in the Figma frame */
             tint="linear-gradient(270deg, rgba(178,52,149,0.20) 0%, rgba(178,52,149,0.09) 32%, rgba(178,52,149,0) 62%)"
           />
-        ) : (
-          <HeroMosaic
-            mode="sheet"
-            src={mosaic.src}
-            sheetWidth={1920}
-            sheetHeight={645}
-            dim={0.55}
-            tint="linear-gradient(270deg, rgba(178,52,149,0.20) 0%, rgba(178,52,149,0.09) 32%, rgba(178,52,149,0) 62%)"
-          />
-        )}
 
         <div className="relative h-full max-w-[1224px] mx-auto px-5 sm:px-8 xl:px-0">
           <div className="absolute top-[124px] left-5 sm:left-8 xl:left-0 flex flex-col gap-[60px] w-full max-w-[496px] pr-5 sm:pr-8 xl:pr-0">

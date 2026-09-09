@@ -242,15 +242,23 @@ export function buildHeroSlides(section?: LandingSection): HeroSlide[] | null {
  *
  * Absent means `content`, which is what Films has always done.
  */
-export type HeaderImageMode = "content" | "tiles" | "sheet";
+export type HeaderImageMode = "content" | "tiles";
+
+/** The catalogues a header wall can import posters from. */
+export type HeaderSource = "films" | "studio" | "academy";
 
 interface HeaderImages {
   imageMode?: HeaderImageMode;
+  /** Which catalogues `content` mode imports from. */
+  sources?: HeaderSource[];
   /** Used when `imageMode` is "tiles". */
   tiles?: string[];
-  /** Used when `imageMode` is "sheet". */
+  /** The retired wide-sheet export. Kept on the row, no longer rendered. */
   imageSrc?: string;
 }
+
+/** Posters available to a header wall, by catalogue. */
+export type HeaderImagePools = Record<HeaderSource, string[]>;
 
 /* ── Films page header (editable from the dashboard → Films → Header) ── */
 export interface FilmsHeader extends HeaderImages {
@@ -342,50 +350,86 @@ export async function getAcademyHeader(): Promise<AcademyHeader> {
 /* ── The mosaic behind an inner-page header ────────────────────────────── */
 
 /**
- * Resolve what `HeroMosaic` should render for a section header.
+ * The wall is three drifting rows. Below this the same photograph is visible
+ * twice at once, which reads as a mistake rather than a pattern.
+ */
+export const MIN_HEADER_TILES = 8;
+
+/**
+ * Read every catalogue a header wall might import from.
+ *
+ * One query set for all three inner pages, so a header can mix them — an
+ * Academy page with film posters behind it is a legitimate choice, and there
+ * is no reason the editor should have to ask a developer for it.
+ */
+export async function getHeaderImagePools(): Promise<HeaderImagePools> {
+  const [films, studio, academy] = await Promise.all([
+    supabase
+      .from("films")
+      .select("thumbnail_url, poster_url")
+      .eq("status", "published"),
+    supabase
+      .from("studio_items")
+      .select("thumbnail_url, cover_url")
+      .eq("status", "published"),
+    supabase
+      .from("academy_programs")
+      .select("thumbnail_url")
+      .eq("status", "published"),
+  ]);
+
+  const pick = (rows: Record<string, unknown>[] | null, keys: string[]) =>
+    (rows ?? [])
+      .map((r) => keys.map((k) => r[k]).find((v) => typeof v === "string" && v))
+      .filter((v): v is string => Boolean(v));
+
+  return {
+    films: pick(films.data, ["thumbnail_url", "poster_url"]),
+    studio: pick(studio.data, ["thumbnail_url", "cover_url"]),
+    academy: pick(academy.data, ["thumbnail_url"]),
+  };
+}
+
+/**
+ * Resolve the tiles for a section header.
  *
  * One function for Films, Studio and Academy so the three cannot drift again
  * — which they had: Films built its wall from the real stills, Studio showed
  * a Figma export, and Academy showed *Studio's* export because its own was
  * never made and nothing could change it.
  *
- * `contentImages` is the section's own material — film posters, studio
- * covers, course thumbnails. It is the fallback for every mode, because a
- * header with no wall is worse than a header with the wrong one:
- *
- *   · `tiles` with fewer than three chosen images would loop visibly
- *   · `sheet` with no image uploaded has nothing to slice
+ * Uploaded images below MIN_HEADER_TILES are topped up from the catalogue
+ * rather than left to repeat visibly. A short list is a warning in the
+ * editor, never a broken wall on the page.
  */
-export function resolveHeaderMosaic(
+export function resolveHeaderTiles(
   header: HeaderImages | undefined,
-  contentImages: string[],
-  fallbackSheet: string
-):
-  | { mode: "tiles"; tiles: string[] }
-  | { mode: "sheet"; src: string } {
-  const mode = header?.imageMode ?? "content";
-  const unique = Array.from(new Set(contentImages.filter(Boolean)));
+  pools: HeaderImagePools
+): string[] {
+  const mode = header?.imageMode === "tiles" ? "tiles" : "content";
 
-  if (mode === "sheet") {
-    const src = header?.imageSrc?.trim() || fallbackSheet;
-    if (src) return { mode: "sheet", src };
-    // Nothing uploaded and no bundled export — fall through to the content.
-  }
+  const fromSources = (header?.sources ?? [])
+    .flatMap((id) => pools[id] ?? [])
+    .filter(Boolean);
 
   if (mode === "tiles") {
-    const chosen = (header?.tiles ?? []).map((t) => t?.trim()).filter(Boolean) as string[];
-    if (chosen.length >= 3) return { mode: "tiles", tiles: chosen };
-    // Too few to drift without repeating; top up from the section's own work
-    // rather than showing the same two photographs cycling.
-    const topped = Array.from(new Set([...chosen, ...unique]));
-    if (topped.length >= 3) return { mode: "tiles", tiles: topped };
+    const chosen = (header?.tiles ?? [])
+      .map((t) => t?.trim())
+      .filter((t): t is string => Boolean(t));
+
+    if (chosen.length >= MIN_HEADER_TILES) return Array.from(new Set(chosen));
+
+    // Top up from every catalogue, not just the selected ones — at this
+    // point the editor has not chosen any, and a thin wall is the problem
+    // being solved.
+    const everything = [
+      ...pools.films,
+      ...pools.studio,
+      ...pools.academy,
+    ].filter(Boolean);
+
+    return Array.from(new Set([...chosen, ...everything]));
   }
 
-  if (unique.length >= 3) return { mode: "tiles", tiles: unique };
-
-  // A near-empty section. The bundled export keeps the page from opening on
-  // a black band.
-  return fallbackSheet
-    ? { mode: "sheet", src: fallbackSheet }
-    : { mode: "tiles", tiles: unique };
+  return Array.from(new Set(fromSources));
 }

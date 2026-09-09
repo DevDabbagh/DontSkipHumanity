@@ -1,5 +1,5 @@
 import { getPrograms } from "@/lib/api";
-import { getAcademyHeader } from "@/lib/landing";
+import { getAcademyHeader, getHeaderImagePools } from "@/lib/landing";
 
 export const dynamic = "force-dynamic";
 import AcademyListing from "./AcademyListing";
@@ -11,6 +11,13 @@ export const metadata = {
 };
 
 export default async function AcademyPage() {
-  const [programs, header] = await Promise.all([getPrograms(), getAcademyHeader()]);
-  return <AcademyListing programs={programs} header={header} />;
+  /* The pools are every catalogue, not just this page's — a header may
+     import film posters behind an Academy headline, and the editor should
+     not need a developer for that. */
+  const [programs, header, pools] = await Promise.all([
+    getPrograms(),
+    getAcademyHeader(),
+    getHeaderImagePools(),
+  ]);
+  return <AcademyListing programs={programs} header={header} pools={pools} />;
 }

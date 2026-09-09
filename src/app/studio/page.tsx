@@ -1,5 +1,5 @@
 import { getStudioProjects } from "@/lib/api";
-import { getStudioHeader } from "@/lib/landing";
+import { getStudioHeader, getHeaderImagePools } from "@/lib/landing";
 
 export const dynamic = "force-dynamic";
 import StudioListing from "./StudioListing";
@@ -10,6 +10,13 @@ export const metadata = {
 };
 
 export default async function StudioPage() {
-  const [projects, header] = await Promise.all([getStudioProjects(), getStudioHeader()]);
-  return <StudioListing projects={projects} header={header} />;
+  /* The pools are every catalogue, not just this page's — a header may
+     import film posters behind an Academy headline, and the editor should
+     not need a developer for that. */
+  const [projects, header, pools] = await Promise.all([
+    getStudioProjects(),
+    getStudioHeader(),
+    getHeaderImagePools(),
+  ]);
+  return <StudioListing projects={projects} header={header} pools={pools} />;
 }
