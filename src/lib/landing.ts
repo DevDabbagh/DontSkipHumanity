@@ -232,9 +232,28 @@ export function buildHeroSlides(section?: LandingSection): HeroSlide[] | null {
   return slides.length > 0 ? slides : null;
 }
 
-/* ── Films page header (editable from the dashboard → Settings) ── */
-export interface FilmsHeader {
+/**
+ * Where an inner page's mosaic photographs come from (migration 037).
+ *
+ *   content  built from the section's own published items — the posters and
+ *            covers already uploaded. New work joins the wall on its own.
+ *   tiles    a list chosen in the dashboard.
+ *   sheet    one wide export, sliced into drifting rows.
+ *
+ * Absent means `content`, which is what Films has always done.
+ */
+export type HeaderImageMode = "content" | "tiles" | "sheet";
+
+interface HeaderImages {
+  imageMode?: HeaderImageMode;
+  /** Used when `imageMode` is "tiles". */
+  tiles?: string[];
+  /** Used when `imageMode` is "sheet". */
   imageSrc?: string;
+}
+
+/* ── Films page header (editable from the dashboard → Films → Header) ── */
+export interface FilmsHeader extends HeaderImages {
   titleNormal?: string;
   titleColored?: string;
   description?: string;
@@ -244,8 +263,7 @@ export interface FilmsHeader {
    The studio headline is split in three because the gradient sits in the
    middle of the sentence ("Bold, / independent media / that strengthens
    movements."), unlike the films one where it closes it. */
-export interface StudioHeader {
-  imageSrc?: string;
+export interface StudioHeader extends HeaderImages {
   titleNormal?: string;
   titleColored?: string;
   titleAfter?: string;
@@ -298,8 +316,7 @@ async function readHeader<T>(
    Three headline parts like the studio one: the Figma headline is
    "Knowledge / is power. / Education is resistance." with the second and
    third lines carrying the gradient. */
-export interface AcademyHeader {
-  imageSrc?: string;
+export interface AcademyHeader extends HeaderImages {
   titleNormal?: string;
   titleColored?: string;
   titleAfter?: string;
@@ -320,4 +337,55 @@ export async function getFilmsHeader(): Promise<FilmsHeader> {
 
 export async function getAcademyHeader(): Promise<AcademyHeader> {
   return readHeader<AcademyHeader>("academy_header", ACADEMY_HEADER_TEXT);
+}
+
+/* ── The mosaic behind an inner-page header ────────────────────────────── */
+
+/**
+ * Resolve what `HeroMosaic` should render for a section header.
+ *
+ * One function for Films, Studio and Academy so the three cannot drift again
+ * — which they had: Films built its wall from the real stills, Studio showed
+ * a Figma export, and Academy showed *Studio's* export because its own was
+ * never made and nothing could change it.
+ *
+ * `contentImages` is the section's own material — film posters, studio
+ * covers, course thumbnails. It is the fallback for every mode, because a
+ * header with no wall is worse than a header with the wrong one:
+ *
+ *   · `tiles` with fewer than three chosen images would loop visibly
+ *   · `sheet` with no image uploaded has nothing to slice
+ */
+export function resolveHeaderMosaic(
+  header: HeaderImages | undefined,
+  contentImages: string[],
+  fallbackSheet: string
+):
+  | { mode: "tiles"; tiles: string[] }
+  | { mode: "sheet"; src: string } {
+  const mode = header?.imageMode ?? "content";
+  const unique = Array.from(new Set(contentImages.filter(Boolean)));
+
+  if (mode === "sheet") {
+    const src = header?.imageSrc?.trim() || fallbackSheet;
+    if (src) return { mode: "sheet", src };
+    // Nothing uploaded and no bundled export — fall through to the content.
+  }
+
+  if (mode === "tiles") {
+    const chosen = (header?.tiles ?? []).map((t) => t?.trim()).filter(Boolean) as string[];
+    if (chosen.length >= 3) return { mode: "tiles", tiles: chosen };
+    // Too few to drift without repeating; top up from the section's own work
+    // rather than showing the same two photographs cycling.
+    const topped = Array.from(new Set([...chosen, ...unique]));
+    if (topped.length >= 3) return { mode: "tiles", tiles: topped };
+  }
+
+  if (unique.length >= 3) return { mode: "tiles", tiles: unique };
+
+  // A near-empty section. The bundled export keeps the page from opening on
+  // a black band.
+  return fallbackSheet
+    ? { mode: "sheet", src: fallbackSheet }
+    : { mode: "tiles", tiles: unique };
 }

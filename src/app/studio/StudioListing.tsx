@@ -9,7 +9,7 @@ import SupportCTA from "@/components/SupportCTA";
 import Footer from "@/components/Footer";
 import type { StudioProject } from "@/lib/types";
 import { useScrollColorize } from "@/hooks/useScrollColorize";
-import type { StudioHeader } from "@/lib/landing";
+import { resolveHeaderMosaic, type StudioHeader } from "@/lib/landing";
 
 /* ═══════════════════════════════════════════════════════════════
    DSH – Studio Landing
@@ -142,6 +142,18 @@ export default function StudioListing({
   const colorizeRef = useScrollColorize<HTMLElement>();
 
   /* Featured — first project, or the first marked ongoing */
+  /* The header wall. `content` mode draws on the covers already uploaded for
+     each project, which is what the app has always shown. */
+  const mosaic = useMemo(
+    () =>
+      resolveHeaderMosaic(
+        header,
+        projects.map((p) => p.thumbnailUrl || p.coverUrl).filter(Boolean) as string[],
+        "/images/studio-hero-mosaic.png"
+      ),
+    [header, projects]
+  );
+
   const featured = projects[0] ?? null;
   const rest = featured ? projects.filter((p) => p.id !== featured.id) : projects;
 
@@ -187,14 +199,22 @@ export default function StudioListing({
           the 128px navbar; buttons close the block at y 734.
          ═══════════════════════════════════════════════════════════ */}
       <section className="relative h-[645px] mt-[128px]">
-        {/* Photo mosaic — exported Figma asset (Frame 563, 1920×645) */}
-        <HeroMosaic
-          mode="sheet"
-          src={h.imageSrc}
-          sheetWidth={1920}
-          sheetHeight={645}
-          dim={0.55}
-        />
+        {/* The wall — whichever source the dashboard chose. Was hardwired to
+            the exported Figma sheet, which is why the app (showing the real
+            project covers) and the site never matched. */}
+        {mosaic.mode === "sheet" ? (
+          <HeroMosaic mode="sheet" src={mosaic.src} sheetWidth={1920} sheetHeight={645} dim={0.55} />
+        ) : (
+          <HeroMosaic
+            mode="tiles"
+            tiles={mosaic.tiles}
+            tileWidth={330}
+            dim={0.55}
+            /* Tile mode gets raw photographs, so match the knocked-back look
+               the exported sheet arrives with. */
+            tileFilter="grayscale(1) brightness(0.42) contrast(1.05)"
+          />
+        )}
 
         {/* Hero copy */}
         <div className="relative h-full max-w-[1224px] mx-auto px-5 sm:px-8 xl:px-0">

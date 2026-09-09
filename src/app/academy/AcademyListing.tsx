@@ -10,7 +10,7 @@ import SupportCTA from "@/components/SupportCTA";
 import { useScrollColorize } from "@/hooks/useScrollColorize";
 import { useT } from "@/contexts/LocaleContext";
 import type { AcademyProgram } from "@/lib/types";
-import type { AcademyHeader } from "@/lib/landing";
+import { resolveHeaderMosaic, type AcademyHeader } from "@/lib/landing";
 
 /**
  * Academy landing — Figma frame 710:1690 (1920 × 7574).
@@ -128,6 +128,21 @@ export default function AcademyListing({
      mosaic is deliberately left out of it. */
   const colorizeRef = useScrollColorize<HTMLElement>();
 
+  /* The header wall.
+     The bundled sheet is a copy of Studio's — the Academy mosaic was never
+     exported from Figma — so switching this section to `content` in the
+     dashboard is a genuine fix, not a preference. It stays the default only
+     because changing it silently would change the live page. */
+  const mosaic = useMemo(
+    () =>
+      resolveHeaderMosaic(
+        header,
+        programs.map((p) => p.thumbnailUrl).filter(Boolean) as string[],
+        "/images/academy-hero-mosaic.png"
+      ),
+    [header, programs]
+  );
+
   const featured = programs[0] ?? null;
   const rest = featured ? programs.filter((p) => p.id !== featured.id) : programs;
 
@@ -171,7 +186,17 @@ export default function AcademyListing({
           Studio hero: mosaic sheet, copy block 124px below the navbar.
          ═══════════════════════════════════════════════════════════ */}
       <section className="relative h-[645px] mt-[128px]">
-        <HeroMosaic mode="sheet" src={h.imageSrc} sheetWidth={1920} sheetHeight={645} dim={0.55} />
+        {mosaic.mode === "sheet" ? (
+          <HeroMosaic mode="sheet" src={mosaic.src} sheetWidth={1920} sheetHeight={645} dim={0.55} />
+        ) : (
+          <HeroMosaic
+            mode="tiles"
+            tiles={mosaic.tiles}
+            tileWidth={330}
+            dim={0.55}
+            tileFilter="grayscale(1) brightness(0.42) contrast(1.05)"
+          />
+        )}
 
         <div className="relative h-full max-w-[1224px] mx-auto px-5 sm:px-8 xl:px-0">
           <div className="absolute top-[124px] left-5 sm:left-8 xl:left-0 flex flex-col gap-[60px] w-full max-w-[496px] pr-5 sm:pr-8 xl:pr-0">
