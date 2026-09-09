@@ -188,6 +188,15 @@ function ResourceRow({
       </Link>
     );
   }
+  /* Seed rows ship `url: "#"`. Rendered as a link that is a blank tab, so a
+     file with no address is shown but is not clickable. */
+  if (!file.url || file.url === "#") {
+    return (
+      <div className={className} style={style}>
+        {inner}
+      </div>
+    );
+  }
   return (
     <a href={file.url} target="_blank" rel="noopener noreferrer" className={className} style={style}>
       {inner}
