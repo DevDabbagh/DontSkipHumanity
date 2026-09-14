@@ -1,32 +1,12 @@
 "use client";
 
+import HlsVideo from "@/components/HlsVideo";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { SliderSlide } from "@/lib/landing";
 
 const SLIDE_DURATION = 6000;
 const VIDEO_REVEAL_DELAY = 2000;
-
-/**
- * Plays a slide's video. Explicitly sets `.muted` and calls `.play()` itself
- * instead of relying only on the `autoPlay` attribute, which some browsers
- * ignore after a client-side re-render.
- */
-function SlideVideo({ src, className, style, onFail }: {
-  src: string; className: string; style?: React.CSSProperties; onFail: () => void;
-}) {
-  const ref = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    el.muted = true;
-    const playPromise = el.play();
-    if (playPromise) playPromise.catch(() => {});
-  }, [src]);
-
-  return <video ref={ref} src={src} className={className} style={style} muted loop playsInline autoPlay onError={onFail} />;
-}
 
 /**
  * Holds a slide's poster on screen for a beat after it becomes active, then
@@ -57,7 +37,7 @@ function SlideMedia({ mediaSrc, className, style }: { mediaSrc: string; classNam
 
   return (
     <div className="absolute inset-0 transition-opacity duration-700 ease-out" style={{ opacity: entered ? 1 : 0 }}>
-      <SlideVideo src={mediaSrc} className={className} style={style} onFail={() => setFailed(true)} />
+      <HlsVideo src={mediaSrc} className={className} style={style} onFail={() => setFailed(true)} />
     </div>
   );
 }

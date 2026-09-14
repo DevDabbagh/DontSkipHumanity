@@ -1,3 +1,5 @@
+import { videoPlaybackUrl } from "@/lib/video-url";
+import { cdnImage } from "./image-url";
 import { supabase } from "./supabase";
 import { pickLang } from "./i18n";
 import type { AcademyProgram } from "./types";
@@ -17,7 +19,10 @@ export interface LandingSlot {
   cardTitle?: string;
   /** Multi-media slide fields (Academy Slider section) — a slide can be an image or a video. */
   mediaType?: "image" | "video";
+  /** A Bunny video id, or a URL for slides saved before the move to Bunny. */
   videoSrc?: string;
+  /** Which of those two `videoSrc` holds. Absent means a URL. */
+  videoProvider?: "file" | "bunny";
   title?: string;
   description?: string;
   badge?: string;
@@ -109,7 +114,7 @@ export async function getLandingConfig(): Promise<LandingConfig> {
 export function firstSlotImage(section?: LandingSection): string | undefined {
   if (!section) return undefined;
   const id = section.slotIds[0];
-  return id ? section.slots[id]?.imageSrc : undefined;
+  return id ? cdnImage(section.slots[id]?.imageSrc) : undefined;
 }
 
 /**
@@ -156,13 +161,19 @@ export function buildAcademySlides(section: LandingSection | undefined, programs
         const s = section.slots[id];
         if (!s) return null;
         const mediaType: "image" | "video" = s.mediaType === "video" ? "video" : "image";
-        const mediaSrc = mediaType === "video" ? s.videoSrc ?? "" : s.imageSrc ?? "";
+        // A video slot holds a Bunny id now; the playlist address is built
+        // here rather than stored, so a change of CDN hostname does not
+        // invalidate every row. Older slots hold a URL and pass through.
+        const mediaSrc =
+          mediaType === "video"
+            ? videoPlaybackUrl(s.videoProvider, s.videoSrc ?? "")
+            : cdnImage(s.imageSrc) ?? "";
         if (!mediaSrc) return null;
         return {
           id,
           mediaType,
           mediaSrc,
-          poster: mediaType === "video" ? (s.imageSrc || "") : mediaSrc,
+          poster: mediaType === "video" ? (cdnImage(s.imageSrc) || "") : mediaSrc,
           title: s.title || "",
           description: s.description || "",
           badge: s.badge || s.cardType || "",
@@ -215,13 +226,19 @@ export function buildHeroSlides(section?: LandingSection): HeroSlide[] | null {
       const s = section.slots[id];
       if (!s) return null;
       const mediaType: "image" | "video" = s.mediaType === "video" ? "video" : "image";
-      const mediaSrc = mediaType === "video" ? s.videoSrc ?? "" : s.imageSrc ?? "";
+      // A video slot holds a Bunny id now; the playlist address is built
+      // here rather than stored, so a change of CDN hostname does not
+      // invalidate every row. Older slots hold a URL and pass through.
+      const mediaSrc =
+        mediaType === "video"
+          ? videoPlaybackUrl(s.videoProvider, s.videoSrc ?? "")
+          : cdnImage(s.imageSrc) ?? "";
       if (!mediaSrc) return null;
       return {
         id,
         mediaType,
         mediaSrc,
-        poster: mediaType === "video" ? s.imageSrc ?? "" : mediaSrc,
+        poster: mediaType === "video" ? cdnImage(s.imageSrc) ?? "" : mediaSrc,
         type: s.cardType || "",
         title: s.cardTitle || "",
         href: s.ctaLink || null,

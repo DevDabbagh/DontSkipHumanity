@@ -13,6 +13,13 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "**.supabase.co" },
       { protocol: "https", hostname: "**.supabase.in" },
+      // Bunny — the image pull zone in front of Supabase Storage, and the
+      // Stream zone for video thumbnails. `next/image` REFUSES any host that
+      // is not listed here, so omitting this turns every optimised image into
+      // a 400 the moment NEXT_PUBLIC_BUNNY_IMAGE_CDN is set. Nothing fails
+      // locally while the variable is empty, which is what makes it a
+      // deploy-time surprise rather than a development one.
+      { protocol: "https", hostname: "**.b-cdn.net" },
     ],
   },
   async headers() {

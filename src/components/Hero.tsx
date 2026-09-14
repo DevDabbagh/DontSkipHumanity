@@ -1,31 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import HlsVideo from "@/components/HlsVideo";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type { HeroSlide } from "@/lib/landing";
 
 const VIDEO_REVEAL_DELAY = 2000;
-
-/**
- * Plays a slide's video. Doesn't rely on the `autoPlay` attribute alone — some
- * browsers ignore it after client-side re-renders unless `.muted` is also set
- * as a real DOM property, so this sets both explicitly and calls `.play()` itself.
- */
-function SlideVideo({ src, className, onFail }: { src: string; className: string; onFail: () => void }) {
-  const ref = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    el.muted = true;
-    const playPromise = el.play();
-    if (playPromise) playPromise.catch(() => {});
-  }, [src]);
-
-  return <video ref={ref} src={src} className={className} muted loop playsInline autoPlay onError={onFail} />;
-}
 
 /**
  * Holds a slide's poster on screen for a beat after it becomes active, then
@@ -55,7 +37,7 @@ function HeroSlideMedia({ mediaSrc, className }: { mediaSrc: string; className: 
 
   return (
     <div className="absolute inset-0 transition-opacity duration-700 ease-out" style={{ opacity: entered ? 1 : 0 }}>
-      <SlideVideo src={mediaSrc} className={className} onFail={() => setFailed(true)} />
+      <HlsVideo src={mediaSrc} className={className} onFail={() => setFailed(true)} />
     </div>
   );
 }

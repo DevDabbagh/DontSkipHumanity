@@ -13,6 +13,32 @@ interface UserProfile {
   createdAt: string;
 }
 
+/**
+ * The third-party sign-ins DSH offers.
+ *
+ * Deliberately narrower than Supabase's own provider union, which lists
+ * twenty. This is the list the login modal and the mobile app both render,
+ * and the two surfaces have to agree on it.
+ */
+export type SocialProvider = "google" | "apple";
+
+/**
+ * The language the visitor is reading the site in, from the URL prefix.
+ *
+ * Read from the path rather than from `useLocale()` on purpose: this is called
+ * inside a callback in a provider that sits ABOVE LocaleProvider in the tree,
+ * so the hook is not available here — and adding a dependency between the two
+ * providers to pass a two-letter string is not worth the coupling.
+ *
+ * The default locale carries no prefix (`/films` is English, `/pt/films` is
+ * Portuguese), so a first segment that isn't a known code means English.
+ */
+function currentLang(): string {
+  if (typeof window === "undefined") return "en";
+  const first = window.location.pathname.split("/")[1] ?? "";
+  return ["pt", "ar"].includes(first) ? first : "en";
+}
+
 interface AuthContextType {
   user: User | null;
   profile: UserProfile | null;
@@ -20,9 +46,11 @@ interface AuthContextType {
   loading: boolean;
   signInWithEmail: (email: string, password: string) => Promise<{ error: string | null }>;
   signUpWithEmail: (email: string, password: string, fullName: string) => Promise<{ error: string | null }>;
-  signInWithGoogle: () => Promise<{ error: string | null }>;
+  signInWithProvider: (provider: SocialProvider) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: string | null }>;
+  /// Changes the password of a signed-in user, checking the old one first.
+  changePassword: (currentPassword: string, newPassword: string) => Promise<{ error: string | null }>;
   updateProfile: (updates: Partial<Pick<UserProfile, "fullName" | "avatarUrl">>) => Promise<{ error: string | null }>;
 }
 
@@ -33,9 +61,10 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   signInWithEmail: async () => ({ error: null }),
   signUpWithEmail: async () => ({ error: null }),
-  signInWithGoogle: async () => ({ error: null }),
+  signInWithProvider: async () => ({ error: null }),
   signOut: async () => {},
   resetPassword: async () => ({ error: null }),
+  changePassword: async () => ({ error: null }),
   updateProfile: async () => ({ error: null }),
 });
 
@@ -143,15 +172,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email,
       password,
       options: {
-        data: { full_name: fullName },
+        // `locale` is read by the send-auth-email Edge Function to decide
+        // which language to write the confirmation email in. It runs before
+        // any profile row exists, so user metadata is the only place it can
+        // look — and the site is read in three languages.
+        data: { full_name: fullName, locale: currentLang() },
       },
     });
     return { error: error?.message ?? null };
   }, []);
 
-  const signInWithGoogle = useCallback(async () => {
+  // One call for both providers rather than one function each. The app's
+  // login screens offer exactly these two, and the only thing that differs is
+  // the string — a second near-identical function would drift from the first
+  // the moment either needed an option the other did not.
+  const signInWithProvider = useCallback(async (provider: SocialProvider) => {
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
+      provider,
       options: {
         redirectTo: typeof window !== "undefined" ? `${window.location.origin}/auth/callback` : undefined,
       },
@@ -172,6 +209,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     return { error: error?.message ?? null };
   }, []);
+
+  /**
+   * Changes the password of someone who is already signed in.
+   *
+   * WHY THE OLD PASSWORD IS CHECKED HERE
+   *
+   * `updateUser` does not ask for it — a valid session is all Supabase
+   * requires. That is fine for the reset flow, where the user just proved
+   * ownership of the mailbox. It is not fine from a settings page: sessions
+   * last for weeks, so an unattended laptop would be enough for someone to
+   * change the password and lock the owner out of their own account.
+   *
+   * So we re-authenticate first. `signInWithPassword` against the user's own
+   * address either succeeds — proving they know the current password — or
+   * fails, and we stop. This is the same reason banks ask for a password you
+   * already typed an hour ago.
+   */
+  const changePassword = useCallback(async (currentPassword: string, newPassword: string) => {
+    if (!user?.email) return { error: "Not signed in." };
+
+    const { error: reauthError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: currentPassword,
+    });
+
+    // Deliberately not "wrong password" — that is what it means, but this
+    // message is also what a Google-only account sees, and telling those
+    // users their password is wrong sends them hunting for one they never set.
+    if (reauthError) {
+      return { error: "That current password didn't match." };
+    }
+
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    return { error: error?.message ?? null };
+  }, [user]);
 
   const updateProfile = useCallback(async (updates: Partial<Pick<UserProfile, "fullName" | "avatarUrl">>) => {
     if (!user) return { error: "Not authenticated" };
@@ -205,9 +277,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         signInWithEmail,
         signUpWithEmail,
-        signInWithGoogle,
+        signInWithProvider,
         signOut,
         resetPassword,
+        changePassword,
         updateProfile,
       }}
     >

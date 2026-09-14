@@ -10,6 +10,23 @@ import type {
   Article, ArticleBlock, ArticleAuthor, ArticleStatus,
   DSHEvent, EventPartner, EventStatus,
 } from "./types";
+import { cdnImage } from "./image-url";
+
+/**
+ * IMAGE URLS ARE REWRITTEN HERE, AND ONLY HERE.
+ *
+ * `cdnImage` swaps a Supabase Storage host for the Bunny pull zone so image
+ * bytes stop counting against Supabase egress — see `image-url.ts` for the
+ * arithmetic. This file is the choke point because it is where a stored value
+ * becomes something a component renders: there are roughly ninety places that
+ * put a URL in a `src`, and only a dozen that read one out of a row.
+ *
+ * It is a no-op when `NEXT_PUBLIC_BUNNY_IMAGE_CDN` is unset, and a no-op for
+ * anything that is not a Supabase Storage URL. So wrapping a field that turns
+ * out not to need it costs nothing, while missing one silently keeps that
+ * image on the expensive path — which is why every image field below is
+ * wrapped rather than only the ones that looked heavy.
+ */
 
 // ── Helper ─────────────────────────────────────────────────────
 
@@ -75,7 +92,7 @@ function entriesFor(list: unknown[] | undefined) {
         term: str(e.term),
         definition: str(e.definition),
         source: str(e.source) || undefined,
-        imageUrl: typeof e.imageUrl === "string" ? e.imageUrl : undefined,
+        imageUrl: typeof e.imageUrl === "string" ? cdnImage(e.imageUrl) : undefined,
       };
     })
     /* A card with nothing in this language and nothing to fall back to would
@@ -109,9 +126,11 @@ export function mapFilm(row: any): Film {
     },
     stage: (row.stage || "development") as FilmStage,
     themes: Array.isArray(row.themes) ? row.themes : [],
+    /* Not wrapped: a trailer is a Bunny Stream id or an external URL, and is
+       resolved by `video-url.ts`, which has its own zone. */
     trailerUrl: row.trailer_url || "",
-    thumbnailUrl: row.thumbnail_url || "",
-    posterUrl: row.poster_url || "",
+    thumbnailUrl: cdnImage(row.thumbnail_url) || "",
+    posterUrl: cdnImage(row.poster_url) || "",
     detailsSliders: Array.isArray(row.details_sliders) ? row.details_sliders : [],
     festivals: Array.isArray(row.film_festivals)
       ? row.film_festivals.map((f: any): FilmFestival => ({
@@ -168,7 +187,7 @@ export function mapStudioProject(row: any): StudioProject {
             season: e.season ?? undefined,
             year: e.year || undefined,
             guest: str(e.guest) || undefined,
-            imageUrl: e.image_url || undefined,
+            imageUrl: cdnImage(e.image_url) || undefined,
             slug: e.slug || undefined,
             status: e.status || "published",
             videoUrl: e.video_url || undefined,
@@ -227,8 +246,8 @@ export function mapStudioProject(row: any): StudioProject {
     relatedFilmIds: Array.isArray(row.related_film_ids) ? row.related_film_ids : [],
     relatedArticleIds: Array.isArray(row.related_article_ids) ? row.related_article_ids : [],
     relatedCampaignIds: [],
-    thumbnailUrl: row.thumbnail_url || "",
-    coverUrl: row.cover_url || "",
+    thumbnailUrl: cdnImage(row.thumbnail_url) || "",
+    coverUrl: cdnImage(row.cover_url) || "",
     createdAt: row.created_at || "",
     updatedAt: row.updated_at || "",
   };
@@ -253,7 +272,7 @@ export function mapAcademyProgram(row: any): AcademyProgram {
     scholarshipNote: str(row.scholarship_note),
     dates: row.dates || "",
     howToJoin: str(row.how_to_join),
-    thumbnailUrl: row.thumbnail_url || "",
+    thumbnailUrl: cdnImage(row.thumbnail_url) || "",
     resources: Array.isArray(row.academy_resources)
       ? [...row.academy_resources]
           .sort((a: any, b: any) => (a.position ?? 0) - (b.position ?? 0))
@@ -331,14 +350,19 @@ export function mapArticle(row: any): Article {
     excerpt: str(row.excerpt),
     date: row.date || "",
     body: Array.isArray(row.body) ? (row.body as ArticleBlock[]) : [],
-    mainImage: row.main_image || "",
+    mainImage: cdnImage(row.main_image) || "",
     mainImageCaption: row.main_image_caption || "",
     mainImageCredit: row.main_image_credit || "",
-    author: (row.author as ArticleAuthor) || { name: "", avatar: "" },
+    author: row.author
+      ? {
+          ...(row.author as ArticleAuthor),
+          avatar: cdnImage((row.author as ArticleAuthor).avatar) || "",
+        }
+      : { name: "", avatar: "" },
     gallery: Array.isArray(row.gallery)
       ? row.gallery.map((g: any) => ({
           id: g.id || "",
-          url: g.url || "",
+          url: cdnImage(g.url) || "",
           caption: g.caption || "",
           credit: g.credit || "",
         }))
@@ -355,7 +379,7 @@ export function mapArticle(row: any): Article {
     scheduledDate: row.scheduled_date || null,
     seo: {
       metaDescription: row.seo_meta_description || "",
-      socialShareImage: row.seo_social_share_image || "",
+      socialShareImage: cdnImage(row.seo_social_share_image) || "",
     },
     createdAt: row.created_at || "",
     updatedAt: row.updated_at || "",
@@ -374,12 +398,12 @@ export function mapEvent(row: any): DSHEvent {
     description: str(row.description),
     startDate: row.start_date || "",
     endDate: row.end_date || "",
-    mainImage: row.main_image || "",
+    mainImage: cdnImage(row.main_image) || "",
     partners: Array.isArray(row.event_partners)
       ? row.event_partners.map((p: any): EventPartner => ({
           id: p.id,
           name: p.name || "",
-          logo: p.logo || "",
+          logo: cdnImage(p.logo) || "",
         }))
       : [],
     address: row.address || "",

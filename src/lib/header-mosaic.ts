@@ -30,6 +30,11 @@
  *
  * Absent means `content`, which is what Films has always done.
  */
+// Safe to import here even though this module reaches client components:
+// `image-url.ts` has no server-only dependency and reads a NEXT_PUBLIC_
+// variable, which is inlined at build time.
+import { cdnImage } from "./image-url";
+
 export type HeaderImageMode = "content" | "tiles";
 
 /** The catalogues a header wall can import posters from. */
@@ -73,8 +78,11 @@ export function resolveHeaderTiles(
   const mode = header?.imageMode === "tiles" ? "tiles" : "content";
 
   if (mode === "tiles") {
+    // Tiles are uploaded straight to this header, so they arrive as raw
+    // Supabase URLs. The pools below come from mapped entities, which were
+    // already put on the CDN in `mappers.ts` — running it twice is a no-op.
     const chosen = (header?.tiles ?? [])
-      .map((t) => t?.trim())
+      .map((t) => cdnImage(t?.trim()))
       .filter((t): t is string => Boolean(t));
 
     if (chosen.length >= MIN_HEADER_TILES) return Array.from(new Set(chosen));
