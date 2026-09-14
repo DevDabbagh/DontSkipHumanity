@@ -1,12 +1,42 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useAuth, type SocialProvider } from "@/contexts/AuthContext";
 import SocialButtons from "@/components/SocialButtons";
 
-type AuthView = "login" | "register" | "forgotPassword";
+type AuthView =
+  | "login"
+  | "register"
+  | "verifyOtp"
+  | "newPassword"
+  | "forgotPassword";
+
+/**
+ * Which email the code came from, and therefore what happens after it is
+ * accepted: a new account is simply signed in, a reset goes on to choose a
+ * password.
+ *
+ * One screen for both because it is the same screen — same digits, same
+ * inbox, same waiting. Two near-identical components would have drifted the
+ * first time either got a fix.
+ */
+type OtpPurpose = "signup" | "recovery";
+
+/** Seconds before "send another" is offered again. */
+const RESEND_COOLDOWN = 60;
+
+/**
+ * How many digits the confirmation code has.
+ *
+ * Must match **Authentication → Providers → Email → Email OTP Length** in
+ * Supabase, and the `length:` on the mobile app's OTP screen. All three are
+ * the same number in three places, and nothing checks that they agree: set
+ * Supabase to 8 while this says 6 and the field fills up before the code is
+ * finished, with no error to explain it.
+ */
+const OTP_LENGTH = 6;
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -23,13 +53,43 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [otp, setOtp] = useState("");
+  const [otpPurpose, setOtpPurpose] = useState<OtpPurpose>("signup");
+  const [cooldown, setCooldown] = useState(0);
 
-  const { signInWithEmail, signUpWithEmail, signInWithProvider, resetPassword } = useAuth();
+  const {
+    signInWithEmail,
+    signUpWithEmail,
+    verifySignupOtp,
+    resendSignupOtp,
+    signInWithProvider,
+    resetPassword,
+    verifyRecoveryOtp,
+    setNewPassword,
+  } = useAuth();
+
+  /**
+   * Counts the resend cooldown down once a second.
+   *
+   * Supabase enforces its own 60-second window per user and answers a early
+   * retry with a rate-limit error. Showing the wait instead of letting people
+   * press a button that can only fail is the difference between "it's
+   * coming" and "this is broken" — and a visible timer is what stops the
+   * second, third and fourth press that burn the project's hourly email quota
+   * for everyone.
+   */
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const id = setInterval(() => setCooldown((s) => (s <= 1 ? 0 : s - 1)), 1000);
+    return () => clearInterval(id);
+  }, [cooldown]);
 
   const clearForm = () => {
     setEmail("");
     setPassword("");
     setFullName("");
+    setOtp("");
+    setCooldown(0);
     setError(null);
     setSuccess(null);
   };
@@ -58,14 +118,41 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       if (err) {
         setError(err);
       } else {
-        setSuccess("Check your email to confirm your account.");
+        // Straight to the code field rather than "check your email" and a
+        // dead end. The address is kept so the next step can verify against
+        // it without asking for it twice.
+        goToOtp("signup");
+      }
+    } else if (view === "verifyOtp") {
+      const verify = otpPurpose === "signup" ? verifySignupOtp : verifyRecoveryOtp;
+      const { error: err } = await verify(email, otp);
+      if (err) {
+        setError(err);
+      } else if (otpPurpose === "signup") {
+        // Supabase returns a session, the auth listener picks it up, and the
+        // reader is signed in. Nothing more to confirm.
+        handleClose();
+      } else {
+        // A reset is only half done here — the session proves the mailbox,
+        // but the forgotten password is still the account's password.
+        setPassword("");
+        setError(null);
+        setSuccess("Code accepted. Choose a new password.");
+        setView("newPassword");
+      }
+    } else if (view === "newPassword") {
+      const { error: err } = await setNewPassword(password);
+      if (err) {
+        setError(err);
+      } else {
+        handleClose();
       }
     } else if (view === "forgotPassword") {
       const { error: err } = await resetPassword(email);
       if (err) {
         setError(err);
       } else {
-        setSuccess("Reset link sent! Check your inbox.");
+        goToOtp("recovery");
       }
     }
 
@@ -88,6 +175,42 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     setError(null);
     setSuccess(null);
     setView(v);
+  };
+
+  /**
+   * Hands off to the code screen after an email has just been sent.
+   *
+   * Starts the cooldown here rather than on the resend button, because the
+   * first email has already gone out — offering "send another" the instant
+   * the screen appears invites a press that Supabase will refuse, and makes
+   * a working flow look broken.
+   */
+  const goToOtp = (purpose: OtpPurpose) => {
+    setOtpPurpose(purpose);
+    setOtp("");
+    setCooldown(RESEND_COOLDOWN);
+    setError(null);
+    setSuccess(`We sent a ${OTP_LENGTH}-digit code to ${email}.`);
+    setView("verifyOtp");
+  };
+
+  const handleResend = async () => {
+    if (cooldown > 0 || isLoading) return;
+    setIsLoading(true);
+    setError(null);
+
+    const { error: err } =
+      otpPurpose === "signup"
+        ? await resendSignupOtp(email)
+        : await resetPassword(email);
+
+    if (err) {
+      setError(err);
+    } else {
+      setSuccess("A new code is on its way.");
+      setCooldown(RESEND_COOLDOWN);
+    }
+    setIsLoading(false);
   };
 
   const inputClass = "w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#9B59B6]/60 focus:bg-white/[0.05] transition-all autofill-dark";
@@ -205,16 +328,107 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
               </motion.div>
             )}
 
+            {/* View: Verify the code from the confirmation email */}
+            {view === "verifyOtp" && (
+              <motion.div key="verify-view" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="duration-300">
+                <h2 className="text-2xl font-bold mb-2">
+                  {otpPurpose === "signup" ? "Check your email" : "Reset your password"}
+                </h2>
+                <p className="text-gray-400 text-sm mb-6">
+                  Enter the {OTP_LENGTH}-digit code we sent to{" "}
+                  <span className="text-white">{email}</span>. It expires in 60 minutes.
+                </p>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <input
+                    // `inputMode` + `autoComplete` together are what make a
+                    // phone show the number pad AND offer the code from the
+                    // notification, so most readers never open their inbox.
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    // `pattern` alone would not stop a paste; the onChange
+                    // strips non-digits so a code copied with a stray space
+                    // or an invisible character still verifies.
+                    placeholder={"0".repeat(OTP_LENGTH)}
+                    required
+                    maxLength={OTP_LENGTH}
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, OTP_LENGTH))}
+                    autoFocus
+                    className={`${inputClass} text-center text-2xl tracking-[0.5em] font-mono`}
+                  />
+                  <button type="submit" disabled={isLoading || otp.length < OTP_LENGTH} className={btnPrimary}>
+                    {isLoading ? <span className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" /> : "Confirm"}
+                  </button>
+                </form>
+
+                <div className="mt-6 flex flex-col gap-3 text-sm text-center">
+                  <button
+                    type="button"
+                    disabled={isLoading || cooldown > 0}
+                    onClick={handleResend}
+                    className="text-gray-400 hover:text-white transition-colors font-medium disabled:opacity-40 disabled:hover:text-gray-400 disabled:cursor-default"
+                  >
+                    {cooldown > 0
+                      ? `Didn't get it? Send another in ${cooldown}s`
+                      : "Didn't get it? Send another"}
+                  </button>
+                  <button onClick={() => switchView("login")} className="text-gray-500 hover:text-white transition-colors" type="button">
+                    &larr; Back to log in
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* View: Choose a new password, after a verified reset code */}
+            {view === "newPassword" && (
+              <motion.div key="new-password-view" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="duration-300">
+                <h2 className="text-2xl font-bold mb-2">Choose a new password</h2>
+                <p className="text-gray-400 text-sm mb-6">
+                  You&apos;re signed in as <span className="text-white">{email}</span>. Pick
+                  something you haven&apos;t used here before.
+                </p>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <input
+                    type="password"
+                    placeholder="New password (min 6 characters)"
+                    required
+                    minLength={6}
+                    // The reset code was just accepted, so nothing is waiting
+                    // on the reader except this field.
+                    autoFocus
+                    autoComplete="new-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={inputClass}
+                  />
+                  <button type="submit" disabled={isLoading || password.length < 6} className={btnPrimary}>
+                    {isLoading ? <span className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" /> : "Save password"}
+                  </button>
+                </form>
+
+                {/* No "skip" and no way back to the code screen. The session
+                    is already live, so leaving here signs them in with the
+                    old password still set — which is a working account, just
+                    not the one they asked for. Closing the modal does that
+                    and says nothing, which is the honest outcome. */}
+              </motion.div>
+            )}
+
             {/* View: Forgot Password */}
             {view === "forgotPassword" && (
               <motion.div key="forgot-view" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="duration-300">
                 <h2 className="text-2xl font-bold mb-2">Password recovery</h2>
-                <p className="text-gray-400 text-sm mb-6">Enter your email and we&apos;ll send a reset link.</p>
+                <p className="text-gray-400 text-sm mb-6">
+                  Enter your email and we&apos;ll send a {OTP_LENGTH}-digit code.
+                </p>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <input type="email" placeholder="Email" required value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} />
                   <button type="submit" disabled={isLoading} className={btnPrimary}>
-                    {isLoading ? <span className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" /> : "Send Reset Link"}
+                    {isLoading ? <span className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" /> : "Send code"}
                   </button>
                 </form>
 

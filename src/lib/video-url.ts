@@ -19,6 +19,8 @@
  * all of that.
  */
 
+import { cdnAsset } from "./image-url";
+
 export type VideoProvider = "file" | "hls" | "bunny" | "embed";
 
 /** Public by design; shipped to the browser the same way an image host is. */
@@ -42,8 +44,23 @@ export function videoPlaybackUrl(
   }
 
   // `file` and `hls` already hold a complete address; `embed` is an iframe
-  // URL somebody pasted. All three are used as-is.
-  return ref;
+  // URL somebody pasted.
+  //
+  // A `file` slide uploaded through the dashboard holds a Supabase Storage
+  // URL, and returning it untouched meant the browser streamed it straight
+  // out of Supabase. The home hero is ~14MB; against the free plan's 5GB
+  // monthly egress that is roughly 370 page views, and it is what put the
+  // project over quota.
+  //
+  // `cdnAsset` is a no-op for an `embed` iframe URL, for an `hls` playlist
+  // hosted elsewhere, and for anything that is not a Supabase Storage URL —
+  // so this only redirects the case that was actually bleeding.
+  //
+  // This is the floor, not the fix. It changes who serves the same single
+  // file; it does not give adaptive renditions. A hero video belongs in
+  // Bunny Stream (`provider: "bunny"`), and this should stop mattering once
+  // these are re-uploaded.
+  return cdnAsset(ref);
 }
 
 /**

@@ -94,6 +94,27 @@ export function cdnImage<T extends string | null | undefined>(url: T): T {
   }
 }
 
+/**
+ * The same function, named for what it actually does.
+ *
+ * The pull zone sits in front of Supabase Storage and serves whatever is
+ * there — mp4 and PDF included, range requests and all. Nothing in
+ * [cdnImage] is specific to images; the name only reflects what it was
+ * written for first.
+ *
+ * This alias exists so the video path can use it without reading as a
+ * mistake. See `video-url.ts`: a slide uploaded as a plain file rather than
+ * through Bunny Stream holds a Supabase URL, and was being served straight
+ * from Supabase — 14MB a page view against a 5GB monthly allowance, which is
+ * about 370 visits.
+ *
+ * It is NOT a substitute for Bunny Stream. Stream transcodes to several
+ * renditions and serves HLS, so a weak connection drops quality instead of
+ * stalling; this only changes who delivers the same single file. It is the
+ * floor, not the goal — the goal is that these get re-uploaded to Stream.
+ */
+export const cdnAsset = cdnImage;
+
 /** The same, for a list column. Non-string entries are dropped. */
 export function cdnImages(urls: unknown): string[] {
   if (!Array.isArray(urls)) return [];

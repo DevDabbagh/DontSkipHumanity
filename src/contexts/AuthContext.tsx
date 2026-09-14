@@ -46,9 +46,18 @@ interface AuthContextType {
   loading: boolean;
   signInWithEmail: (email: string, password: string) => Promise<{ error: string | null }>;
   signUpWithEmail: (email: string, password: string, fullName: string) => Promise<{ error: string | null }>;
+  /// Exchanges the code from the confirmation email for a session.
+  verifySignupOtp: (email: string, token: string) => Promise<{ error: string | null }>;
+  /// Sends a fresh confirmation code to an address that has signed up but
+  /// not yet confirmed.
+  resendSignupOtp: (email: string) => Promise<{ error: string | null }>;
   signInWithProvider: (provider: SocialProvider) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: string | null }>;
+  /// Exchanges the code from the reset email for a session.
+  verifyRecoveryOtp: (email: string, token: string) => Promise<{ error: string | null }>;
+  /// Sets a new password using the session [verifyRecoveryOtp] created.
+  setNewPassword: (password: string) => Promise<{ error: string | null }>;
   /// Changes the password of a signed-in user, checking the old one first.
   changePassword: (currentPassword: string, newPassword: string) => Promise<{ error: string | null }>;
   updateProfile: (updates: Partial<Pick<UserProfile, "fullName" | "avatarUrl">>) => Promise<{ error: string | null }>;
@@ -61,9 +70,13 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   signInWithEmail: async () => ({ error: null }),
   signUpWithEmail: async () => ({ error: null }),
+  verifySignupOtp: async () => ({ error: null }),
+  resendSignupOtp: async () => ({ error: null }),
   signInWithProvider: async () => ({ error: null }),
   signOut: async () => {},
   resetPassword: async () => ({ error: null }),
+  verifyRecoveryOtp: async () => ({ error: null }),
+  setNewPassword: async () => ({ error: null }),
   changePassword: async () => ({ error: null }),
   updateProfile: async () => ({ error: null }),
 });
@@ -182,6 +195,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error?.message ?? null };
   }, []);
 
+  /**
+   * Confirms a new account with the code from the email.
+   *
+   * WHY THIS EXISTS AT ALL
+   *
+   * Supabase's default confirmation is a link: the reader clicks it, lands
+   * back on the site, and the session is created for them. That stopped being
+   * what happens the day the Send Email hook went live — the hook renders the
+   * six-digit `token` instead, and a code in an inbox is no use without a
+   * field to type it into. The signup form said "check your email" and the
+   * journey ended there.
+   *
+   * A code rather than a link is also the right shape for this product: it
+   * works when the reader signs up on a laptop and opens mail on a phone,
+   * which a link cannot do without bouncing them between devices.
+   *
+   * On success Supabase returns a session and the `onAuthStateChange`
+   * listener above picks it up, so nothing here has to set state by hand.
+   */
+  const verifySignupOtp = useCallback(async (email: string, token: string) => {
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token: token.trim(),
+      type: "signup",
+    });
+    return { error: error?.message ?? null };
+  }, []);
+
+  /**
+   * A new code for someone whose first one expired or never arrived.
+   *
+   * Codes last 60 minutes, and "it never came" is usually a spam folder — but
+   * without this the only way out is to sign up again with the same address,
+   * which fails because the account already exists. That dead end is the
+   * reason the button exists.
+   */
+  const resendSignupOtp = useCallback(async (email: string) => {
+    const { error } = await supabase.auth.resend({ type: "signup", email });
+    return { error: error?.message ?? null };
+  }, []);
+
   // One call for both providers rather than one function each. The app's
   // login screens offer exactly these two, and the only thing that differs is
   // the string — a second near-identical function would drift from the first
@@ -203,10 +257,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(null);
   }, []);
 
+  /**
+   * Starts a password reset. Sends a code, not a link.
+   *
+   * `redirectTo` is deliberately gone. It was there for the link flow, and
+   * once the Send Email hook began rendering `{{ .Token }}` the link stopped
+   * being sent at all — leaving the modal promising a "reset link" that never
+   * arrived and a `/auth/reset-password` page nobody could reach. Passing a
+   * redirect that nothing uses is worse than passing none: it reads like the
+   * link flow is still alive.
+   */
   const resetPassword = useCallback(async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: typeof window !== "undefined" ? `${window.location.origin}/auth/reset-password` : undefined,
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    return { error: error?.message ?? null };
+  }, []);
+
+  /**
+   * Exchanges the reset code for a session.
+   *
+   * `type: "recovery"` rather than `"signup"` — same six digits, different
+   * purpose, and Supabase will not accept one for the other. Succeeding here
+   * signs the person in, which is what makes [setNewPassword] below possible
+   * without asking for a password they have by definition forgotten.
+   */
+  const verifyRecoveryOtp = useCallback(async (email: string, token: string) => {
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token: token.trim(),
+      type: "recovery",
     });
+    return { error: error?.message ?? null };
+  }, []);
+
+  /**
+   * Sets a new password at the end of a reset.
+   *
+   * No current password, unlike [changePassword] — the session this is called
+   * with was created seconds earlier by verifying a code sent to the mailbox,
+   * so ownership is already proven. Asking again for a password they have
+   * forgotten would make the reset impossible to complete.
+   *
+   * Only ever reachable straight after [verifyRecoveryOtp]. If it is ever
+   * called from anywhere else, that reasoning no longer holds.
+   */
+  const setNewPassword = useCallback(async (password: string) => {
+    const { error } = await supabase.auth.updateUser({ password });
     return { error: error?.message ?? null };
   }, []);
 
@@ -277,9 +372,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         signInWithEmail,
         signUpWithEmail,
+        verifySignupOtp,
+        resendSignupOtp,
         signInWithProvider,
         signOut,
         resetPassword,
+        verifyRecoveryOtp,
+        setNewPassword,
         changePassword,
         updateProfile,
       }}
