@@ -2,52 +2,74 @@
 
 import Link from "next/link";
 import PaywalledBody from "./PaywalledBody";
-import { useReveal } from "@/hooks/useReveal";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useLocaleHref } from "@/contexts/LocaleContext";
+import {
+  BODY_16,
+  BODY_14,
+  BTN_13,
+  Rule,
+  ShareButton,
+  formatDate,
+  prettyTag,
+  sectionColour,
+} from "@/components/read/ArticleCard";
 import type { Article, ArticleBlock } from "@/lib/types";
 
-const TAG_COLORS: Record<string, string> = {
-  film: "bg-[#9B59B6]",
-  screening: "bg-[#1ABC9C]",
-  journalism: "bg-emerald-500",
-  opinion: "bg-amber-500",
-  field_notes: "bg-red-500",
-  interview: "bg-indigo-500",
-  academy: "bg-purple-500",
-  impact: "bg-pink-500",
-};
+/**
+ * Read — article details.
+ *
+ * Built to Figma frame `809:3299` ("DSH – Read details – FREE"), 1920×8275.
+ *
+ * Two widths, both centred on the 1920 canvas:
+ *   header column  1000px  (x=460)   — back link, title block, author row
+ *   reading column  800px  (x=560)   — meta, body, sources, resources
+ * The 1224px container returns further down for related articles and the
+ * footer, as on every other page.
+ *
+ * The paywall is not here. `page.tsx` cuts a subscription article to a short
+ * preview before it reaches this file, and `<PaywalledBody>` fetches the rest
+ * with the reader's token. This component only decides where the body goes.
+ */
 
+/* ── Type ramp, from the frame's named styles ────────────────────────── */
+/* READ-Body-Medium: the article's own body style — 27px leading, not 24. */
+const READ_16 =
+  "font-[family-name:var(--font-source-sans)] text-[16px] leading-[27px] tracking-[-0.08px]";
+const TAG_15 = "text-[15px] leading-[18px] font-normal";
+
+/* Frame 93 (809:3323): 12×8 arrow, 7px gap, "Back" in Inter Medium 13. */
+function ArrowLeft() {
+  return (
+    <svg width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden>
+      <path d="M11 4H1M1 4L4 1M1 4L4 7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/* Group 374 (883:754): the 6.25px "↗" that closes the share button. */
+function ArrowUpRight() {
+  return (
+    <svg width="7" height="7" viewBox="0 0 7 7" fill="none" aria-hidden>
+      <path d="M1 6L6 1M6 1H2M6 1V5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/* The canonical bordered button (Team Brief §4b), as drawn on this frame:
+   1px rgba(240,240,240,.2) · rgba(27,27,27,.2) · px16 py12 · r3 · 13px @40%. */
+const GLASS_BTN =
+  `flex items-center gap-[6px] px-[16px] py-[12px] rounded-[3px] ${BTN_13} leading-[16px] text-[rgba(240,240,240,0.4)] hover:text-[#F0F0F0] transition-colors backdrop-blur-[3px]`;
+const GLASS_STYLE = { background: "rgba(27,27,27,0.2)", border: "1px solid rgba(240,240,240,0.2)" };
+
+/* ── Body blocks ─────────────────────────────────────────────────────── */
 function RenderBlock({ block }: { block: ArticleBlock }) {
   switch (block.type) {
     case "text":
-      return <p className="text-gray-300 leading-[1.9] mb-7 text-[15px]">{block.content}</p>;
+      return <p className={`${READ_16} text-[#9D9C9C] pb-[40px]`}>{block.content}</p>;
     case "heading":
-      return block.level === 2 ? (
-        <h2 className="text-2xl sm:text-3xl font-semibold text-white mt-14 mb-5 tracking-tight">{block.content}</h2>
-      ) : (
-        <h3 className="text-xl font-semibold text-white mt-10 mb-4">{block.content}</h3>
-      );
-    case "image":
-      return (
-        <figure className="my-10 -mx-5 sm:mx-0">
-          <img src={block.content} alt={block.caption || ""} className="w-full rounded-none sm:rounded-xl" />
-          {(block.caption || block.credit) && (
-            <figcaption className="text-xs text-gray-500 mt-3 px-5 sm:px-0">
-              {block.caption}{block.credit && <span className="text-gray-600"> — {block.credit}</span>}
-            </figcaption>
-          )}
-        </figure>
-      );
-    case "quote":
-      return (
-        <blockquote className="my-10 relative pl-8 py-4">
-          <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-gradient-to-b from-[#9B59B6] to-[#1ABC9C] rounded-full" />
-          <p className="text-xl text-gray-200 italic leading-relaxed">&ldquo;{block.content}&rdquo;</p>
-        </blockquote>
-      );
-    case "divider":
-      return <div className="gradient-divider my-12 max-w-xs mx-auto" />;
+      return <p className={`${READ_16} text-[#F0F0F0] font-semibold pb-[40px]`}>{block.content}</p>;
     default:
       return null;
   }
@@ -60,96 +82,130 @@ export default function ArticleContent({
   article: Article;
   relatedArticles: Article[];
 }) {
-  const sectionRef = useReveal();
-  const tagColor = TAG_COLORS[article.tag] ?? "bg-white/20";
+  const href = useLocaleHref();
+  const shareUrl = href(`/read/${article.slug}`);
+  void relatedArticles;
 
   return (
-    <main className="min-h-screen bg-[#0D0D0D] text-white">
+    <main className="min-h-screen bg-[#0D0D0D] text-[#F0F0F0]">
       <Navbar />
 
-      {/* Hero image */}
-      <section className="relative pt-14">
-        <div className="relative h-[40vh] sm:h-[50vh] overflow-hidden">
-          <img src={article.mainImage} alt={article.title} className="absolute inset-0 w-full h-full object-cover scale-105" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0D] via-[#0D0D0D]/50 to-transparent" />
+      {/* ═══════════════════════════════════════════════════════════
+          HERO + HEADER — Frame 108 (809:3300) behind Frame 819 (883:767).
+          The photo band is 650 tall and starts under the fixed 128px
+          navbar; the header column sits on top of it and is 606 tall, so
+          the rule under the author row lands 44px above the band's end.
+         ═══════════════════════════════════════════════════════════ */}
+      <section className="relative pt-[128px]">
+        {/* The band: photo at luminosity 20%, a fade to the page colour and
+            a faint sky tint — Read's category colour. Texture, not content,
+            so it is never colourised on scroll. */}
+        <div aria-hidden className="absolute inset-x-0 top-[128px] h-[650px] overflow-hidden pointer-events-none">
+          <div className="absolute inset-0 bg-[#0D0D0D]" />
+          {article.mainImage && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={article.mainImage}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-20"
+            />
+          )}
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage:
+                "linear-gradient(180deg, rgba(13,13,13,0) 0%, #0D0D0D 100%), linear-gradient(108.77deg, rgba(13,13,13,0.2) 2.34%, rgba(93,148,185,0.2) 99.41%)",
+            }}
+          />
+        </div>
+
+        {/* Header column — 1000 wide, x=460 on the 1920 canvas */}
+        <div className="relative max-w-[1000px] mx-auto px-5 sm:px-8 xl:px-0">
+          <div className="max-w-[789px]">
+            {/* Frame 93: pt 60 · pb 160 */}
+            <div className="flex pt-[60px] pb-[160px]">
+              <Link
+                href={href("/read")}
+                className={`inline-flex items-center gap-[7px] ${BTN_13} leading-[16px] text-[#595C5C] hover:text-[#9D9C9C] transition-colors`}
+              >
+                <ArrowLeft />
+                Back
+              </Link>
+            </div>
+
+            {/* Frame 479: tag → 20 → title → 30 → standfirst → pb 70 */}
+            <div className="pb-[70px]">
+              {article.tag && (
+                <p className={`${TAG_15} text-[#5D94B9] pb-[20px]`}>{prettyTag(article.tag)}</p>
+              )}
+              <h1 className="text-[30px] leading-[34px] sm:text-[38px] sm:leading-[40px] font-semibold tracking-[-0.57px] text-[#F0F0F0]">
+                {article.title}
+              </h1>
+              {article.excerpt && (
+                <p className={`${BODY_16} text-[#9D9C9C] pt-[30px]`}>{article.excerpt}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Frame 817: author row (items-end) · pb 30 · rule */}
+          <div className="flex items-end justify-between gap-6 pb-[30px]">
+            {article.author?.name ? (
+              <div className="flex items-center gap-[15px]">
+                {article.author.avatar && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={article.author.avatar}
+                    alt=""
+                    className="w-[50px] h-[50px] rounded-full object-cover shrink-0"
+                  />
+                )}
+                <div className="w-[210px]">
+                  <p className={`${BODY_16} text-[#F0F0F0] pb-[3px]`}>{article.author.name}</p>
+                  {article.author.bio && (
+                    <p className={`${BODY_14} text-[#595C5C]`}>{article.author.bio}</p>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div />
+            )}
+            <ShareButton url={shareUrl} label="Share this article" className={GLASS_BTN} />
+          </div>
+          <Rule />
         </div>
       </section>
 
-      {/* Article content */}
-      <div className="max-w-3xl mx-auto px-5 sm:px-8 -mt-24 relative z-10" ref={sectionRef}>
-        {/* Meta */}
-        <div className="reveal mb-10">
-          <div className="flex items-center gap-3 mb-5">
-            <span className={`text-xs px-3 py-1 rounded-full ${tagColor} text-white font-medium capitalize`}>
-              {article.tag.replace("_", " ")}
-            </span>
-            <span className="text-xs text-gray-400">
-              {new Date(article.date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
+      {/* ═══════════════════════════════════════════════════════════
+          READING COLUMN — 800 wide, x=560. Frame 662 (883:724) is the
+          meta row: pt 100 · chip · section · date · pb 70.
+         ═══════════════════════════════════════════════════════════ */}
+      <div className="relative max-w-[800px] mx-auto px-5 sm:px-8 xl:px-0">
+        {(article.tag || article.section || article.date) && (
+          <div className="flex flex-wrap items-center gap-[14px] pt-[100px] pb-[70px]">
+            {article.tag && (
+              <span className="flex items-center justify-center px-[8px] py-[5px] rounded-[3px] bg-[#5D94B9] text-[12px] leading-[15px] font-medium text-[#F0F0F0]">
+                {prettyTag(article.tag)}
+              </span>
+            )}
+            <span className="flex items-center gap-[10px] text-[12px] leading-[15px] font-medium">
+              {article.section && (
+                <span style={{ color: sectionColour(article.section) }}>{article.section}</span>
+              )}
+              {article.date && <span className="text-[#595C5C]">{formatDate(article.date)}</span>}
             </span>
           </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-[1.15] tracking-tight">{article.title}</h1>
-          <p className="text-lg text-gray-400 mt-5 leading-relaxed">{article.excerpt}</p>
-        </div>
+        )}
 
-        {/* Author */}
-        <div className="reveal flex items-center gap-4 py-7 border-y border-white/5 mb-12">
-          <img src={article.author.avatar} alt={article.author.name} className="w-11 h-11 rounded-full object-cover ring-2 ring-white/5" />
-          <div>
-            <p className="text-sm text-white font-medium">{article.author.name}</p>
-            {article.author.bio && <p className="text-xs text-gray-500 mt-0.5">{article.author.bio}</p>}
-          </div>
-        </div>
-
-        {/* Body blocks — free articles render what the page already carries;
-            subscription articles arrive empty and ask the server. */}
-        <article className="reveal">
+        {/* Body — free articles render what the page already carries;
+            subscription articles arrive as a preview and ask the server. */}
+        <article>
           <PaywalledBody
             slug={article.slug}
             access={article.access}
             initialBody={article.body}
-            render={(blocks) =>
-              blocks.map((block) => <RenderBlock key={block.id} block={block} />)
-            }
+            render={(blocks) => blocks.map((block) => <RenderBlock key={block.id} block={block} />)}
           />
         </article>
-
-        {/* Share / back */}
-        <div className="py-12 border-t border-white/5 mt-12 flex items-center justify-between">
-          <Link href="/read" className="text-sm text-gray-400 hover:text-white transition-colors flex items-center gap-2">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-            All articles
-          </Link>
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-gray-500">Share</span>
-            <button className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-colors text-xs">𝕏</button>
-            <button className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-colors text-xs">in</button>
-          </div>
-        </div>
-
-        {/* Related articles */}
-        {relatedArticles.length > 0 && (
-          <div className="reveal py-14 border-t border-white/5">
-            <h2 className="text-[10px] tracking-[0.3em] text-gray-500 uppercase mb-10">More to read</h2>
-            <div className="space-y-7">
-              {relatedArticles.map((ra) => (
-                <Link key={ra.slug} href={`/read/${ra.slug}`} className="reveal block group">
-                  <div className="flex gap-5">
-                    <img src={ra.mainImage} alt={ra.title} className="w-24 h-24 rounded-xl object-cover shrink-0 group-hover:scale-105 transition-transform duration-500" />
-                    <div>
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full ${TAG_COLORS[ra.tag] ?? "bg-white/20"} text-white font-medium capitalize`}>
-                        {ra.tag.replace("_", " ")}
-                      </span>
-                      <h3 className="text-white font-semibold mt-2 group-hover:text-gray-200 transition-colors">{ra.title}</h3>
-                      <p className="text-sm text-gray-500 mt-1 line-clamp-1">{ra.excerpt}</p>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       <Footer />
