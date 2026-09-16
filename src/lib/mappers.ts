@@ -7,7 +7,7 @@ import type {
   Film, FilmFestival, FilmScreening, FilmStage, FilmForm, FilmFormat,
   StudioProject, StudioFormat, StudioStatus,
   AcademyProgram, AcademyType, AcademyFormat,
-  Article, ArticleBlock, ArticleAuthor, ArticleStatus,
+  Article, ArticleBlock, ArticleAuthor, ArticleStatus, ArticleSource, ArticleResource,
   DSHEvent, EventPartner, EventStatus,
 } from "./types";
 import { cdnImage } from "./image-url";
@@ -376,6 +376,28 @@ export function mapArticle(row: any): Article {
     readMinutes: Number(row.read_minutes) || 0,
     relatedArticleIds: Array.isArray(row.related_article_ids) ? row.related_article_ids : [],
     relatedFilmIds: Array.isArray(row.related_film_ids) ? row.related_film_ids : [],
+    /* Migration 044. Absent on rows from before it, so every read tolerates
+       a missing column: the sections simply do not render. */
+    sources: Array.isArray(row.sources)
+      ? row.sources
+          .map((x: any) => ({
+            title: str(x?.title),
+            description: str(x?.description),
+            url: typeof x?.url === "string" ? x.url : "",
+          }))
+          .filter((x: ArticleSource) => x.title)
+      : [],
+    resources: Array.isArray(row.resources)
+      ? row.resources
+          .map((x: any) => ({
+            label: typeof x?.label === "string" ? x.label : "",
+            title: str(x?.title),
+            url: typeof x?.url === "string" ? x.url : "",
+            sizeLabel: typeof x?.size_label === "string" ? x.size_label : typeof x?.sizeLabel === "string" ? x.sizeLabel : "",
+          }))
+          .filter((x: ArticleResource) => x.title)
+      : [],
+    additionalInfo: str(row.additional_info),
     scheduledDate: row.scheduled_date || null,
     seo: {
       metaDescription: row.seo_meta_description || "",

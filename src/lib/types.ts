@@ -289,8 +289,34 @@ export interface Article {
   readMinutes: number;
   relatedArticleIds: string[];
   relatedFilmIds: string[];
+  /**
+   * The three blocks under the body on the Read details frame (809:3299):
+   * "articles sources", "Article Resources", "additional information".
+   * Each section is hidden when its data is empty — never rendered blank.
+   * Columns arrive with dashboard migration 044.
+   */
+  sources: ArticleSource[];
+  resources: ArticleResource[];
+  additionalInfo: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ArticleSource {
+  title: string;
+  description: string;
+  /** Optional: with a URL the title is a link; without, plain text. */
+  url: string;
+}
+
+export interface ArticleResource {
+  /** The chip — "PDF", "XLS", "LINK". Shown uppercase. */
+  label: string;
+  title: string;
+  /** Empty means the file is not available: the row is shown inert. */
+  url: string;
+  /** "PDF · 420 KB" — written by the editor, never computed here. */
+  sizeLabel: string;
 }
 
 /* ─── Event ───────────────────────────────────────────────────── */

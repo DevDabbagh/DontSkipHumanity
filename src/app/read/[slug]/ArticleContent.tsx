@@ -8,6 +8,7 @@ import ArticleGallery from "@/components/read/ArticleGallery";
 import { useLocaleHref } from "@/contexts/LocaleContext";
 import { useScrollColorize } from "@/hooks/useScrollColorize";
 import {
+  EYEBROW,
   BODY_16,
   BODY_14,
   BTN_13,
@@ -17,7 +18,7 @@ import {
   prettyTag,
   sectionColour,
 } from "@/components/read/ArticleCard";
-import type { Article, ArticleBlock } from "@/lib/types";
+import type { Article, ArticleBlock, ArticleResource, ArticleSource } from "@/lib/types";
 
 /**
  * Read — article details.
@@ -160,6 +161,122 @@ function RenderBlock({ block }: { block: ArticleBlock }) {
     default:
       return null;
   }
+}
+
+/* ── Under the body: sources · resources · additional information ─── */
+
+/* Frame 744 (896:1410) + Frame 802 (896:1412). Rule, eyebrow 60 below it,
+   30 to the first entry; each entry is a 16/24 title over a 14/20 note with
+   20 under it. Hidden without entries. */
+function Sources({ items }: { items: ArticleSource[] }) {
+  if (items.length === 0) return null;
+  return (
+    <section>
+      <Rule />
+      <p className={`${EYEBROW} pt-[60px] pb-[30px]`}>articles sources</p>
+      {items.map((src, i) => (
+        <div key={`${src.title}-${i}`} className="pb-[20px]">
+          <p className={`${BODY_16} text-[#9D9C9C] pb-[5px]`}>
+            {src.url ? (
+              <a href={src.url} target="_blank" rel="noopener noreferrer" className="hover:text-[#F0F0F0] transition-colors">
+                {src.title}
+              </a>
+            ) : (
+              src.title
+            )}
+          </p>
+          {src.description && <p className={`${BODY_14} text-[#363636]`}>{src.description}</p>}
+        </div>
+      ))}
+    </section>
+  );
+}
+
+/* Frame 742 (896:1367). Rule, then py 60: eyebrow, 14, rows 16 apart.
+   A row: rgba(27,27,27,.4) · r6 · px 20 py 14 · chip + title on the left,
+   size + icon on the right. A file with no URL (the frame's third row) is
+   drawn inert — dimmer chip, dimmer title, no link — never a dead link. */
+function Resources({ items }: { items: ArticleResource[] }) {
+  if (items.length === 0) return null;
+  return (
+    <section>
+      <Rule />
+      <div className="py-[60px]">
+        <p className={`${EYEBROW} pb-[14px]`}>Article Resources</p>
+        <div className="flex flex-col gap-[16px]">
+          {items.map((res, i) => {
+            const live = Boolean(res.url);
+            const row = (
+              <>
+                <span className="flex items-center gap-[12px] min-w-0">
+                  {res.label && (
+                    <span
+                      className="shrink-0 px-[8px] py-[2px] rounded-[3px] text-[10px] leading-[15px] font-bold tracking-[0.12px] uppercase"
+                      style={
+                        live
+                          ? { background: "rgba(50,198,204,0.2)", color: "#32C6CC" }
+                          : { background: "#363636", color: "#595C5C" }
+                      }
+                    >
+                      {res.label}
+                    </span>
+                  )}
+                  <span className={`${BODY_14} truncate ${live ? "text-[#595C5C]" : "text-[#363636]"}`}>{res.title}</span>
+                </span>
+                <span className="flex items-center gap-[12px] shrink-0">
+                  {res.sizeLabel && (
+                    <span className="text-[12px] leading-[18px] font-normal text-[#363636]">{res.sizeLabel}</span>
+                  )}
+                  {live ? (
+                    /* download arrow, 14px */
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden className="text-[#595C5C]">
+                      <path d="M7 1.5v8M3.5 6.5L7 10l3.5-3.5M2 12.5h10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  ) : (
+                    /* lock, 24px box */
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden className="text-[#363636]">
+                      <rect x="6" y="11" width="12" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.2" />
+                      <path d="M9 11V8.5a3 3 0 016 0V11" stroke="currentColor" strokeWidth="1.2" />
+                    </svg>
+                  )}
+                </span>
+              </>
+            );
+            const cls =
+              "flex items-center justify-between gap-[20px] w-full rounded-[6px] px-[20px] py-[14px] bg-[rgba(27,27,27,0.4)]";
+            return live ? (
+              <a
+                key={`${res.title}-${i}`}
+                href={res.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${cls} transition-colors hover:bg-[rgba(27,27,27,0.7)]`}
+              >
+                {row}
+              </a>
+            ) : (
+              <div key={`${res.title}-${i}`} className={cls} aria-disabled title="Not available">
+                {row}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* Frame 827 (896:1433) + Frame 828 (896:1435). Rule, eyebrow 60 below,
+   30 to a 14/20 note in the darkest grey. */
+function AdditionalInfo({ text }: { text: string }) {
+  if (!text.trim()) return null;
+  return (
+    <section>
+      <Rule />
+      <p className={`${EYEBROW} pt-[60px] pb-[30px]`}>additional information</p>
+      <p className={`${BODY_14} text-[#363636] whitespace-pre-line`}>{text}</p>
+    </section>
+  );
 }
 
 export default function ArticleContent({
@@ -314,12 +431,23 @@ export default function ArticleContent({
                   <RenderBlock key={block.id} block={block} />
                 ))}
                 {afterBody(blocks) && (
-                  /* Full bleed inside the 800 column: break out to the viewport.
-                     Frame 590 is py 120 on its own, so the 40 the last block
-                     leaves is taken back here. */
-                  <div className="-mt-[40px] w-screen relative left-1/2 -translate-x-1/2">
-                    <ArticleGallery images={article.gallery} />
-                  </div>
+                  <>
+                    {/* Full bleed inside the 800 column: break out to the
+                        viewport. Frame 590 is py 120 on its own, so the 40
+                        the last block leaves is taken back here. */}
+                    {article.gallery.length > 0 && (
+                      <div className="-mt-[40px] w-screen relative left-1/2 -translate-x-1/2">
+                        <ArticleGallery images={article.gallery} />
+                      </div>
+                    )}
+                    {/* Frame 823 ends 150 under its text: the last block
+                        leaves 40, the gallery leaves 120 of its own. */}
+                    <div className={article.gallery.length > 0 ? "pt-[30px]" : "pt-[110px]"}>
+                      <Sources items={article.sources} />
+                      <Resources items={article.resources} />
+                      <AdditionalInfo text={article.additionalInfo} />
+                    </div>
+                  </>
                 )}
               </>
             )}
