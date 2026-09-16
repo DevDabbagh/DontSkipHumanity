@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
-import { getArticleBySlug, getArticles } from "@/lib/api";
+import { getArticleBySlug, getArticles, getAllFilms } from "@/lib/api";
 import ArticleContent from "./ArticleContent";
-import type { ArticleBlock } from "@/lib/types";
+import type { Article, ArticleBlock, Film } from "@/lib/types";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -65,10 +65,25 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
      body of the article being read means nothing if the page also carries the
      full text of three others, one of which may be a subscription piece. */
   const allArticles = await getArticles();
-  const relatedArticles = allArticles
-    .filter((a) => a.slug !== article.slug)
+  /* The editor's picks first, in the order they were picked; the newest
+     three stand in when nothing was picked, so the row is never empty. */
+  const picked = article.relatedArticleIds
+    .map((id) => allArticles.find((a) => a.id === id))
+    .filter((a): a is Article => Boolean(a) && a!.slug !== article.slug);
+  const relatedArticles = (picked.length > 0 ? picked : allArticles.filter((a) => a.slug !== article.slug))
     .slice(0, 3)
     .map((a) => ({ ...a, body: [] }));
+
+  /* "related projects" shows only the films the editor linked — there is no
+     sensible fallback, so an article with none shows no row. */
+  let relatedFilms: Film[] = [];
+  if (article.relatedFilmIds.length > 0) {
+    const films = await getAllFilms();
+    relatedFilms = article.relatedFilmIds
+      .map((id) => films.find((f) => f.id === id))
+      .filter((f): f is Film => Boolean(f))
+      .slice(0, 2);
+  }
 
   /* THE PAYWALL IS HERE, not in the markup.
      A subscription article is sent to the browser with an empty body. The
@@ -82,5 +97,5 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
   /* No second flag for "is it free": `access` travels on the article itself,
      and PaywalledBody reads it. Two sources for one fact is how they drift. */
-  return <ArticleContent article={safeArticle} relatedArticles={relatedArticles} />;
+  return <ArticleContent article={safeArticle} relatedArticles={relatedArticles} relatedFilms={relatedFilms} />;
 }

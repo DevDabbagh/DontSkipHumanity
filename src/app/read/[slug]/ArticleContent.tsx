@@ -4,6 +4,7 @@ import Link from "next/link";
 import PaywalledBody from "./PaywalledBody";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Newsletter from "@/components/Newsletter";
 import ArticleGallery from "@/components/read/ArticleGallery";
 import SupportProjectBand from "@/components/SupportProjectBand";
 import { useLocaleHref } from "@/contexts/LocaleContext";
@@ -14,12 +15,14 @@ import {
   BODY_14,
   BTN_13,
   Rule,
+  ArticleCard,
+  ArrowRight,
   ShareButton,
   formatDate,
   prettyTag,
   sectionColour,
 } from "@/components/read/ArticleCard";
-import type { Article, ArticleBlock, ArticleResource, ArticleSource } from "@/lib/types";
+import type { Article, ArticleBlock, ArticleResource, ArticleSource, Film } from "@/lib/types";
 
 /**
  * Read — article details.
@@ -280,17 +283,98 @@ function AdditionalInfo({ text }: { text: string }) {
   );
 }
 
+/* ── Related projects — Frame 465 (883:915) ──
+   Poster 221×288 (hairline, standard shadow) with its buttons 40 below;
+   text column 338 wide (pr 20): form chip · stage · year, 30 to the H6
+   title, 20 to the logline, 63 to the "Directed by" pair. */
+const STAGE_LABEL: Record<string, string> = {
+  development: "Development",
+  production: "Production",
+  post_production: "Post-production",
+  festivals: "Festivals",
+  distribution: "Distribution",
+  impact: "Impact",
+};
+
+function RelatedProjectCard({ film, href }: { film: Film; href: (p: string) => string }) {
+  const to = href(`/film/${film.slug}`);
+  const poster = film.posterUrl || film.thumbnailUrl;
+  return (
+    <div className="flex gap-[40px] items-start">
+      <div className="flex flex-col gap-[40px] items-center w-[221px] shrink-0">
+        <Link href={to} className="block w-full">
+          <div
+            className="relative h-[288px] rounded-[6px] overflow-hidden bg-[#0D0D0D]"
+            style={{ border: "1.5px solid rgba(240,240,240,0.1)", boxShadow: "0px 6px 20px 2px rgba(0,0,0,0.5)" }}
+          >
+            {poster && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img data-colorize src={poster} alt={film.title} className="absolute inset-0 w-full h-full object-cover" />
+            )}
+          </div>
+        </Link>
+        <div className="flex items-center gap-[24px] w-full">
+          {/* Only with a trailer — a button that opens an empty tab is the
+              bug the Film page still carries (Screen Spec A9). */}
+          {film.trailerUrl && (
+            <a
+              href={film.trailerUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex items-center gap-[6px] px-[14px] py-[11px] rounded-[3px] ${BTN_13} leading-[16px] text-[rgba(240,240,240,0.4)] hover:text-[#F0F0F0] transition-colors backdrop-blur-[3px]`}
+              style={GLASS_STYLE}
+            >
+              Watch trailer
+              <ArrowRight />
+            </a>
+          )}
+          <Link href={to} className={`${BTN_13} leading-[16px] text-[rgba(240,240,240,0.3)] hover:text-[#F0F0F0] transition-colors`}>
+            Know more
+          </Link>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-[63px] w-[338px] pr-[20px] min-w-0">
+        <div className="flex flex-col gap-[20px] w-full">
+          <div className="flex flex-col gap-[30px] w-full">
+            <div className="flex items-center gap-[14px] text-[12px] leading-[15px] font-medium">
+              <span className="px-[8px] py-[5px] rounded-[3px] bg-[#B23495] text-[#F0F0F0]">
+                {film.credits.form === "fiction" ? "Fiction" : "Documentary"}
+              </span>
+              <span className="flex items-center gap-[10px]">
+                {film.stage && <span className="text-[#771D5C]">{STAGE_LABEL[film.stage] ?? film.stage}</span>}
+                {film.credits.year && <span className="text-[#595C5C]">{film.credits.year}</span>}
+              </span>
+            </div>
+            <Link href={to}>
+              <h3 className="text-[24px] leading-[30px] font-semibold text-[#F0F0F0] hover:text-white transition-colors">{film.title}</h3>
+            </Link>
+          </div>
+          {film.logline && <p className={`${BODY_16} text-[#595C5C]`}>{film.logline}</p>}
+        </div>
+        {film.credits.direction && (
+          <div className="flex flex-col gap-[6px] w-full">
+            <p className="text-[10px] leading-[24px] tracking-[1.6px] uppercase text-[#363636] h-[21px]">Directed by</p>
+            <p className="text-[15px] leading-[18px] text-[#F0F0F0] h-[21px]">{film.credits.direction}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function ArticleContent({
   article,
   relatedArticles,
+  relatedFilms,
 }: {
   article: Article;
   relatedArticles: Article[];
+  relatedFilms: Film[];
 }) {
   const href = useLocaleHref();
   const shareUrl = href(`/read/${article.slug}`);
   const colorizeRef = useScrollColorize<HTMLElement>();
-  void relatedArticles;
 
   /* Everything that belongs to the article's body — the photo strip, the
      sources, the resources — ships with the body. `PaywalledBody` calls
@@ -483,6 +567,37 @@ export default function ArticleContent({
 
       <SupportProjectBand href={href("/support")} imageSrc={article.mainImage || undefined} />
 
+      {/* ═══════════════════════════════════════════════════════════
+          RELATED ARTICLES — Frame 824 (883:908), on the 1224 container:
+          pt 160 · eyebrow · 40 · three cards 24 apart · pb 120.
+         ═══════════════════════════════════════════════════════════ */}
+      {relatedArticles.length > 0 && (
+        <section className="relative max-w-[1224px] mx-auto px-5 sm:px-8 xl:px-0 pt-[160px] pb-[120px]">
+          <p className={`${EYEBROW} pb-[40px]`}>Related articles</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[24px]">
+            {relatedArticles.slice(0, 3).map((a) => (
+              <ArticleCard key={a.slug} article={a} href={href} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════
+          RELATED PROJECTS — Frame 543 (883:912): eyebrow · 64 · two film
+          cards 24 apart · pb 170. Only the films the editor linked.
+         ═══════════════════════════════════════════════════════════ */}
+      {relatedFilms.length > 0 && (
+        <section className="relative max-w-[1224px] mx-auto px-5 sm:px-8 xl:px-0 pb-[170px]">
+          <p className={`${EYEBROW} pb-[40px]`}>related projects</p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-[24px]">
+            {relatedFilms.slice(0, 2).map((f) => (
+              <RelatedProjectCard key={f.slug} film={f} href={href} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      <Newsletter />
       <Footer />
     </main>
   );

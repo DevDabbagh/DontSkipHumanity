@@ -111,7 +111,10 @@ export function ArticleCard({ article, href }: { article: Article; href: (p: str
         <CardMeta article={article} />
       </div>
 
-      <Link href={to} className="block pt-[25px] group">
+      {/* 40 under the meta line: Frame 807 ends at 315, Frame 408 starts at
+          355, on the listing card (883:262) and the details card (883:842)
+          alike. Was 25. */}
+      <Link href={to} className="block pt-[40px] group">
         <h3 className="text-[26px] font-semibold leading-[30px] tracking-[-0.75px] text-[#F0F0F0] group-hover:text-white transition-colors">
           {article.title}
         </h3>
