@@ -117,7 +117,7 @@ function RenderBlock({ block }: { block: ArticleBlock }) {
       return (
         <figure className="pt-[60px] pb-[100px] mx-auto w-full max-w-[650px]">
           <div
-            className="relative h-[500px] rounded-[6px] overflow-hidden bg-[#0D0D0D]"
+            className="relative aspect-[13/10] sm:aspect-auto sm:h-[500px] rounded-[6px] overflow-hidden bg-[#0D0D0D]"
             style={{
               border: "1.5px solid rgba(240,240,240,0.1)",
               boxShadow: "0px 6px 20px 2px rgba(0,0,0,0.5)",
@@ -300,7 +300,7 @@ function RelatedProjectCard({ film, href }: { film: Film; href: (p: string) => s
   const to = href(`/film/${film.slug}`);
   const poster = film.posterUrl || film.thumbnailUrl;
   return (
-    <div className="flex gap-[40px] items-start">
+    <div className="flex flex-col sm:flex-row gap-[40px] items-start">
       <div className="flex flex-col gap-[40px] items-center w-[221px] shrink-0">
         <Link href={to} className="block w-full">
           <div
@@ -334,7 +334,7 @@ function RelatedProjectCard({ film, href }: { film: Film; href: (p: string) => s
         </div>
       </div>
 
-      <div className="flex flex-col gap-[63px] w-[338px] pr-[20px] min-w-0">
+      <div className="flex flex-col gap-[63px] w-full sm:w-[338px] pr-[20px] min-w-0">
         <div className="flex flex-col gap-[20px] w-full">
           <div className="flex flex-col gap-[30px] w-full">
             <div className="flex items-center gap-[14px] text-[12px] leading-[15px] font-medium">
@@ -449,7 +449,7 @@ export default function ArticleContent({
           </div>
 
           {/* Frame 817: author row (items-end) · pb 30 · rule */}
-          <div className="flex items-end justify-between gap-6 pb-[30px]">
+          <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-[20px] pb-[30px]">
             {article.author?.name ? (
               <div className="flex items-center gap-[15px]">
                 {article.author.avatar && (
@@ -460,7 +460,7 @@ export default function ArticleContent({
                     className="w-[50px] h-[50px] rounded-full object-cover shrink-0"
                   />
                 )}
-                <div className="w-[210px]">
+                <div className="w-full max-w-[210px]">
                   <p className={`${BODY_16} text-[#F0F0F0] pb-[3px]`}>{article.author.name}</p>
                   {article.author.bio && (
                     <p className={`${BODY_14} text-[#595C5C]`}>{article.author.bio}</p>

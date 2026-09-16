@@ -380,7 +380,7 @@ export function mapArticle(row: any): Article {
        a missing column: the sections simply do not render. */
     sources: Array.isArray(row.sources)
       ? row.sources
-          .map((x: any) => ({
+          .map((x: Record<string, unknown>) => ({
             title: str(x?.title),
             description: str(x?.description),
             url: typeof x?.url === "string" ? x.url : "",
@@ -389,7 +389,7 @@ export function mapArticle(row: any): Article {
       : [],
     resources: Array.isArray(row.resources)
       ? row.resources
-          .map((x: any) => ({
+          .map((x: Record<string, unknown>) => ({
             label: typeof x?.label === "string" ? x.label : "",
             title: str(x?.title),
             url: typeof x?.url === "string" ? x.url : "",
