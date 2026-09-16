@@ -5,6 +5,7 @@ import PaywalledBody from "./PaywalledBody";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ArticleGallery from "@/components/read/ArticleGallery";
+import SupportProjectBand from "@/components/SupportProjectBand";
 import { useLocaleHref } from "@/contexts/LocaleContext";
 import { useScrollColorize } from "@/hooks/useScrollColorize";
 import {
@@ -454,6 +455,33 @@ export default function ArticleContent({
           />
         </article>
       </div>
+
+      {/* ═══════════════════════════════════════════════════════════
+          SHARE ROW — Frame 484 (809:3562). Back on the 1000 column:
+          pt 200 · share button left, "Want to write your piece?" right ·
+          pb 30. Then the support band, Frame 483 (809:3571).
+         ═══════════════════════════════════════════════════════════ */}
+      <div className="relative max-w-[1000px] mx-auto px-5 sm:px-8 xl:px-0">
+        <div className="flex flex-wrap items-center justify-between gap-[20px] pt-[200px] pb-[30px]">
+          <ShareButton
+            url={shareUrl}
+            label="Share this article"
+            className={GLASS_BTN}
+            style={GLASS_STYLE}
+            icon={<ArrowUpRight />}
+          />
+          {/* The frame gives this line no destination. It goes to About, as
+              the Studio page's contact links do, until Tiago names one. */}
+          <Link
+            href={href("/about")}
+            className={`${BTN_13} leading-[16px] text-[#595C5C] hover:text-[#9D9C9C] transition-colors`}
+          >
+            Want to write your piece? Get in touch
+          </Link>
+        </div>
+      </div>
+
+      <SupportProjectBand href={href("/support")} imageSrc={article.mainImage || undefined} />
 
       <Footer />
     </main>
