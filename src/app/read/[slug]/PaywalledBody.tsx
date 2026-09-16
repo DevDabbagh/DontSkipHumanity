@@ -121,31 +121,39 @@ export default function PaywalledBody({
               the text it sits over. */}
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-[180px]"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-[260px]"
             style={{
+              /* Four stops, not three. A three-stop fade has a visible seam
+                 where the middle one sits; easing it across the last line is
+                 what makes the text look like it is dissolving rather than
+                 being covered by a panel. */
               background:
-                "linear-gradient(to bottom, rgba(13,13,13,0) 0%, rgba(13,13,13,0.75) 55%, #0D0D0D 100%)",
+                "linear-gradient(to bottom, rgba(13,13,13,0) 0%, rgba(13,13,13,0.35) 30%, rgba(13,13,13,0.85) 65%, #0D0D0D 100%)",
             }}
           />
         </div>
       )}
-      <div className={initialBody.length > 0 ? "-mt-[40px] relative" : ""}>
+      {/* The card takes the article's own column rather than floating narrow
+          inside it — a 420px box centred in a 530px column reads as a popup
+          that wandered in, not as where the article stops. */}
+      <div className={initialBody.length > 0 ? "-mt-[60px] relative" : ""}>
       <div
-        className="mx-auto w-full max-w-[420px] rounded-[6px] p-[30px]"
+        className="w-full rounded-[6px] px-[40px] py-[36px] text-center"
         style={{
-          background: "rgba(19,19,19,0.92)",
+          background:
+            "linear-gradient(180deg, rgba(30,30,30,0.9) 0%, rgba(19,19,19,0.92) 100%)",
           border: "1.5px solid rgba(240,240,240,0.1)",
           boxShadow: "0px 6px 20px 2px rgba(0,0,0,0.5)",
           backdropFilter: "blur(3px)",
         }}
       >
-        <p className="text-[11px] font-normal leading-[24px] tracking-[1.76px] uppercase text-[#363636]">
+        <p className="text-[11px] font-normal leading-[24px] tracking-[1.76px] uppercase text-[#595C5C]">
           Monthly
         </p>
-        <p className="text-[22px] font-semibold leading-[28px] tracking-[-0.5px] text-[#F0F0F0] pt-[6px]">
+        <p className="text-[26px] font-semibold leading-[32px] tracking-[-0.75px] text-[#F0F0F0] pt-[10px] max-w-[420px] mx-auto">
           Get your subscription or membership
         </p>
-        <p className="font-[family-name:var(--font-source-sans)] text-[14px] leading-[20px] text-[#595C5C] pt-[8px]">
+        <p className="font-[family-name:var(--font-source-sans)] text-[16px] leading-[24px] tracking-[-0.08px] text-[#9D9C9C] pt-[12px] max-w-[420px] mx-auto">
           {needsSignIn
             ? "Sign in to read this article. All access to our articles and associated newsletters."
             : "All access to our articles and associated newsletters."}
@@ -153,7 +161,7 @@ export default function PaywalledBody({
 
         <Link
           href={href(needsSignIn ? "/support?type=monthly" : "/support?type=monthly")}
-          className="mt-[24px] flex items-center justify-center gap-[7px] h-[44px] rounded-[3px] text-[13px] font-medium text-[#F0F0F0] transition-opacity hover:opacity-90"
+          className="mt-[28px] mx-auto flex w-full max-w-[300px] items-center justify-center gap-[7px] h-[44px] rounded-[3px] text-[13px] font-medium text-[#F0F0F0] transition-opacity hover:opacity-90"
           style={{
             border: "1px solid rgba(240,240,240,0.2)",
             backgroundImage:
@@ -172,7 +180,7 @@ export default function PaywalledBody({
         </Link>
 
         {needsSignIn && (
-          <p className="text-center pt-[14px] text-[13px] text-[#595C5C]">
+          <p className="text-center pt-[16px] text-[13px] text-[#595C5C]">
             Already a subscriber?{" "}
             <Link href={href("/profile")} className="text-[#32C6CC] hover:underline">
               Sign in
