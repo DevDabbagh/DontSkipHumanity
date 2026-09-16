@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import type { Article } from "@/lib/types";
 
@@ -126,7 +126,9 @@ export function ArticleCard({ article, href }: { article: Article; href: (p: str
       <div className="flex items-center gap-[24px] pt-[40px]">
         <Link
           href={to}
-          className={`flex items-center gap-[8px] px-[14px] py-[12px] rounded-[3px] ${BTN_13} text-[#F0F0F0] transition-colors hover:bg-[rgba(27,27,27,0.7)]`}
+          /* py 11, not the frame's 12: the 1px border is inside the box in CSS
+             and outside it in Figma, and the frame's button is 40 tall. */
+          className={`flex items-center gap-[8px] px-[14px] py-[11px] rounded-[3px] ${BTN_13} leading-[16px] text-[#F0F0F0] transition-colors hover:bg-[rgba(27,27,27,0.7)]`}
           style={{ background: "rgba(27,27,27,0.4)", border: "1px solid rgba(240,240,240,0.2)" }}
         >
           Read now
@@ -145,10 +147,14 @@ export function ShareButton({
   url,
   label = "Share article",
   className,
+  style,
+  icon,
 }: {
   url: string;
   label?: string;
   className?: string;
+  style?: React.CSSProperties;
+  icon?: ReactNode;
 }) {
   const [copied, setCopied] = useState(false);
   return (
@@ -166,8 +172,10 @@ export function ShareButton({
           .catch(() => {});
       }}
       className={className ?? `${BTN_13} text-[#595C5C] hover:text-[#9D9C9C] transition-colors`}
+      style={style}
     >
       {copied ? "Link copied" : label}
+      {icon}
     </button>
   );
 }

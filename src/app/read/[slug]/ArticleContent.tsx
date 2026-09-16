@@ -4,7 +4,9 @@ import Link from "next/link";
 import PaywalledBody from "./PaywalledBody";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ArticleGallery from "@/components/read/ArticleGallery";
 import { useLocaleHref } from "@/contexts/LocaleContext";
+import { useScrollColorize } from "@/hooks/useScrollColorize";
 import {
   BODY_16,
   BODY_14,
@@ -60,16 +62,101 @@ function ArrowUpRight() {
 /* The canonical bordered button (Team Brief §4b), as drawn on this frame:
    1px rgba(240,240,240,.2) · rgba(27,27,27,.2) · px16 py12 · r3 · 13px @40%. */
 const GLASS_BTN =
-  `flex items-center gap-[6px] px-[16px] py-[12px] rounded-[3px] ${BTN_13} leading-[16px] text-[rgba(240,240,240,0.4)] hover:text-[#F0F0F0] transition-colors backdrop-blur-[3px]`;
+  `flex items-center gap-[6px] px-[16px] py-[11px] rounded-[3px] ${BTN_13} leading-[16px] text-[rgba(240,240,240,0.4)] hover:text-[#F0F0F0] transition-colors backdrop-blur-[3px]`;
 const GLASS_STYLE = { background: "rgba(27,27,27,0.2)", border: "1px solid rgba(240,240,240,0.2)" };
 
 /* ── Body blocks ─────────────────────────────────────────────────────── */
+/*
+ * The rhythm, read off the frame:
+ *   paragraph → paragraph   40   (Frame 506: pb 40)
+ *   paragraph → image      100   (Frame 391: pb 100)
+ *   caption   → paragraph  100   (Frame 820: pt 100)
+ *   paragraph → quote       80   (Frame 820: pb 80)
+ *   quote     → paragraph   80   (Frame 821: pt 80)
+ *   heading   → paragraph   30   (Frame 822: pt 30)
+ *   last text → rule       150   (Frame 823: pb 150)
+ * Every block owns a 40px bottom; the larger gaps are the block's own top
+ * padding on top of that 40, so any two blocks meet at the frame's distance
+ * whatever order an editor puts them in.
+ */
 function RenderBlock({ block }: { block: ArticleBlock }) {
   switch (block.type) {
     case "text":
       return <p className={`${READ_16} text-[#9D9C9C] pb-[40px]`}>{block.content}</p>;
+
+    case "html":
+      /* The dashboard's HTML block. Same measure as a paragraph; inline
+         emphasis takes the frame's smoke white, links the Read sky. */
+      return (
+        <div
+          className={`${READ_16} text-[#9D9C9C] pb-[40px] [&_strong]:font-semibold [&_strong]:text-[#F0F0F0] [&_b]:font-semibold [&_b]:text-[#F0F0F0] [&_a]:text-[#5D94B9] [&_a:hover]:underline [&_p+p]:pt-[27px] [&_ul]:list-disc [&_ul]:pl-[24px] [&_ol]:list-decimal [&_ol]:pl-[24px]`}
+          dangerouslySetInnerHTML={{ __html: block.content }}
+        />
+      );
+
     case "heading":
-      return <p className={`${READ_16} text-[#F0F0F0] font-semibold pb-[40px]`}>{block.content}</p>;
+      /* Frame 391 (883:829): H4 — Inter 600 26/26 −0.75 — then 30 to the text. */
+      return block.level === 3 ? (
+        <h3 className={`${READ_16} font-semibold text-[#F0F0F0] pt-[20px] pb-[30px]`}>{block.content}</h3>
+      ) : (
+        <h2 className="text-[26px] leading-[26px] font-semibold tracking-[-0.75px] text-[#F0F0F0] pt-[40px] pb-[30px]">
+          {block.content}
+        </h2>
+      );
+
+    case "image":
+      /* Frame 646 (883:777) + Frame 451 (883:792): a 650×500 card centred in
+         the column, 1.5px hairline, the standard shadow, the photo at 80%;
+         caption 20 below in Inter Medium 12 #363636. Colourises on scroll
+         like every content photograph on the site. */
+      return (
+        <figure className="pt-[60px] pb-[100px] mx-auto w-full max-w-[650px]">
+          <div
+            className="relative h-[500px] rounded-[6px] overflow-hidden bg-[#0D0D0D]"
+            style={{
+              border: "1.5px solid rgba(240,240,240,0.1)",
+              boxShadow: "0px 6px 20px 2px rgba(0,0,0,0.5)",
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              data-colorize
+              src={block.content}
+              alt={block.caption || ""}
+              className="absolute inset-0 w-full h-full object-cover opacity-80"
+            />
+          </div>
+          {(block.caption || block.credit) && (
+            <figcaption className="pt-[20px] text-[12px] leading-[15px] font-medium text-[#363636]">
+              {block.caption}
+              {block.caption && block.credit ? " — " : ""}
+              {block.credit}
+            </figcaption>
+          )}
+        </figure>
+      );
+
+    case "quote":
+      /* Frame 538 (883:799): indented 76 into the column, 551 wide, a 2px
+         teal rule on the left, Source Sans 3 Medium Italic 18/25. */
+      return (
+        <blockquote className="pt-[40px] pb-[80px] sm:ml-[76px] max-w-[551px]">
+          <p
+            className="font-[family-name:var(--font-source-sans)] italic font-medium text-[18px] leading-[25px] tracking-[-0.09px] text-[#F0F0F0] pl-[30px]"
+            style={{ borderLeft: "2px solid #32C6CC" }}
+          >
+            {block.content}
+          </p>
+        </blockquote>
+      );
+
+    case "divider":
+      return (
+        <div className="pt-[20px] pb-[60px]">
+          <Rule />
+        </div>
+      );
+
     default:
       return null;
   }
@@ -84,10 +171,22 @@ export default function ArticleContent({
 }) {
   const href = useLocaleHref();
   const shareUrl = href(`/read/${article.slug}`);
+  const colorizeRef = useScrollColorize<HTMLElement>();
   void relatedArticles;
 
+  /* Everything that belongs to the article's body — the photo strip, the
+     sources, the resources — ships with the body. `PaywalledBody` calls
+     `render` twice for a subscription piece: once with the server-cut
+     preview (the same array the page arrived with) under the fade, and once
+     with the blocks the API handed over. Only the second is the article.
+     Comparing the reference is deliberate: a free article's body IS
+     `article.body`, so it needs no second flag, and there is no fact to
+     drift. */
+  const afterBody = (blocks: ArticleBlock[]) =>
+    article.access === "free" || blocks !== article.body;
+
   return (
-    <main className="min-h-screen bg-[#0D0D0D] text-[#F0F0F0]">
+    <main ref={colorizeRef} className="min-h-screen bg-[#0D0D0D] text-[#F0F0F0]">
       <Navbar />
 
       {/* ═══════════════════════════════════════════════════════════
@@ -169,7 +268,13 @@ export default function ArticleContent({
             ) : (
               <div />
             )}
-            <ShareButton url={shareUrl} label="Share this article" className={GLASS_BTN} />
+            <ShareButton
+              url={shareUrl}
+              label="Share this article"
+              className={GLASS_BTN}
+              style={GLASS_STYLE}
+              icon={<ArrowUpRight />}
+            />
           </div>
           <Rule />
         </div>
@@ -203,7 +308,21 @@ export default function ArticleContent({
             slug={article.slug}
             access={article.access}
             initialBody={article.body}
-            render={(blocks) => blocks.map((block) => <RenderBlock key={block.id} block={block} />)}
+            render={(blocks) => (
+              <>
+                {blocks.map((block) => (
+                  <RenderBlock key={block.id} block={block} />
+                ))}
+                {afterBody(blocks) && (
+                  /* Full bleed inside the 800 column: break out to the viewport.
+                     Frame 590 is py 120 on its own, so the 40 the last block
+                     leaves is taken back here. */
+                  <div className="-mt-[40px] w-screen relative left-1/2 -translate-x-1/2">
+                    <ArticleGallery images={article.gallery} />
+                  </div>
+                )}
+              </>
+            )}
           />
         </article>
       </div>
