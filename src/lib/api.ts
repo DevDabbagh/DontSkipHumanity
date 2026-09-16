@@ -103,7 +103,10 @@ async function loadDataSources(): Promise<void> {
   _cacheTime = now;
 }
 
-async function isModuleLive(module: ContentModule): Promise<boolean> {
+/* Exported so the Read body route can answer from the same source the pages
+   read from. A route that always went straight to Supabase while the pages
+   were on mock would 404 every mock article — which is exactly what it did. */
+export async function isModuleLive(module: ContentModule): Promise<boolean> {
   await loadDataSources();
   return _cachedModuleSources?.[module] === "live";
 }

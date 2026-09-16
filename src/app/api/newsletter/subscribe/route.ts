@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { sendNewsletterConfirmation } from "@/lib/newsletter-confirm";
+// The domain the request actually arrived on, so the confirm link points back
+// at the site the reader is on rather than a hardcoded host.
+import { resolveSiteUrl } from "@/lib/site-url";
 
 /**
  * Newsletter signup — step one of double opt-in.
@@ -50,6 +54,18 @@ export async function POST(req: NextRequest) {
     console.error("newsletter_subscribe failed:", error.message);
     return NextResponse.json({ ok: false }, { status: 500 });
   }
+
+  // The second half of double opt-in, and the half that was missing: the row
+  // above is `pending`, and until someone answers this email it stays that
+  // way forever — invisible to every send, because the recipient list is
+  // confirmed addresses only.
+  //
+  // Awaited rather than fired and forgotten: a serverless function can be
+  // frozen the moment it returns a response, so a dangling promise here is a
+  // confirmation email that sometimes sends and sometimes does not, with
+  // nothing in the logs either way. It is best-effort inside, so a provider
+  // outage cannot fail the signup.
+  await sendNewsletterConfirmation(email, resolveSiteUrl(req));
 
   return NextResponse.json({ ok: true });
 }

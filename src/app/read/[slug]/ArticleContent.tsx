@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import PaywalledBody from "./PaywalledBody";
 import { useReveal } from "@/hooks/useReveal";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -99,11 +100,17 @@ export default function ArticleContent({
           </div>
         </div>
 
-        {/* Body blocks */}
+        {/* Body blocks — free articles render what the page already carries;
+            subscription articles arrive empty and ask the server. */}
         <article className="reveal">
-          {article.body.map((block) => (
-            <RenderBlock key={block.id} block={block} />
-          ))}
+          <PaywalledBody
+            slug={article.slug}
+            access={article.access}
+            initialBody={article.body}
+            render={(blocks) =>
+              blocks.map((block) => <RenderBlock key={block.id} block={block} />)
+            }
+          />
         </article>
 
         {/* Share / back */}

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { getUserIdFromRequest } from "@/lib/reader";
 import { hasActiveSubscription } from "@/lib/subscriptions";
+import { isModuleLive } from "@/lib/api";
+import { getArticleBySlug as mockGetArticle } from "@/lib/mock-data";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -37,6 +39,31 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params;
+
+  /* Mock mode: the pages are showing sample articles, so this must answer from
+     the same list or every subscription piece renders "could not be loaded".
+     Sample content is not secret — the access rules below still apply to it, so
+     the paywall can be exercised end to end without a database. */
+  if (!(await isModuleLive("articles"))) {
+    const mock = mockGetArticle(slug);
+    if (!mock) return NextResponse.json({ error: "Not found." }, { status: 404 });
+    if (mock.access === "subscription") {
+      const userId = await getUserIdFromRequest(req);
+      if (!userId) {
+        return NextResponse.json(
+          { error: "sign_in_required", message: "Sign in to read this article." },
+          { status: 401 }
+        );
+      }
+      if (!(await hasActiveSubscription(userId))) {
+        return NextResponse.json(
+          { error: "subscription_required", message: "This article is for subscribers." },
+          { status: 402 }
+        );
+      }
+    }
+    return NextResponse.json({ body: mock.body ?? [] });
+  }
 
   interface Row {
     access: string;
