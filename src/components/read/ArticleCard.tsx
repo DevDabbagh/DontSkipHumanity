@@ -120,7 +120,10 @@ export function ArticleCard({ article, href }: { article: Article; href: (p: str
         </h3>
       </Link>
 
-      <p className={`${BODY_16} text-[#595C5C] pt-[20px]`}>{article.excerpt}</p>
+      {/* Three lines, always: clamped at three and reserving three (3 × 24),
+          so "by …" and the buttons sit at the same height on every card in
+          a row whatever the excerpt's length. The frame's excerpt box is 72. */}
+      <p className={`${BODY_16} text-[#595C5C] line-clamp-3 mt-[20px] min-h-[72px]`}>{article.excerpt}</p>
 
       {article.author?.name && (
         <p className={`${BODY_14} text-[#595C5C] pt-[30px]`}>by {article.author.name}</p>
