@@ -34,7 +34,7 @@
  * stored stays the Supabase URL — the durable address of the actual file — and
  * the delivery host is decided when the page is rendered.
  *
- * That is also what makes this safe to switch off. `NEXT_PUBLIC_BUNNY_IMAGE_CDN`
+ * That is also what makes this safe to switch off. `NEXT_PUBLIC_BUNNY_LEGACY_CDN`
  * unset means every function here returns its input untouched and images come
  * from Supabase exactly as before. No migration either way, and no upload path
  * is touched, so a misconfigured zone can never cost an editor their work.
@@ -48,12 +48,35 @@
  */
 
 /**
- * The pull-zone hostname, e.g. `dsh-media.b-cdn.net`.
+ * THE ZONE THAT REWRITES OLD URLS IS NOT THE ZONE NEW UPLOADS LAND IN
  *
- * Public by design — it appears in the src of every image on the page, the
- * same way the Supabase host does today. Empty is the off switch.
+ * This was one variable doing two incompatible jobs, and it would have taken
+ * every existing image down the first time it was configured.
+ *
+ * A pull zone has exactly ONE origin. The two jobs need different ones:
+ *
+ *   · new uploads live in a Bunny Storage zone and are served as
+ *     `https://<zone>/films/123-poster.webp` — a pull zone whose origin IS
+ *     that storage zone
+ *   · old files are still physically in Supabase, at
+ *     `/storage/v1/object/public/media/films/x.webp`, and this file rewrites
+ *     only their hostname — which needs a pull zone whose origin is the
+ *     Supabase project URL
+ *
+ * Point one zone at storage and ask it for `/storage/v1/object/public/...`
+ * and it looks for that path inside the storage zone, does not find it, and
+ * returns 404. Every image uploaded before the move, gone at once, from a
+ * change that looks like configuration rather than deletion.
+ *
+ * So: two variables, two zones. `NEXT_PUBLIC_BUNNY_IMAGE_CDN` is where new
+ * uploads are served from and is read by the upload code, not here. The one
+ * below is only for the older Supabase-hosted files.
+ *
+ * Leaving it unset is a safe, sensible choice: old images then come straight
+ * from Supabase exactly as they do today. That costs Supabase egress on a set
+ * of files that only ever shrinks, and it is one less thing to get wrong.
  */
-const ZONE = (process.env.NEXT_PUBLIC_BUNNY_IMAGE_CDN ?? "").trim();
+const ZONE = (process.env.NEXT_PUBLIC_BUNNY_LEGACY_CDN ?? "").trim();
 
 /** The marker that says a URL is a file in Supabase Storage. */
 const STORAGE_PATH = "/storage/v1/object/public/";

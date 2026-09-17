@@ -21,7 +21,7 @@ import { cdnImage } from "./image-url";
  * becomes something a component renders: there are roughly ninety places that
  * put a URL in a `src`, and only a dozen that read one out of a row.
  *
- * It is a no-op when `NEXT_PUBLIC_BUNNY_IMAGE_CDN` is unset, and a no-op for
+ * It is a no-op when `NEXT_PUBLIC_BUNNY_LEGACY_CDN` is unset, and a no-op for
  * anything that is not a Supabase Storage URL. So wrapping a field that turns
  * out not to need it costs nothing, while missing one silently keeps that
  * image on the expensive path — which is why every image field below is
