@@ -125,6 +125,20 @@ export function webhookSecretFor(mode: StripeMode): string | undefined {
   return specific || process.env.STRIPE_WEBHOOK_SECRET;
 }
 
+/**
+ * Whether a usable key exists for a mode — set AND of the right prefix, the
+ * same test `keyFor` applies before charging. A boolean, for the mode route
+ * and the dashboard's status page; the key itself stays here.
+ */
+export function hasStripeKey(mode: StripeMode): boolean {
+  const specific =
+    mode === "live"
+      ? process.env.STRIPE_SECRET_KEY_LIVE
+      : process.env.STRIPE_SECRET_KEY_TEST;
+  const key = specific || process.env.STRIPE_SECRET_KEY;
+  return Boolean(key && key.startsWith(mode === "live" ? "sk_live_" : "sk_test_"));
+}
+
 /** Whether payments are configured at all — for showing a disabled state. */
 export function isStripeConfigured(): boolean {
   return Boolean(
