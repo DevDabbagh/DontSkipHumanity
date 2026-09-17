@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import SupportCTA from "@/components/SupportCTA";
 import HeroMosaic from "@/components/HeroMosaic";
 import { HERO_TILES } from "@/components/heroTiles";
+import { useScrollColorize } from "@/hooks/useScrollColorize";
 import { useLocaleHref } from "@/contexts/LocaleContext";
 import type { Article } from "@/lib/types";
 import {
@@ -67,6 +68,9 @@ function PageArrow({ direction }: { direction: "left" | "right" }) {
 
 export default function ReadListing({ articles }: { articles: Article[] }) {
   const href = useLocaleHref();
+  /* Photos start black & white and develop into colour as they rise — the
+     same treatment as /films and /studio. Drives every `data-colorize`. */
+  const colorizeRef = useScrollColorize<HTMLElement>();
 
   const [category, setCategory] = useState<string | null>(null);
   const [access, setAccess] = useState<"free" | "subscription" | null>(null);
@@ -96,7 +100,7 @@ export default function ReadListing({ articles }: { articles: Article[] }) {
   }
 
   return (
-    <main className="relative bg-[#0D0D0D]">
+    <main ref={colorizeRef} className="relative bg-[#0D0D0D]">
       <div className="film-grain" />
       <Navbar />
 
@@ -165,11 +169,14 @@ export default function ReadListing({ articles }: { articles: Article[] }) {
               <div className="relative overflow-hidden rounded-[6px]" style={{ aspectRatio: "612 / 448" }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
+                  data-colorize
                   src={featured.mainImage}
                   alt={featured.title}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-                  style={{ filter: "grayscale(1) brightness(0.85)" }}
                 />
+                {/* The dimming that was brightness(0.85): an overlay, because the
+                    hook owns this image's `filter` and would overwrite it. */}
+                <div className="pointer-events-none absolute inset-0 bg-black/15" />
               </div>
             </Link>
 

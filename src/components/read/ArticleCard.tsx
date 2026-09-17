@@ -124,9 +124,12 @@ export function ArticleCard({ article, href }: { article: Article; href: (p: str
           <img
             src={article.mainImage}
             alt={article.title}
+            data-colorize
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-            style={{ filter: "grayscale(1) brightness(0.8)" }}
           />
+          {/* Was brightness(0.8). An overlay instead: the page's
+              `useScrollColorize` writes this image's `filter` as it scrolls. */}
+          <div className="pointer-events-none absolute inset-0 bg-black/20" />
         </div>
       </Link>
 
