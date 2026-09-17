@@ -116,7 +116,9 @@ export default function FilmsListing({
 
   /* Explore buttons — apply the form filter and scroll down to the list */
   const listRef = useRef<HTMLDivElement>(null);
-  const exploreForm = (form: "documentary" | "fiction") => {
+  /* A slug, not one of two literals — the tenth copy of the assumption this
+     change is removing, hiding in a parameter type instead of a ternary. */
+  const exploreForm = (form: string) => {
     setFormFilter(form);
     listRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
@@ -419,7 +421,7 @@ export default function FilmsListing({
                 className="grid md:grid-cols-2 gap-[100px] md:gap-x-[24px] md:gap-y-[100px]"
               >
                 {row.map((film) => (
-                  <FilmRow key={film.slug} film={film} />
+                  <FilmRow key={film.slug} film={film} forms={forms} locale={locale} defaultLocale={defaultLocale} />
                 ))}
               </div>
             ))}
@@ -445,7 +447,17 @@ export default function FilmsListing({
    Poster 221×288, mix-blend-luminosity, buttons below poster.
    Info column: category chip + stage text + title + description + directed-by. */
 
-function FilmRow({ film }: { film: Film }) {
+function FilmRow({
+  film,
+  forms,
+  locale = "en",
+  defaultLocale = "en",
+}: {
+  film: Film;
+  forms: FilmFormOption[];
+  locale?: string;
+  defaultLocale?: string;
+}) {
   const stage = STAGE_LABELS[film.stage] ?? film.stage;
 
   return (
