@@ -11,6 +11,14 @@ import Newsletter from "@/components/Newsletter";
 import ScrollGalleryAuto from "@/components/ScrollGalleryAuto";
 import TrailerModal from "@/components/TrailerModal";
 import type { Film } from "@/lib/types";
+/* Resolvers only. The fetcher lives in `film-forms-server` so this client
+   component does not pull Supabase into the browser bundle. */
+import {
+  filmFormLabel,
+  filmFormColor,
+  FALLBACK_FILM_FORMS,
+  type FilmFormOption,
+} from "@/lib/film-forms";
 
 /* ── Shared bits ── */
 
@@ -34,9 +42,16 @@ function formatDate(d: string) {
 export default function FilmContent({
   film,
   relatedFilms,
+  forms = FALLBACK_FILM_FORMS,
+  locale = "en",
+  defaultLocale = "en",
 }: {
   film: Film;
   relatedFilms: Film[];
+  /** From `site_settings.film_categories`, fetched by the server page. */
+  forms?: FilmFormOption[];
+  locale?: string;
+  defaultLocale?: string;
 }) {
   const t = useT();
   const sectionRef = useReveal();
@@ -45,7 +60,7 @@ export default function FilmContent({
      `[data-colorize]` descendant. */
   const colorizeRef = useScrollColorize<HTMLElement>();
   const [trailerOpen, setTrailerOpen] = useState(false);
-  const formLabel = film.credits.form === "documentary" ? "Documentary" : "Fiction";
+  const formLabel = filmFormLabel(forms, film.credits.form, locale, defaultLocale);
   const formatLabel =
     film.credits.format === "feature"
       ? "Feature"
@@ -425,8 +440,14 @@ export default function FilmContent({
                 </Link>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-[11px] px-2 py-0.5 rounded-[3px] bg-[#B23495] text-white font-medium">
-                      {rf.credits.form === "documentary" ? "Documentary" : "Fiction"}
+                    {/* The chip was pink for every related film regardless of
+                        its form — the colour was a constant while the label was
+                        a ternary. Both come from the form now. */}
+                    <span
+                      className="text-[11px] px-2 py-0.5 rounded-[3px] text-white font-medium"
+                      style={{ backgroundColor: filmFormColor(forms, rf.credits.form) }}
+                    >
+                      {filmFormLabel(forms, rf.credits.form, locale, defaultLocale)}
                     </span>
                     <span className="text-[13px] text-white/30">{rf.credits.year}</span>
                   </div>

@@ -17,6 +17,14 @@ import {
   type HeaderImagePools,
 } from "@/lib/header-mosaic";
 import type { FilmsHeader } from "@/lib/landing";
+/* Pure resolvers only — `film-forms` splits its fetcher from these for the
+   same reason the comment above gives. */
+import {
+  filmFormLabel,
+  filmFormColor,
+  filmFormColorAlpha,
+  type FilmFormOption,
+} from "@/lib/film-forms";
 import { useScrollColorize } from "@/hooks/useScrollColorize";
 
 /* ── Constants ── */
@@ -51,11 +59,23 @@ export default function FilmsListing({
   films,
   header,
   pools,
+  forms,
+  locale = "en",
+  defaultLocale = "en",
 }: {
   films: Film[];
   header?: FilmsHeader;
   /** Every catalogue the header wall may import from. */
   pools: HeaderImagePools;
+  /**
+   * The forms the dashboard defines, fetched by the server page and passed
+   * down. This is a client component; importing the fetcher here would pull
+   * Supabase into the browser bundle, which is the same reason the header
+   * resolver is imported from `header-mosaic` rather than `landing`.
+   */
+  forms: FilmFormOption[];
+  locale?: string;
+  defaultLocale?: string;
 }) {
   /* Scroll-linked black-and-white → colour, as on the detail pages. Drives
      the featured poster and the film cards; the hero and the decorative
@@ -250,11 +270,13 @@ export default function FilmsListing({
               <div className="flex items-center gap-3 mb-5">
                 <span
                   className="text-[15px]"
-                  style={{ color: featured.credits.form === "documentary" ? "#B23495" : "#771D5C" }}
+                  style={{ color: filmFormColor(forms, featured.credits.form) }}
                 >
-                  {featured.credits.form === "documentary" ? "Documentary" : "Fiction"}
+                  {filmFormLabel(forms, featured.credits.form, locale, defaultLocale)}
                 </span>
-                <span className="text-[15px]" style={{ color: featured.credits.form === "documentary" ? "rgba(178,52,149,0.6)" : "rgba(119,29,92,0.6)" }}>
+                {/* The year was a hand-written rgba() of the colour above it,
+                    so changing one meant remembering the other. Derived now. */}
+                <span className="text-[15px]" style={{ color: filmFormColorAlpha(forms, featured.credits.form, 0.6) }}>
                   {featured.credits.year}
                 </span>
               </div>
@@ -358,10 +380,9 @@ export default function FilmsListing({
           </div>
           {/* Right — form filters */}
           <div className="flex items-center gap-2">
-            {[
-              { value: "documentary" as const, label: "Documentary" },
-              { value: "fiction" as const, label: "Fiction" },
-            ].map((tab) => (
+            {/* Two hardcoded buttons became the editable list. A form added in
+                the dashboard now appears here without a deploy. */}
+            {forms.map((f) => ({ value: f.slug, label: filmFormLabel(forms, f.slug, locale, defaultLocale) })).map((tab) => (
               <button
                 key={tab.value}
                 onClick={() => setFormFilter(formFilter === tab.value ? "all" : tab.value)}
@@ -486,11 +507,9 @@ function FilmRow({ film }: { film: Film }) {
             <div className="flex items-center gap-[20px]">
               <span
                 className="text-[12px] font-medium text-[#F0F0F0] px-[8px] py-[5px] rounded-[3px]"
-                style={{
-                  backgroundColor: film.credits.form === "documentary" ? "#B23495" : "#771D5C",
-                }}
+                style={{ backgroundColor: filmFormColor(forms, film.credits.form) }}
               >
-                {film.credits.form === "documentary" ? "Documentary" : "Fiction"}
+                {filmFormLabel(forms, film.credits.form, locale, defaultLocale)}
               </span>
               <span className="text-[12px] font-medium flex items-center gap-[10px]">
                 <span className="text-[#B23495]">{stage}</span>

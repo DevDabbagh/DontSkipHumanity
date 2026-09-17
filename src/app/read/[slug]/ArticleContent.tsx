@@ -23,6 +23,13 @@ import {
   sectionColour,
 } from "@/components/read/ArticleCard";
 import type { Article, ArticleBlock, ArticleResource, ArticleSource, Film } from "@/lib/types";
+/* KNOWN LIMIT, WRITTEN DOWN RATHER THAN HIDDEN
+   This uses the fallback pair, not the editor's list: the linked-film chip is
+   a small corner of an article page and threading `forms` through this route
+   is a separate change. The behaviour it replaces was worse — a custom form
+   printed "Documentary" here — where now it prints the slug, which looks
+   wrong on purpose and points at the fix. */
+import { filmFormLabel, FALLBACK_FILM_FORMS } from "@/lib/film-forms";
 
 /**
  * Read — article details.
@@ -339,7 +346,11 @@ function RelatedProjectCard({ film, href }: { film: Film; href: (p: string) => s
           <div className="flex flex-col gap-[30px] w-full">
             <div className="flex items-center gap-[14px] text-[12px] leading-[15px] font-medium">
               <span className="px-[8px] py-[5px] rounded-[3px] bg-[#B23495] text-[#F0F0F0]">
-                {film.credits.form === "fiction" ? "Fiction" : "Documentary"}
+                {/* Note this one was inverted relative to the other eight —
+                    fiction-first rather than documentary-first. Same two
+                    outcomes, opposite default, which is what a rule copied by
+                    hand nine times looks like. */}
+                {filmFormLabel(FALLBACK_FILM_FORMS, film.credits.form)}
               </span>
               <span className="flex items-center gap-[10px]">
                 {film.stage && <span className="text-[#771D5C]">{STAGE_LABEL[film.stage] ?? film.stage}</span>}

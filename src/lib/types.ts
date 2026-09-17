@@ -6,7 +6,19 @@
 /* ─── Film ────────────────────────────────────────────────────── */
 
 export type FilmStage = "development" | "production" | "post_production" | "festivals" | "distribution" | "impact";
-export type FilmForm = "documentary" | "fiction";
+/**
+ * A slug from `site_settings.film_categories`, not a fixed pair.
+ *
+ * This was `"documentary" | "fiction"`, which was true when the two were
+ * hardcoded and false the moment the dashboard let an editor add a third. The
+ * dashboard's own `FilmForm` has been `string` since then; this side was never
+ * widened to match, so the website's type system positively asserted that no
+ * other form could exist — and every ternary written against it agreed.
+ *
+ * Use `filmFormLabel` / `filmFormColor` to turn one into something a visitor
+ * reads. Comparing it to a literal is what this change exists to stop.
+ */
+export type FilmForm = string;
 export type FilmFormat = "feature" | "short" | "series";
 
 export interface FilmCredit {
