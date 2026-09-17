@@ -66,26 +66,49 @@ export function prettyTag(tag: string) {
 /* ── The meta line every card carries — Frame 807 (883:338) ──
    chip · section · date · access. Each piece is left out when it is empty,
    so a half-filled article shows a short line rather than stray separators. */
-export function CardMeta({ article }: { article: Article }) {
+export function CardMeta({ article, stacked = false }: { article: Article; stacked?: boolean }) {
   const paid = article.access === "subscription";
-  return (
-    <div className="flex flex-wrap items-center gap-x-[14px] gap-y-[8px]">
+  const access = (
+    <span
+      className="text-[12px] leading-[15px] font-medium whitespace-nowrap"
+      style={{ color: paid ? "#B23495" : "#595C5C" }}
+    >
+      {paid ? "Subscription only" : "Free article"}
+    </span>
+  );
+  const pieces = (
+    <>
       {article.tag && (
         <span
-          className="flex items-center justify-center px-[8px] py-[5px] rounded-[3px] text-[12px] leading-[15px] font-medium text-[#F0F0F0]"
+          className="flex shrink-0 items-center justify-center px-[8px] py-[5px] rounded-[3px] text-[12px] leading-[15px] font-medium text-[#F0F0F0] whitespace-nowrap"
           style={{ background: "rgba(93,148,185,0.7)" }}
         >
           {prettyTag(article.tag)}
         </span>
       )}
-      {article.section && <span className={`${META_15} text-[#9D9C9C]`}>{article.section}</span>}
-      {article.date && <span className={`${META_15} text-[#595C5C]`}>{formatDate(article.date)}</span>}
-      <span
-        className="text-[12px] leading-[15px] font-medium"
-        style={{ color: paid ? "#B23495" : "#595C5C" }}
-      >
-        {paid ? "Subscription only" : "Free article"}
-      </span>
+      {article.section && <span className={`${META_15} text-[#9D9C9C] whitespace-nowrap`}>{article.section}</span>}
+      {article.date && (
+        <span className={`${META_15} text-[#595C5C] whitespace-nowrap`}>{formatDate(article.date)}</span>
+      )}
+    </>
+  );
+
+  if (!stacked) {
+    return (
+      <div className="flex flex-wrap items-center gap-x-[14px] gap-y-[8px]">
+        {pieces}
+        {access}
+      </div>
+    );
+  }
+
+  /* Grid cards: two fixed rows. The chip row never wraps (25 = the chip's
+     height) and the access label always has its own 15px row, free or paid,
+     so every card in a row starts its title at the same height. */
+  return (
+    <div className="flex flex-col gap-[8px]">
+      <div className="flex h-[25px] items-center gap-x-[14px] overflow-hidden">{pieces}</div>
+      <div className="h-[15px]">{access}</div>
     </div>
   );
 }
@@ -108,14 +131,16 @@ export function ArticleCard({ article, href }: { article: Article; href: (p: str
       </Link>
 
       <div className="pt-[40px]">
-        <CardMeta article={article} />
+        <CardMeta article={article} stacked />
       </div>
 
       {/* 40 under the meta line: Frame 807 ends at 315, Frame 408 starts at
           355, on the listing card (883:262) and the details card (883:842)
           alike. Was 25. */}
       <Link href={to} className="block pt-[40px] group">
-        <h3 className="text-[26px] font-semibold leading-[30px] tracking-[-0.75px] text-[#F0F0F0] group-hover:text-white transition-colors">
+        {/* Two lines at most, and always two (2 × 30) — same reason as the
+            excerpt below. */}
+        <h3 className="text-[26px] font-semibold leading-[30px] tracking-[-0.75px] text-[#F0F0F0] group-hover:text-white transition-colors line-clamp-2 min-h-[60px]">
           {article.title}
         </h3>
       </Link>
@@ -125,9 +150,10 @@ export function ArticleCard({ article, href }: { article: Article; href: (p: str
           a row whatever the excerpt's length. The frame's excerpt box is 72. */}
       <p className={`${BODY_16} text-[#595C5C] line-clamp-3 mt-[20px] min-h-[72px]`}>{article.excerpt}</p>
 
-      {article.author?.name && (
-        <p className={`${BODY_14} text-[#595C5C] pt-[30px]`}>by {article.author.name}</p>
-      )}
+      {/* The row is kept even with no author, so the buttons stay aligned. */}
+      <p className={`${BODY_14} text-[#595C5C] mt-[30px] min-h-[20px] truncate`}>
+        {article.author?.name ? `by ${article.author.name}` : ""}
+      </p>
 
       <div className="flex items-center gap-[24px] pt-[40px]">
         <Link
