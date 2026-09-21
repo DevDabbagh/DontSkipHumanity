@@ -100,3 +100,75 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function looksLikeBunnyId(value: string): boolean {
   return UUID.test(value.trim());
 }
+
+/**
+ * MP4 addresses for the same video, best quality first.
+ *
+ * WHY A SLIDER LOOP MUST NOT USE THE HLS PLAYLIST
+ *
+ * `videoPlaybackUrl` above returns `playlist.m3u8`, and for watch-content that
+ * is right: adaptive bitrate means a weak connection drops a rendition instead
+ * of stalling, which over ninety minutes is the difference between watchable
+ * and abandoned.
+ *
+ * Over a five-second loop it is the wrong trade, and measurably so. HLS costs
+ * three round trips before a single frame appears — master playlist, variant
+ * playlist, first segment — and on top of that the browser has to fetch and
+ * run hls.js, because only Safari plays HLS natively. An MP4 paints after one
+ * range request. For the hero slider, where the whole requirement is "it must
+ * not stutter, not for one second", the adaptive ladder buys nothing and the
+ * latency costs everything.
+ *
+ * WHY A LIST AND NOT ONE URL
+ *
+ * Bunny only generates the renditions enabled under the library's Encoding
+ * tab. Hard-coding `play_720p.mp4` means a 404 and a dead slide the day
+ * somebody unticks 720p — a configuration change in a different system, with
+ * no error anywhere near the code. Returning the ladder lets the player render
+ * one `<source>` per entry and let the browser take the first that loads,
+ * which is exactly what source fallback is for.
+ *
+ * REQUIRES `MP4 Fallback` ENABLED (Stream → library → Encoding). Bunny only
+ * generates the MP4 for videos uploaded AFTER it is switched on — an older
+ * video has the playlist and no `play_*.mp4`, so the player falls through to
+ * the HLS source last in the list.
+ */
+export function videoMp4Urls(
+  provider: VideoProvider | undefined,
+  value: string
+): string[] {
+  const ref = (value ?? "").trim();
+  if (!ref) return [];
+
+  if (provider === "bunny" || (!provider && looksLikeBunnyId(ref))) {
+    if (!CDN) return [];
+    // Descending, because the first that loads wins and the slider is a
+    // full-bleed background — the better rendition is worth having when the
+    // library offers it.
+    return [1080, 720, 480, 360].map((h) => `https://${CDN}/${ref}/play_${h}p.mp4`);
+  }
+
+  // `file` and `hls` hold a finished address already. An MP4 sitting on
+  // storage is exactly what this function is for, so it passes through; an
+  // `.m3u8` in there would be wrong, but that is a row that predates this and
+  // the HLS fallback below still catches it.
+  return [cdnAsset(ref)];
+}
+
+/**
+ * Everything the slider should try, in order: the MP4 renditions, then the
+ * HLS playlist as a last resort.
+ *
+ * The playlist entry is what keeps videos uploaded BEFORE MP4 Fallback was
+ * enabled playing at all. It goes last so it is only reached when no MP4
+ * exists — a browser that cannot play HLS natively will simply fail that
+ * source, and the poster underneath stays up, which is the honest outcome.
+ */
+export function videoSourceLadder(
+  provider: VideoProvider | undefined,
+  value: string
+): string[] {
+  const mp4 = videoMp4Urls(provider, value);
+  const hls = videoPlaybackUrl(provider, value);
+  return hls && !mp4.includes(hls) ? [...mp4, hls] : mp4;
+}

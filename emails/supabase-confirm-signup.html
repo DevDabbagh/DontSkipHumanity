@@ -1,0 +1,121 @@
+<!--
+  Supabase → Authentication → Emails → "Confirm signup".
+
+  Paste this whole file into that template's body. `{{ .Token }}` is the code
+  Supabase generates; its length is set in Authentication → Sign In / Providers
+  → Email → "Email OTP Length", not here.
+
+  Written as tables with inline styles because that is what Gmail, Outlook and
+  Apple Mail agree on. No <style> block: Gmail strips it in some clients.
+
+  The logo is `public/logo-email.png` — the transparent wordmark with its text
+  recoloured to #F0F0F0 and drawn at 3x so it stays sharp on a retina screen.
+  It is transparent, so it reads correctly only against this email's own dark
+  background; do not reuse it on a white one.
+
+  Swap the three URLs below for the final domain when dontskiphumanity.com
+  starts serving the site — the same file is then at /logo-email.png there.
+  Pre-launch checklist §3.5.
+-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0D0D0D;margin:0;padding:0;">
+  <tr>
+    <td align="center" style="padding:40px 16px;">
+
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background-color:#0D0D0D;">
+
+        <!-- Logo -->
+        <tr>
+          <td align="left" style="padding:0 0 12px 0;">
+            <a href="https://dont-skip-humanity.vercel.app" target="_blank" style="text-decoration:none;">
+              <img src="https://dont-skip-humanity.vercel.app/logo-email.png"
+                   width="170" height="70" alt="Don't Skip Humanity"
+                   style="display:block;border:0;outline:none;width:170px;height:auto;" />
+            </a>
+          </td>
+        </tr>
+
+        <!-- Two lines: what DSH is, then what it is for. The second line is
+             dimmer so the pair reads as one block, not two sentences. -->
+        <tr>
+          <td align="left" style="padding:0 0 40px 0;font-family:Helvetica,Arial,sans-serif;font-size:13px;line-height:21px;letter-spacing:0.2px;color:#9D9C9C;">
+            An independent media company — films, journalism and education.<br />
+            <span style="color:#595C5C;">Stories that refuse to look away.</span>
+          </td>
+        </tr>
+
+        <!-- Heading -->
+        <tr>
+          <td align="left" style="padding:0 0 18px 0;font-family:Helvetica,Arial,sans-serif;font-size:28px;line-height:34px;font-weight:600;letter-spacing:-0.6px;color:#F0F0F0;">
+            Confirm your email
+          </td>
+        </tr>
+
+        <tr>
+          <td align="left" style="padding:0 0 34px 0;font-family:Helvetica,Arial,sans-serif;font-size:16px;line-height:26px;color:#9D9C9C;">
+            Welcome to Don&rsquo;t Skip Humanity. Use this code to finish setting up your account.
+          </td>
+        </tr>
+
+        <!-- The code -->
+        <tr>
+          <td align="left" style="padding:0 0 10px 0;font-family:Helvetica,Arial,sans-serif;font-size:11px;line-height:24px;letter-spacing:1.76px;text-transform:uppercase;color:#595C5C;">
+            Your code
+          </td>
+        </tr>
+        <tr>
+          <td align="left" style="padding:0 0 14px 0;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:separate;">
+              <tr>
+                <td align="center" style="background-color:#161616;border:1px solid rgba(240,240,240,0.10);border-radius:6px;padding:22px 34px;font-family:'Courier New',Courier,monospace;font-size:32px;line-height:36px;font-weight:700;letter-spacing:8px;color:#FFFFFF;">
+                  {{ .Token }}
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td align="left" style="padding:0 0 40px 0;font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:22px;color:#595C5C;">
+            This code expires in 60 minutes.
+          </td>
+        </tr>
+
+        <!-- Visit the site — a bulletproof button: the background is on the
+             <td>, so Outlook shows it even though it ignores the padding on
+             an <a>. The gradient is the brand's teal → magenta, flattened to
+             magenta for every client that cannot render one. -->
+        <tr>
+          <td align="left" style="padding:0 0 44px 0;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td align="center" bgcolor="#B23495" style="border-radius:3px;background-color:#B23495;background-image:linear-gradient(90deg,#32C6CC 0%,#B23495 100%);">
+                  <a href="https://dont-skip-humanity.vercel.app" target="_blank"
+                     style="display:inline-block;padding:14px 28px;font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:18px;font-weight:600;color:#FFFFFF;text-decoration:none;border-radius:3px;">
+                    Visit Don&rsquo;t Skip Humanity
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <tr>
+          <td align="left" style="padding:0 0 30px 0;font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:22px;color:#595C5C;">
+            If you didn&rsquo;t create an account, you can ignore this email — nothing was set up.
+          </td>
+        </tr>
+
+        <!-- Rule + footer -->
+        <tr>
+          <td style="padding:0;border-top:1px solid rgba(240,240,240,0.10);font-size:0;line-height:0;">&nbsp;</td>
+        </tr>
+        <tr>
+          <td align="left" style="padding:26px 0 0 0;font-family:Helvetica,Arial,sans-serif;font-size:13px;line-height:22px;color:#4A4A4A;">
+            Don&rsquo;t Skip Humanity<br />
+            <a href="https://dont-skip-humanity.vercel.app" target="_blank" style="color:#5D94B9;text-decoration:none;">dontskiphumanity.com</a>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>

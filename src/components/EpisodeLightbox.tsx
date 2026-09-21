@@ -3,6 +3,7 @@
 import { useT } from "@/contexts/LocaleContext";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { videoPlaybackUrl } from "@/lib/video-url";
 
 /**
  * Studio "watch episode" lightbox — Figma `DSH – Studio Details – lightbox`
@@ -41,19 +42,32 @@ export type LightboxEpisode = {
 };
 
 /**
- * The one place that knows how a stored URL becomes something the player can
- * use. `file` is a plain MP4 the <video> element handles natively. `hls` and
- * `bunny` are accepted now so content can be entered ahead of the switch —
- * Safari plays HLS natively, other browsers will need hls.js wired in here.
+ * The one place that knows how a stored reference becomes something the player
+ * can open.
+ *
+ * `file` and `hls` already hold a complete address and are used as they are.
+ * `bunny` holds an id — see `video-url.ts` for why the id is what is stored —
+ * and becomes an adaptive `.m3u8` playlist here.
+ *
+ * The `native` flag is not decoration. Safari plays HLS through the `<video>`
+ * element; Chrome, Firefox and Edge do not, and a playlist handed to them as
+ * a plain `src` is a black rectangle with no error anyone sees. Anything
+ * false here goes through hls.js instead — loaded on demand, so a page whose
+ * episodes are all MP4 never downloads it.
  */
 function resolveSource(ep: LightboxEpisode): { src: string; native: boolean } {
-  const src = ep.videoUrl || "";
+  const ref = (ep.videoUrl || "").trim();
+  if (!ref) return { src: "", native: false };
+
   const provider = ep.videoProvider || "file";
+  const src = provider === "bunny" ? videoPlaybackUrl("bunny", ref) : ref;
   if (!src) return { src: "", native: false };
-  if (provider === "file") return { src, native: true };
-  // HLS: native in Safari, needs a media-source shim elsewhere. Treated as
-  // native so it at least plays where it can, rather than showing nothing.
-  return { src, native: true };
+
+  // Decided by the address rather than by the provider: `hls` holds a
+  // playlist and so does an older row whose provider was never set but whose
+  // URL ends in .m3u8. What the player has to do depends on the file, not on
+  // the label somebody typed beside it.
+  return { src, native: !src.includes(".m3u8") };
 }
 
 function fmt(seconds: number) {
@@ -130,12 +144,62 @@ export default function EpisodeLightbox({
   const drawerRef = useRef(false);
 
   const ep = episodes[index];
-  const { src } = ep ? resolveSource(ep) : { src: "" };
+  const { src, native } = ep ? resolveSource(ep) : { src: "", native: true };
 
   useEffect(() => {
     setMounted(true);
     setCoarse(window.matchMedia?.("(pointer: coarse)").matches ?? false);
   }, []);
+
+  /* HLS IN THE BROWSERS THAT DO NOT HAVE IT
+     ═══════════════════════════════════════
+
+     A Bunny episode is a `.m3u8` playlist, which only Safari opens through
+     the `<video>` element. Everywhere else hls.js attaches a MediaSource and
+     feeds the element segments itself.
+
+     Imported dynamically so it stays out of the bundle for a visitor whose
+     browser does not need it, and out of it altogether on a page with no
+     video. `native` is what keeps the two paths apart: when it is true the
+     element carries a real `src` attribute and this effect does nothing, so
+     the two can never both drive the same element.
+
+     The teardown is not optional. Leaving a player attached after the viewer
+     moves to the next episode keeps it pulling segments in the background —
+     paid-for bytes nobody is watching, which is the exact shape of the bug
+     that emptied this project's egress allowance once already. */
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el || !src || native) return;
+
+    let cancelled = false;
+    let destroy: (() => void) | undefined;
+
+    void import("hls.js").then(({ default: Hls }) => {
+      if (cancelled || !videoRef.current) return;
+
+      if (!Hls.isSupported()) {
+        setFailed("This browser cannot play adaptive video.");
+        return;
+      }
+
+      const hls = new Hls({ enableWorker: true });
+      hls.loadSource(src);
+      hls.attachMedia(videoRef.current);
+      hls.on(Hls.Events.ERROR, (_event, data) => {
+        // Non-fatal errors are recovered by hls.js on its own; surfacing them
+        // would put an error over a video that is about to carry on playing.
+        if (data.fatal) setFailed(`Playback failed (${data.type}).`);
+      });
+
+      destroy = () => hls.destroy();
+    });
+
+    return () => {
+      cancelled = true;
+      destroy?.();
+    };
+  }, [src, native]);
 
   // Re-seat on the episode the caller asked for each time the lightbox opens,
   // so reopening from a different row doesn't resume the previous episode.
@@ -394,7 +458,11 @@ export default function EpisodeLightbox({
           {src ? (
             <video
               ref={videoRef}
-              src={src}
+              // Only when the element itself can open it. For a playlist
+              // outside Safari, hls.js attaches its own MediaSource above,
+              // and a competing `src` would make the element try to download
+              // the playlist as a plain file at the same time.
+              src={native ? src : undefined}
               poster={ep.imageUrl}
               playsInline
               preload="metadata"

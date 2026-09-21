@@ -1,6 +1,7 @@
 "use client";
 
 import HlsVideo from "@/components/HlsVideo";
+import LoopVideo from "@/components/LoopVideo";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -17,7 +18,16 @@ const VIDEO_REVEAL_DELAY = 2000;
  * If the video fails to load/decode, it renders nothing and the poster
  * underneath keeps showing.
  */
-function HeroSlideMedia({ mediaSrc, className }: { mediaSrc: string; className: string }) {
+function HeroSlideMedia({
+  mediaSrc,
+  mediaSources,
+  className,
+}: {
+  mediaSrc: string;
+  /** MP4 candidates then HLS. Empty for slides saved before this existed. */
+  mediaSources?: string[];
+  className: string;
+}) {
   const [reveal, setReveal] = useState(false);
   const [entered, setEntered] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -37,7 +47,20 @@ function HeroSlideMedia({ mediaSrc, className }: { mediaSrc: string; className: 
 
   return (
     <div className="absolute inset-0 transition-opacity duration-700 ease-out" style={{ opacity: entered ? 1 : 0 }}>
-      <HlsVideo src={mediaSrc} className={className} onFail={() => setFailed(true)} />
+      {/* The ladder is the path this is meant to take: MP4 first, so the
+          first frame arrives on one range request instead of three round
+          trips through playlists plus hls.js. `HlsVideo` stays as the
+          fallback for slides built before `mediaSources` existed — dropping
+          it would have blanked every video slide already saved. */}
+      {mediaSources && mediaSources.length > 0 ? (
+        <LoopVideo
+          sources={mediaSources}
+          className={className}
+          onFail={() => setFailed(true)}
+        />
+      ) : (
+        <HlsVideo src={mediaSrc} className={className} onFail={() => setFailed(true)} />
+      )}
     </div>
   );
 }
@@ -46,6 +69,7 @@ interface CarouselSlide {
   id: string;
   mediaType: "image" | "video";
   mediaSrc: string;
+  mediaSources?: string[];
   poster: string;
   type: string;
   typeColor: string;
@@ -364,6 +388,7 @@ export default function Hero({ slides, heading }: { slides?: HeroSlide[] | null;
                   <HeroSlideMedia
                     key={item.id}
                     mediaSrc={item.mediaSrc}
+                    mediaSources={item.mediaSources}
                     className="absolute inset-0 w-full h-full object-cover scale-100 grayscale-0"
                   />
                 )}

@@ -1,4 +1,4 @@
-import { videoPlaybackUrl } from "@/lib/video-url";
+import { videoPlaybackUrl, videoSourceLadder } from "@/lib/video-url";
 import { cdnImage } from "./image-url";
 import { supabase } from "./supabase";
 import { pickLang } from "./i18n";
@@ -212,6 +212,13 @@ export interface HeroSlide {
   id: string;
   mediaType: "image" | "video";
   mediaSrc: string;
+  /**
+   * MP4 renditions first, the HLS playlist last — what `LoopVideo` renders as
+   * `<source>` elements. The hero is a short loop, and an MP4 paints after one
+   * range request where HLS needs three round trips plus hls.js. Empty for an
+   * image slide.
+   */
+  mediaSources: string[];
   poster: string;
   type: string;
   title: string;
@@ -233,11 +240,19 @@ export function buildHeroSlides(section?: LandingSection): HeroSlide[] | null {
         mediaType === "video"
           ? videoPlaybackUrl(s.videoProvider, s.videoSrc ?? "")
           : cdnImage(s.imageSrc) ?? "";
+      const mediaSources =
+        mediaType === "video"
+          ? videoSourceLadder(s.videoProvider, s.videoSrc ?? "")
+          : [];
+      // A video slide with no playable address is not a slide. `mediaSrc` is
+      // still the test because `mediaSources` can legitimately hold MP4
+      // candidates that 404 — the browser decides that, not us.
       if (!mediaSrc) return null;
       return {
         id,
         mediaType,
         mediaSrc,
+        mediaSources,
         poster: mediaType === "video" ? cdnImage(s.imageSrc) ?? "" : mediaSrc,
         type: s.cardType || "",
         title: s.cardTitle || "",
