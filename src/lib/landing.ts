@@ -161,19 +161,20 @@ export function buildAcademySlides(section: LandingSection | undefined, programs
         const s = section.slots[id];
         if (!s) return null;
         const mediaType: "image" | "video" = s.mediaType === "video" ? "video" : "image";
-        // A video slot holds a Bunny id now; the playlist address is built
-        // here rather than stored, so a change of CDN hostname does not
-        // invalidate every row. Older slots hold a URL and pass through.
-        const mediaSrc =
-          mediaType === "video"
-            ? videoPlaybackUrl(s.videoProvider, s.videoSrc ?? "")
-            : cdnImage(s.imageSrc) ?? "";
+        /* Same rule as the homepage hero: a slide marked "video" whose upload
+           never finished keeps its poster and becomes an image slide, rather
+           than disappearing and taking a working poster with it. */
+        const poster = cdnImage(s.imageSrc) ?? "";
+        const video =
+          mediaType === "video" ? videoPlaybackUrl(s.videoProvider, s.videoSrc ?? "") : "";
+        const effectiveType: "image" | "video" = video ? "video" : "image";
+        const mediaSrc = video || poster;
         if (!mediaSrc) return null;
         return {
           id,
-          mediaType,
+          mediaType: effectiveType,
           mediaSrc,
-          poster: mediaType === "video" ? (cdnImage(s.imageSrc) || "") : mediaSrc,
+          poster: poster || mediaSrc,
           title: s.title || "",
           description: s.description || "",
           badge: s.badge || s.cardType || "",
@@ -233,27 +234,35 @@ export function buildHeroSlides(section?: LandingSection): HeroSlide[] | null {
       const s = section.slots[id];
       if (!s) return null;
       const mediaType: "image" | "video" = s.mediaType === "video" ? "video" : "image";
-      // A video slot holds a Bunny id now; the playlist address is built
-      // here rather than stored, so a change of CDN hostname does not
-      // invalidate every row. Older slots hold a URL and pass through.
-      const mediaSrc =
-        mediaType === "video"
-          ? videoPlaybackUrl(s.videoProvider, s.videoSrc ?? "")
-          : cdnImage(s.imageSrc) ?? "";
-      const mediaSources =
-        mediaType === "video"
-          ? videoSourceLadder(s.videoProvider, s.videoSrc ?? "")
-          : [];
-      // A video slide with no playable address is not a slide. `mediaSrc` is
-      // still the test because `mediaSources` can legitimately hold MP4
-      // candidates that 404 — the browser decides that, not us.
+      /* A video slot holds a Bunny id; the address is built here rather than
+         stored, so a change of CDN hostname does not invalidate every row.
+         Older slots hold a URL and pass through. */
+      const poster = cdnImage(s.imageSrc) ?? "";
+      const video =
+        mediaType === "video" ? videoPlaybackUrl(s.videoProvider, s.videoSrc ?? "") : "";
+
+      /* THE VIDEO IS AN ENHANCEMENT ON THE POSTER, NOT A PRECONDITION.
+
+         This used to read `if (!mediaSrc) return null` with `mediaSrc` being
+         the VIDEO address for a video slot — so a slide marked "video" whose
+         upload had not completed was dropped from the carousel entirely,
+         poster and all. That is how "Free Fish" vanished from the homepage:
+         the slide was switched to video, the upload failed on the old route's
+         size ceiling, the row was saved with an empty `videoSrc`, and the
+         perfectly good poster sitting in `imageSrc` was never even consulted.
+         A missing video should cost the video, not the slide. */
+      const effectiveType: "image" | "video" = video ? "video" : "image";
+      const mediaSrc = video || poster;
+      const mediaSources = video ? videoSourceLadder(s.videoProvider, s.videoSrc ?? "") : [];
+
+      // Only now, with nothing at all to show, is there no slide.
       if (!mediaSrc) return null;
       return {
         id,
-        mediaType,
+        mediaType: effectiveType,
         mediaSrc,
         mediaSources,
-        poster: mediaType === "video" ? cdnImage(s.imageSrc) ?? "" : mediaSrc,
+        poster: poster || mediaSrc,
         type: s.cardType || "",
         title: s.cardTitle || "",
         href: s.ctaLink || null,
