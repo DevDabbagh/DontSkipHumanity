@@ -5,8 +5,23 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
+import LessonVideo from "@/components/LessonVideo";
 import { useLocaleHref } from "@/contexts/LocaleContext";
+import { videoThumbnailUrl } from "@/lib/video-url";
 import type { AcademyProgram, AcademyLesson } from "@/lib/types";
+
+/** What a lesson row says instead of a running time, by type. */
+const KIND_LABEL: Record<string, string> = {
+  survey: "Survey",
+  quiz: "Quiz",
+  page: "Reading",
+  link: "Link",
+  file: "File",
+  certificate: "Certificate",
+};
+
+/** Lessons from before migration 047 carry no type; they were always videos. */
+const kindOf = (l: AcademyLesson | undefined) => l?.type ?? "video";
 
 /**
  * Academy — lesson details.
@@ -204,6 +219,153 @@ function ResourceRow({
   );
 }
 
+/* ── What sits in the video frame when the lesson is not a video ─────
+   Every imported course has surveys, a reading page, links and a certificate
+   (DSH-Academy-Migration-Inventory.md). Showing a play button over a survey
+   would be a control that lies; each type gets the panel it needs. */
+function LessonPanel({
+  lesson,
+  kind,
+  isDone,
+  answer,
+  setAnswer,
+  remaining,
+  onComplete,
+}: {
+  lesson: AcademyLesson | undefined;
+  kind: string;
+  isDone: boolean;
+  answer: string;
+  setAnswer: (v: string) => void;
+  remaining: number;
+  onComplete: () => void;
+}) {
+  const wrap =
+    "relative flex flex-col items-center gap-[18px] text-center w-full max-w-[640px] px-[24px] py-[40px]";
+  const title = (
+    <p className="text-[20px] font-semibold leading-[28px] tracking-[-0.5px] text-[#F0F0F0]">
+      {lesson?.title}
+    </p>
+  );
+  const primary =
+    "flex gap-[7px] items-center justify-center w-full sm:w-[260px] p-[14px] rounded-[3px] text-[13px] font-medium text-[#F0F0F0] transition-opacity disabled:opacity-40";
+  const primaryStyle = {
+    border: "1px solid rgba(240,240,240,0.2)",
+    backgroundImage: "linear-gradient(93.1087deg, rgb(50,198,204) 0.1096%, rgb(178,52,149) 100.11%)",
+  };
+
+  if (kind === "survey" || kind === "quiz") {
+    return (
+      <div className={wrap}>
+        <p className={EYEBROW}>{KIND_LABEL[kind]}</p>
+        {title}
+        {isDone ? (
+          /* Worded so it promises nothing: answers are not stored yet. The
+             academy_answers table exists (047); saving into it needs a
+             signed-in, enrolled learner, which is the next piece of work. */
+          <p className={`${BODY_14} text-[#32C6CC]`}>Thank you for your answer.</p>
+        ) : (
+          <>
+            <textarea
+              value={answer}
+              onChange={(e) => setAnswer(e.target.value)}
+              placeholder="Your answer…"
+              className={`w-full h-[110px] p-[16px] rounded-[6px] resize-none outline-none ${BTN_13} text-[#F0F0F0] placeholder:text-[#363636] text-left`}
+              style={{ background: "rgba(13,13,13,0.7)", border: "1px solid #363636" }}
+            />
+            <button type="button" disabled={!answer.trim()} onClick={onComplete} className={primary} style={primaryStyle}>
+              Submit
+            </button>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  if (kind === "link" || kind === "file") {
+    return (
+      <div className={wrap}>
+        <p className={EYEBROW}>{KIND_LABEL[kind]}</p>
+        {title}
+        {lesson?.url ? (
+          <a
+            href={lesson.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={onComplete}
+            className={primary}
+            style={primaryStyle}
+          >
+            Open ↗
+          </a>
+        ) : (
+          /* The 49 LearnWorlds links were imported with their titles only —
+             the addresses are visible only inside the old player. A dead
+             button would be worse than this sentence. */
+          <p className={`${BODY_14} text-[#595C5C]`}>This link is being prepared.</p>
+        )}
+      </div>
+    );
+  }
+
+  if (kind === "page") {
+    const blocks = lesson?.body ?? [];
+    return (
+      <div className={`${wrap} text-left items-stretch`}>
+        <p className={`${EYEBROW} text-center`}>{KIND_LABEL.page}</p>
+        <div className="text-center">{title}</div>
+        {blocks.length === 0 ? (
+          <p className={`${BODY_14} text-[#595C5C] text-center`}>This reading is being prepared.</p>
+        ) : (
+          <div className="flex flex-col gap-[16px] max-h-[360px] overflow-y-auto pr-[8px]">
+            {blocks.map((b) =>
+              b.type === "heading" ? (
+                <h3 key={b.id} className="text-[17px] font-semibold text-[#F0F0F0]">{b.content}</h3>
+              ) : b.type === "quote" ? (
+                <blockquote key={b.id} className={`${BODY_16} italic text-[#F0F0F0] border-l-2 border-[#32C6CC] pl-[14px]`}>
+                  {b.content}
+                </blockquote>
+              ) : b.type === "image" ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img key={b.id} src={b.content} alt={b.caption ?? ""} className="w-full rounded-[6px]" />
+              ) : b.type === "html" ? (
+                /* Editor-authored, rendered the same way the Read article page
+                   renders its HTML block. */
+                <div key={b.id} className={`${BODY_16} text-[#9D9C9C] [&_a]:text-[#32C6CC]`} dangerouslySetInnerHTML={{ __html: b.content }} />
+              ) : b.type === "divider" ? (
+                <hr key={b.id} className="border-[#363636]" />
+              ) : (
+                <p key={b.id} className={`${BODY_16} text-[#9D9C9C]`}>{b.content}</p>
+              )
+            )}
+          </div>
+        )}
+        {!isDone && blocks.length > 0 && (
+          <button type="button" onClick={onComplete} className={`${primary} self-center`} style={primaryStyle}>
+            Mark as read
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  if (kind === "certificate") {
+    return (
+      <div className={wrap}>
+        <p className={EYEBROW}>{KIND_LABEL.certificate}</p>
+        {title}
+        <p className={`${BODY_14} text-[#9D9C9C]`}>
+          {remaining > 0
+            ? `${remaining} lesson${remaining === 1 ? "" : "s"} left before your certificate.`
+            : "You have completed every lesson. Certificates are issued to signed-in learners."}
+        </p>
+      </div>
+    );
+  }
+
+  return null;
+}
+
 export default function CoursePlayer({
   program,
   lessonIndex,
@@ -226,6 +388,20 @@ export default function CoursePlayer({
   /* Completion is held here for now. It survives a lesson change but not a
      reload — persisting it needs a per-user record, which does not exist yet. */
   const [done, setDone] = useState<Set<number>>(new Set());
+  /* Which lesson's player is mounted. Tracked by index rather than a boolean
+     so moving to another lesson unmounts the old player — and stops its
+     download — without an effect to reset state. */
+  const [playingIndex, setPlayingIndex] = useState<number | null>(null);
+  const [failedIndex, setFailedIndex] = useState<number | null>(null);
+  const [answer, setAnswer] = useState("");
+  const markDone = (i: number) => setDone((d) => new Set(d).add(i));
+
+  const kind = kindOf(lesson);
+  const playable = kind === "video" && Boolean(lesson?.videoUrl) && !lockedNow;
+  const isPlaying = playable && playingIndex === current && failedIndex !== current;
+  const poster =
+    (lesson?.videoGuid ? videoThumbnailUrl("bunny", lesson.videoGuid) : "") || program.thumbnailUrl;
+  const sections = program.sections ?? [];
   const [tab, setTab] = useState<"notes" | "comments">("notes");
   const [noteText, setNoteText] = useState("");
   const [commentText, setCommentText] = useState("");
@@ -285,50 +461,92 @@ export default function CoursePlayer({
         <div
           className="relative flex items-center justify-center overflow-hidden rounded-[6px] w-full"
           style={{
-            aspectRatio: "1224 / 600",
+            /* The frame's 1224×600 is a video's shape. A survey or a reading
+               on a phone would be cut off inside it, so non-video lessons
+               keep the width and let the height follow the content. */
+            aspectRatio: kind === "video" || lockedNow ? "1224 / 600" : undefined,
+            minHeight: kind === "video" || lockedNow ? undefined : 360,
             background: "#0D0D0D",
             border: "1.5px solid rgba(240,240,240,0.1)",
             filter: "drop-shadow(0px 6px 7px rgba(17,17,17,0.8))",
           }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={program.thumbnailUrl}
-            alt=""
-            aria-hidden
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ opacity: 0.8 }}
-          />
-          {lockedNow ? (
-            <Link
-              href={courseHref}
-              className="relative flex flex-col items-center gap-[14px] text-[#F0F0F0] transition-opacity hover:opacity-80"
-            >
-              <span className="opacity-90">
-                <LockIcon size={60} />
-              </span>
-              <span className={BTN_13}>Unlock this lesson</span>
-            </Link>
+          {isPlaying ? (
+            /* Mounted only after the click — see LessonVideo for why. */
+            <LessonVideo
+              key={current}
+              src={lesson!.videoUrl}
+              poster={poster}
+              onEnded={() => markDone(current)}
+              onFail={() => setFailedIndex(current)}
+            />
           ) : (
-            <button
-              type="button"
-              className="relative transition-transform hover:scale-[1.04]"
-              aria-label={`Play — ${lesson?.title ?? ""}`}
-              onClick={() => {
-                /* Until a lesson carries its own video source, the control
-                   marks the lesson watched rather than opening a player with
-                   nothing to play. */
-                setDone((d) => new Set(d).add(current));
-              }}
-            >
-              <BigPlayButton />
-            </button>
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={kind === "video" ? poster : program.thumbnailUrl}
+                alt=""
+                aria-hidden
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ opacity: kind === "video" ? 0.8 : 0.18 }}
+              />
+
+              {lockedNow ? (
+                <Link
+                  href={courseHref}
+                  className="relative flex flex-col items-center gap-[14px] text-[#F0F0F0] transition-opacity hover:opacity-80"
+                >
+                  <span className="opacity-90">
+                    <LockIcon size={60} />
+                  </span>
+                  <span className={BTN_13}>Unlock this lesson</span>
+                </Link>
+              ) : kind === "video" ? (
+                playable && failedIndex !== current ? (
+                  <button
+                    type="button"
+                    className="relative transition-transform hover:scale-[1.04]"
+                    aria-label={`Play — ${lesson?.title ?? ""}`}
+                    onClick={() => setPlayingIndex(current)}
+                  >
+                    <BigPlayButton />
+                  </button>
+                ) : (
+                  /* No source, or the player reported a fatal error. Say so
+                     instead of offering a play button that does nothing. */
+                  <p className={`relative ${BODY_14} text-[#F0F0F0] px-[24px] text-center`}>
+                    {failedIndex === current
+                      ? "This video could not be loaded. Please try again later."
+                      : "This video is being prepared."}
+                  </p>
+                )
+              ) : (
+                <LessonPanel
+                  lesson={lesson}
+                  kind={kind}
+                  isDone={done.has(current)}
+                  answer={answer}
+                  setAnswer={setAnswer}
+                  remaining={lessons.filter(
+                    (l, i) => !done.has(i) && !["link", "certificate"].includes(kindOf(l))
+                  ).length}
+                  onComplete={() => {
+                    markDone(current);
+                    setAnswer("");
+                  }}
+                />
+              )}
+            </>
           )}
         </div>
 
         {/* ── Module — Frame 775 (851:1721): pt 60 / pb 20 eyebrow, pb 80 block ── */}
         <div className="flex flex-col items-start pb-[80px]">
-          <p className={`${EYEBROW} pt-[60px] pb-[20px]`}>Module</p>
+          <p className={`${EYEBROW} pt-[60px] pb-[20px]`}>
+            {lesson?.sectionIndex !== undefined && sections[lesson.sectionIndex]
+              ? sections[lesson.sectionIndex].title
+              : "Module"}
+          </p>
           <div className="flex flex-wrap gap-[15px] items-end pb-[20px] w-full">
             <p className="text-[26px] font-semibold leading-[26px] tracking-[1px] text-[#32C6CC]">
               {String(current + 1).padStart(2, "0")}
@@ -373,8 +591,22 @@ export default function CoursePlayer({
           {lessons.map((l, i) => {
             const isDone = done.has(i);
             const locked = l.locked;
+            const k = kindOf(l);
+            /* A section header goes above the first lesson of each section.
+               Pre-047 courses have no sections and render exactly as before. */
+            const si = l.sectionIndex;
+            const startsSection =
+              sections.length > 0 && si !== undefined && (i === 0 || lessons[i - 1].sectionIndex !== si);
             return (
-              <div key={i} className="flex flex-col gap-[18px]">
+              <div key={l.id ?? i} className="flex flex-col gap-[18px]">
+                {startsSection && (
+                  <p
+                    className={`${EYEBROW} px-[24px] ${i === 0 ? "" : "pt-[30px]"}`}
+                    style={{ color: "#595C5C" }}
+                  >
+                    {String(si + 1).padStart(2, "0")} · {sections[si]?.title}
+                  </p>
+                )}
                 <div className="flex items-center justify-between gap-[24px] px-[24px] flex-wrap">
                   <div className="flex items-end min-w-0">
                     <span
@@ -404,12 +636,17 @@ export default function CoursePlayer({
                     </Link>
                   ) : (
                     <div className="flex gap-[40px] items-center flex-wrap">
-                      {/* A running time only appears when the lesson has one. */}
-                      {l.duration && (
-                        <span className="flex gap-[10px] items-center text-[#F0F0F0]">
-                          <span className={BODY_14}>{l.duration}</span>
-                          <ClockIcon />
-                        </span>
+                      {/* A running time only appears when the lesson has one;
+                          a lesson that is not a video says what it is instead. */}
+                      {k === "video" ? (
+                        l.duration && (
+                          <span className="flex gap-[10px] items-center text-[#F0F0F0]">
+                            <span className={BODY_14}>{l.duration}</span>
+                            <ClockIcon />
+                          </span>
+                        )
+                      ) : (
+                        <span className={`${BODY_14} text-[#595C5C]`}>{KIND_LABEL[k] ?? k}</span>
                       )}
 
                       <Link
@@ -417,7 +654,7 @@ export default function CoursePlayer({
                         className={`flex gap-[10px] items-center ${BTN_13} transition-colors hover:text-[#8B8F8F]`}
                         style={{ color: i === current ? "#F0F0F0" : "#595C5C" }}
                       >
-                        Play lesson
+                        {k === "video" ? "Play lesson" : "Open"}
                         <PlaySmallIcon />
                       </Link>
 

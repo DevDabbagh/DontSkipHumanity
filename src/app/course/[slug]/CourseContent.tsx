@@ -301,7 +301,18 @@ export default function CourseContent({
               ) : (
                 <div className="flex flex-col gap-[20px]">
                   {program.lessons.map((l, i) => (
-                    <div key={i} className="flex items-start justify-between gap-[24px]">
+                    <div key={l.id ?? i} className="flex flex-col gap-[20px]">
+                    {/* Section header above the first lesson of each section
+                        (047 courses). Older courses have no sections and
+                        render exactly as before. */}
+                    {(program.sections?.length ?? 0) > 0 &&
+                      l.sectionIndex !== undefined &&
+                      (i === 0 || program.lessons[i - 1].sectionIndex !== l.sectionIndex) && (
+                        <p className={`${EYEBROW} ${i === 0 ? "" : "pt-[16px]"}`} style={{ color: "#595C5C" }}>
+                          {String(l.sectionIndex + 1).padStart(2, "0")} · {program.sections![l.sectionIndex]?.title}
+                        </p>
+                      )}
+                    <div className="flex items-start justify-between gap-[24px]">
                       <div className="flex items-start min-w-0">
                         <span
                           className="shrink-0 pr-[30px] text-[11px] leading-[24px] tracking-[1.76px] uppercase"
@@ -314,10 +325,25 @@ export default function CourseContent({
                         </p>
                       </div>
                       <div className="flex items-center gap-[15px] shrink-0 text-[#595C5C]">
-                        {l.videoUrl && !l.locked && <PlayIcon />}
-                        {l.duration && !l.locked && <ClockIcon />}
+                        {l.type && l.type !== "video" ? (
+                          /* Surveys, readings, links: say what it is rather
+                             than drawing a play icon over something that
+                             does not play. */
+                          <span className="text-[12px] leading-[18px]">
+                            {{ survey: "Survey", quiz: "Quiz", page: "Reading", link: "Link", file: "File", certificate: "Certificate" }[l.type]}
+                          </span>
+                        ) : (
+                          <>
+                            {l.duration && !l.locked && (
+                              <span className="text-[12px] leading-[18px]">{l.duration}</span>
+                            )}
+                            {l.videoUrl && !l.locked && <PlayIcon />}
+                            {l.duration && !l.locked && <ClockIcon />}
+                          </>
+                        )}
                         {l.locked ? <LockIcon /> : <CheckCircleIcon />}
                       </div>
+                    </div>
                     </div>
                   ))}
                 </div>

@@ -197,13 +197,48 @@ export type AcademyFormat = "online" | "in_person" | "hybrid" | "self_paced" | "
  * running time and a locked state per line, and neither fits in a string.
  * `objectives` is still carried below for rows written before migration 031.
  */
+/** Migration 047. A lesson is not always a video — 2 of every course's lessons
+ *  are the shared surveys, and the resources sections are pages and links. */
+export type AcademyLessonType = "video" | "survey" | "quiz" | "page" | "link" | "file" | "certificate";
+
 export interface AcademyLesson {
   title: string;
-  /** As written by an editor — "32:11". Empty means the row shows no time. */
+  /** "32:11". Computed from duration_seconds for 047 rows; empty = no time shown. */
   duration: string;
   /** True when only a paying participant may open it. */
   locked: boolean;
+  /** Ready-to-play address (Bunny HLS playlist for 047 rows). */
   videoUrl: string;
+  /* The fields below exist only on 047 rows. A row from the old `lessons`
+     JSONB has none of them and is treated as a video, which is all that
+     column could ever hold. */
+  id?: string;
+  type?: AcademyLessonType;
+  /** Bunny Stream guid — used for the poster frame. */
+  videoGuid?: string;
+  /** Link lessons: where the link goes. Empty until captured from LearnWorlds. */
+  url?: string;
+  /** Page lessons: Articles-editor blocks. */
+  body?: ArticleBlock[];
+  questionSetId?: string | null;
+  /** Index into `program.sections`. */
+  sectionIndex?: number;
+}
+
+export interface AcademySection {
+  id: string;
+  title: string;
+  isFree: boolean;
+  lessons: AcademyLesson[];
+}
+
+export interface AcademyInstructor {
+  slug: string;
+  name: string;
+  role: string;
+  bio: string;
+  handles: string[];
+  photoUrl: string;
 }
 
 export interface AcademyProgram {
@@ -232,8 +267,17 @@ export interface AcademyProgram {
     sizeLabel: string;
     locked: boolean;
   }[];
-  /** The curriculum. Falls back to `objectives` on rows that predate it. */
+  /** The curriculum, flat and in order. For 047 rows this is every lesson of
+   *  every section; older rows fall back to the JSONB column, then objectives. */
   lessons: AcademyLesson[];
+  /* Migration 047. Optional so the mock programmes stay valid; the mapper
+     always fills them for a database row. */
+  sections?: AcademySection[];
+  instructors?: AcademyInstructor[];
+  level?: string;
+  studyTime?: string;
+  videoTime?: string;
+  certificateEnabled?: boolean;
   testimonials: { quote: string; author: string }[];
   partnerships: { label: string; title: string; body: string }[];
   /** The "Certification / Available after completion" pair in the meta row. */

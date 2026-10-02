@@ -241,19 +241,47 @@ export async function getPrograms(): Promise<AcademyProgram[]> {
   return MOCK_PROGRAMS.filter((p) => p.status === "published");
 }
 
+/**
+ * The course page and the player need the whole tree: sections → lessons, and
+ * the instructors. Each embed rides a single foreign key (047), so PostgREST
+ * resolves it without hints.
+ */
+const PROGRAM_DETAIL_SELECT =
+  "*, academy_resources(*), " +
+  "academy_sections(*, academy_lessons(*)), " +
+  "academy_program_instructors(position, academy_instructors(*))";
+
 export async function getProgramBySlug(slug: string): Promise<AcademyProgram | null> {
   await useRequestLocale();
   if (await isModuleLive("academy")) {
     try {
-      const { data, error } = await supabase
+      const rich = await supabase
         .from("academy_programs")
-        .select("*, academy_resources(*)")
+        .select(PROGRAM_DETAIL_SELECT)
         .eq("slug", slug)
         .eq("status", "published")
-        .single();
+        .maybeSingle();
 
-      if (!error && data) return mapAcademyProgram(data);
-    } catch {}
+      if (!rich.error && rich.data) return mapAcademyProgram(rich.data);
+
+      /* If the curriculum embed itself fails — 047 not run on this database,
+         a relationship PostgREST cannot resolve — fall back to the flat query
+         so the course still renders from the old columns. But SAY so: the
+         previous version swallowed every error and served mock data, which
+         is how a broken query passes for a working page. */
+      if (rich.error) {
+        console.error(`[academy] curriculum query failed for "${slug}": ${rich.error.message}`);
+        const flat = await supabase
+          .from("academy_programs")
+          .select("*, academy_resources(*)")
+          .eq("slug", slug)
+          .eq("status", "published")
+          .maybeSingle();
+        if (!flat.error && flat.data) return mapAcademyProgram(flat.data);
+      }
+    } catch (e) {
+      console.error(`[academy] getProgramBySlug("${slug}") threw:`, e);
+    }
   }
   return mockGetProgram(slug) ?? null;
 }

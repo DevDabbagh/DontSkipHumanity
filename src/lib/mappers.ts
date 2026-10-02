@@ -7,10 +7,12 @@ import type {
   Film, FilmFestival, FilmScreening, FilmStage, FilmForm, FilmFormat,
   StudioProject, StudioFormat, StudioStatus,
   AcademyProgram, AcademyType, AcademyFormat,
+  AcademyLesson, AcademyLessonType, AcademySection, AcademyInstructor,
   Article, ArticleBlock, ArticleAuthor, ArticleStatus, ArticleSource, ArticleResource,
   DSHEvent, EventPartner, EventStatus,
 } from "./types";
 import { cdnImage } from "./image-url";
+import { videoPlaybackUrl } from "./video-url";
 
 /**
  * IMAGE URLS ARE REWRITTEN HERE, AND ONLY HERE.
@@ -255,7 +257,111 @@ export function mapStudioProject(row: any): StudioProject {
 
 // ── Academy ────────────────────────────────────────────────────
 
+/** 1414 → "23:34", 3725 → "1:02:05". Computed from seconds rather than
+ *  stored as text, so the course page and the player can never disagree. */
+function clock(seconds: unknown): string {
+  const s = typeof seconds === "number" && Number.isFinite(seconds) ? Math.round(seconds) : 0;
+  if (s <= 0) return "";
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const r = String(s % 60).padStart(2, "0");
+  return h ? `${h}:${String(m).padStart(2, "0")}:${r}` : `${String(m).padStart(2, "0")}:${r}`;
+}
+
+/* Row shapes for the 047 curriculum embeds. Typed, unlike the older mappers
+   in this file, so a renamed column is a compile error here rather than a
+   silently empty field on the site. */
+interface LessonRow {
+  id: string;
+  position?: number;
+  type?: string;
+  title?: unknown;
+  duration_seconds?: number | null;
+  is_free?: boolean;
+  video_guid?: string;
+  video_url?: string;
+  url?: string;
+  body?: unknown;
+  question_set_id?: string | null;
+}
+interface SectionRow {
+  id: string;
+  position?: number;
+  title?: unknown;
+  is_free?: boolean;
+  academy_lessons?: LessonRow[];
+}
+interface InstructorRow {
+  slug?: string;
+  name?: string;
+  role?: unknown;
+  bio?: unknown;
+  handles?: string[];
+  photo_url?: string;
+}
+interface InstructorLinkRow {
+  position?: number;
+  academy_instructors?: InstructorRow | null;
+}
+
+const byPosition = (a: { position?: number }, b: { position?: number }) =>
+  (a.position ?? 0) - (b.position ?? 0);
+
+/**
+ * Migration 047 curriculum: sections, each with its lessons, in order.
+ *
+ * Returns [] for a row that has no `academy_sections` embedded — a programme
+ * written before 047, or a query that did not ask for them — and the caller
+ * then falls back to the old JSONB `lessons` column.
+ */
+function mapSections(row: { academy_sections?: SectionRow[] }): AcademySection[] {
+  if (!Array.isArray(row.academy_sections)) return [];
+  return [...row.academy_sections].sort(byPosition).map((s, si) => ({
+    id: s.id,
+    title: str(s.title),
+    isFree: s.is_free !== false,
+    lessons: (Array.isArray(s.academy_lessons) ? [...s.academy_lessons] : [])
+      .sort(byPosition)
+      .map((l): AcademyLesson => {
+        const guid = typeof l.video_guid === "string" ? l.video_guid.trim() : "";
+        return {
+          id: l.id,
+          type: (l.type || "video") as AcademyLessonType,
+          title: str(l.title),
+          duration: clock(l.duration_seconds),
+          locked: l.is_free === false,
+          // A Bunny guid becomes the HLS playlist here, at read time, so a
+          // change of CDN hostname never leaves dead URLs in the database.
+          videoUrl: guid ? videoPlaybackUrl("bunny", guid) : (l.video_url || ""),
+          videoGuid: guid,
+          url: typeof l.url === "string" ? l.url : "",
+          body: Array.isArray(l.body) ? (l.body as ArticleBlock[]) : [],
+          questionSetId: l.question_set_id ?? null,
+          sectionIndex: si,
+        };
+      }),
+  }));
+}
+
+function mapInstructors(row: { academy_program_instructors?: InstructorLinkRow[] }): AcademyInstructor[] {
+  if (!Array.isArray(row.academy_program_instructors)) return [];
+  return [...row.academy_program_instructors]
+    .sort(byPosition)
+    .map((link) => link.academy_instructors)
+    .filter((i): i is InstructorRow => Boolean(i))
+    .map((i) => ({
+      slug: i.slug || "",
+      name: i.name || "",
+      role: str(i.role),
+      bio: str(i.bio),
+      handles: Array.isArray(i.handles) ? i.handles : [],
+      photoUrl: cdnImage(i.photo_url) || "",
+    }));
+}
+
 export function mapAcademyProgram(row: any): AcademyProgram {
+  const sections = mapSections(row);
+  const instructors = mapInstructors(row);
   return {
     id: row.id,
     title: str(row.title),
@@ -264,15 +370,22 @@ export function mapAcademyProgram(row: any): AcademyProgram {
     format: (row.format || "online") as AcademyFormat,
     description: str(row.description),
     objectives: Array.isArray(row.objectives) ? row.objectives : [],
-    whoLeads: str(row.who_leads),
+    whoLeads: str(row.who_leads) || instructors.map((i) => i.name).join(" & "),
     whoItsFor: str(row.who_its_for),
-    duration: row.duration || "",
+    // The old free-text duration first; an imported course has study_time.
+    duration: row.duration || row.study_time || "",
     isFree: row.is_free ?? true,
     price: row.price ?? null,
     scholarshipNote: str(row.scholarship_note),
     dates: row.dates || "",
     howToJoin: str(row.how_to_join),
-    thumbnailUrl: cdnImage(row.thumbnail_url) || "",
+    thumbnailUrl: cdnImage(row.thumbnail_url) || cdnImage(row.cover_url) || "",
+    sections,
+    instructors,
+    level: row.level || "",
+    studyTime: row.study_time || "",
+    videoTime: row.video_time || "",
+    certificateEnabled: Boolean(row.certificate_enabled),
     resources: Array.isArray(row.academy_resources)
       ? [...row.academy_resources]
           .sort((a: any, b: any) => (a.position ?? 0) - (b.position ?? 0))
@@ -286,10 +399,13 @@ export function mapAcademyProgram(row: any): AcademyProgram {
           }))
       : [],
 
-    /* The curriculum. Rows written before migration 031 have no `lessons`, so
-       their `objectives` are read as unlocked, untimed lessons — the page must
-       not go blank for a programme nobody has re-saved yet. */
+    /* The curriculum, in order of precedence:
+         1. 047 sections → every lesson of every section, flattened in order
+         2. the JSONB `lessons` column (migration 031)
+         3. `objectives`, read as unlocked, untimed lessons
+       so the page never goes blank for a programme nobody has re-saved. */
     lessons: (() => {
+      if (sections.length > 0) return sections.flatMap((s) => s.lessons);
       const rows = Array.isArray(row.lessons) ? row.lessons : [];
       if (rows.length > 0) {
         return rows.map((l: any) => ({
@@ -324,8 +440,8 @@ export function mapAcademyProgram(row: any): AcademyProgram {
       : [],
 
     certification: {
-      label: str(row.certification?.label),
-      value: str(row.certification?.value),
+      label: str(row.certification?.label) || (row.certificate_enabled ? "Certification" : ""),
+      value: str(row.certification?.value) || (row.certificate_enabled ? "Available after completion" : ""),
     },
     year: row.year || "",
     currency: row.currency || "EUR",
