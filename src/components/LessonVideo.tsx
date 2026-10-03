@@ -60,16 +60,39 @@ export default function LessonVideo({
     el.addEventListener("ended", handleEnded);
 
     const isPlaylist = src.includes(".m3u8");
-    const nativeHls = el.canPlayType("application/vnd.apple.mpegurl") !== "";
 
-    if (isPlaylist && !nativeHls) {
+    /* hls.js FIRST, the browser's own HLS only as the fallback.
+     *
+     * This is the order hls.js's own documentation recommends, and it matters
+     * more now than it did: recent Chrome answers
+     * canPlayType("application/vnd.apple.mpegurl") with "maybe", so a
+     * native-first check would hand Chrome users to its new built-in HLS
+     * player instead of hls.js. Preferring hls.js wherever Media Source exists
+     * keeps one playback path — and one quality-switching behaviour — across
+     * every desktop browser. The native player stays as the fallback for where
+     * hls.js cannot run at all (iPhones without Media Source).
+     *
+     * Note for whoever tests this: Chrome defers media loading in a tab that
+     * is hidden, so a player "stuck at readyState 0" in a background or
+     * automated tab is not evidence of a playback bug. Test in a visible tab. */
+    if (isPlaylist) {
       let cancelled = false;
       let destroy: (() => void) | undefined;
 
       void import("hls.js").then(({ default: Hls }) => {
         if (cancelled) return;
         if (!Hls.isSupported()) {
-          failRef.current?.();
+          if (el.canPlayType("application/vnd.apple.mpegurl") !== "") {
+            el.src = src;
+            el.play().catch(() => {});
+            destroy = () => {
+              el.pause();
+              el.removeAttribute("src");
+              el.load();
+            };
+          } else {
+            failRef.current?.();
+          }
           return;
         }
         const hls = new Hls({ enableWorker: true });
