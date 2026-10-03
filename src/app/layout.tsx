@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Source_Sans_3 } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import SupportBanner from "@/components/SupportBanner";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -7,14 +7,23 @@ import { getRequestLocale } from "@/lib/locale-server";
 import { LocaleProvider } from "@/contexts/LocaleContext";
 import { getUiStrings, flattenUiStrings } from "@/lib/ui-strings";
 
-const inter = Inter({
+/* Self-hosted, not next/font/google: on 3 Oct the dashboard's Vercel build
+   failed with "next/font/google queries have exactly one entry" — Google Fonts
+   returned a URL shape Turbopack cannot parse (vercel/next.js#99114). Same
+   variable fonts (Fontsource, OFL-1.1, latin subset — covers Portuguese), so
+   the build no longer depends on Google answering. */
+const inter = localFont({
+  src: "./fonts/inter-latin-wght-normal.woff2",
   variable: "--font-inter",
-  subsets: ["latin"],
+  weight: "100 900",
+  display: "swap",
 });
 
-const sourceSans3 = Source_Sans_3({
+const sourceSans3 = localFont({
+  src: "./fonts/source-sans-3-latin-wght-normal.woff2",
   variable: "--font-source-sans",
-  subsets: ["latin"],
+  weight: "200 900",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
