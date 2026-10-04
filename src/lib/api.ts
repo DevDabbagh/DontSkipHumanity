@@ -13,7 +13,8 @@
 
 import type { Film, AcademyProgram, Article, DSHEvent, StudioProject } from "./types";
 import { supabase } from "./supabase";
-import { mapFilm, mapStudioProject, mapAcademyProgram, mapArticle, mapEvent } from "./mappers";
+import { mapFilm, mapStudioProject, mapAcademyProgram, mapArticle, mapEvent, attachQuestions } from "./mappers";
+import type { QuestionRow } from "./mappers";
 import { setMapperLocale } from "./mappers";
 import {
   MOCK_FILMS,
@@ -262,7 +263,25 @@ export async function getProgramBySlug(slug: string): Promise<AcademyProgram | n
         .eq("status", "published")
         .maybeSingle();
 
-      if (!rich.error && rich.data) return mapAcademyProgram(rich.data);
+      if (!rich.error && rich.data) {
+        const program = mapAcademyProgram(rich.data);
+        /* Survey questions live in their own (shared) sets, read through the
+           view that leaves the answer key out. A failure here only costs the
+           options — the survey falls back to a text answer — so it is logged,
+           not fatal. */
+        const setIds = [
+          ...new Set((program.sections ?? []).flatMap((s) => s.lessons.map((l) => l.questionSetId)).filter(Boolean)),
+        ] as string[];
+        if (setIds.length) {
+          const qs = await supabase
+            .from("academy_questions_public")
+            .select("id, set_id, position, prompt, kind, options")
+            .in("set_id", setIds);
+          if (qs.error) console.error(`[academy] questions query failed for "${slug}": ${qs.error.message}`);
+          else attachQuestions(program, (qs.data ?? []) as QuestionRow[]);
+        }
+        return program;
+      }
 
       /* If the curriculum embed itself fails — 047 not run on this database,
          a relationship PostgREST cannot resolve — fall back to the flat query

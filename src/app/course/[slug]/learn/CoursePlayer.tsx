@@ -219,6 +219,30 @@ function ResourceRow({
   );
 }
 
+/** A link lesson that is a YouTube or Spotify player is shown in place, with
+ *  a way out to the provider. Anything else stays an "Open ↗" button. */
+function embedOf(url: string): { src: string; open: string; provider: string; height: number } | null {
+  const yt = url.match(/^https:\/\/www\.youtube(?:-nocookie)?\.com\/embed\/([\w-]{6,})/);
+  if (yt) {
+    return {
+      src: `https://www.youtube-nocookie.com/embed/${yt[1]}`,
+      open: `https://www.youtube.com/watch?v=${yt[1]}`,
+      provider: "YouTube",
+      height: 315,
+    };
+  }
+  const sp = url.match(/^https:\/\/open\.spotify\.com\/embed\/(episode|show|playlist|track|album)\/(\w+)/);
+  if (sp) {
+    return {
+      src: `https://open.spotify.com/embed/${sp[1]}/${sp[2]}`,
+      open: `https://open.spotify.com/${sp[1]}/${sp[2]}`,
+      provider: "Spotify",
+      height: sp[1] === "playlist" || sp[1] === "show" ? 352 : 232,
+    };
+  }
+  return null;
+}
+
 /* ── What sits in the video frame when the lesson is not a video ─────
    Every imported course has surveys, a reading page, links and a certificate
    (DSH-Academy-Migration-Inventory.md). Showing a play button over a survey
@@ -266,13 +290,41 @@ function LessonPanel({
           <p className={`${BODY_14} text-[#32C6CC]`}>Thank you for your answer.</p>
         ) : (
           <>
-            <textarea
-              value={answer}
-              onChange={(e) => setAnswer(e.target.value)}
-              placeholder="Your answer…"
-              className={`w-full h-[110px] p-[16px] rounded-[6px] resize-none outline-none ${BTN_13} text-[#F0F0F0] placeholder:text-[#363636] text-left`}
-              style={{ background: "rgba(13,13,13,0.7)", border: "1px solid #363636" }}
-            />
+            {/* The options captured from LearnWorlds (049): SIM/NÃO, or the
+                1–4 scale. One choice per survey, kept in `answer` like the
+                free-text fallback below so Submit behaves the same. */}
+            {lesson?.questions?.[0]?.options.length ? (
+              <div role="radiogroup" aria-label={lesson.questions[0].prompt} className="flex flex-wrap justify-center gap-[10px] w-full">
+                {lesson.questions[0].options.map((o) => {
+                  const on = answer === o.id;
+                  return (
+                    <button
+                      key={o.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={on}
+                      onClick={() => setAnswer(o.id)}
+                      className={`px-[18px] py-[12px] rounded-[3px] ${BTN_13} transition-colors`}
+                      style={{
+                        background: on ? "rgba(50,198,204,0.14)" : "rgba(13,13,13,0.7)",
+                        border: `1px solid ${on ? "#32C6CC" : "#363636"}`,
+                        color: on ? "#F0F0F0" : "#9D9C9C",
+                      }}
+                    >
+                      {o.label}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <textarea
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                placeholder="Your answer…"
+                className={`w-full h-[110px] p-[16px] rounded-[6px] resize-none outline-none ${BTN_13} text-[#F0F0F0] placeholder:text-[#363636] text-left`}
+                style={{ background: "rgba(13,13,13,0.7)", border: "1px solid #363636" }}
+              />
+            )}
             <button type="button" disabled={!answer.trim()} onClick={onComplete} className={primary} style={primaryStyle}>
               Submit
             </button>
@@ -283,11 +335,30 @@ function LessonPanel({
   }
 
   if (kind === "link" || kind === "file") {
+    const embed = lesson?.url ? embedOf(lesson.url) : null;
     return (
       <div className={wrap}>
         <p className={EYEBROW}>{KIND_LABEL[kind]}</p>
         {title}
-        {lesson?.url ? (
+        {embed ? (
+          /* LearnWorlds showed these 42 YouTube talks and Spotify episodes
+             inside the lesson; so do we. Opening it counts as done. */
+          <>
+            <iframe
+              src={embed.src}
+              title={lesson?.title ?? ""}
+              className="w-full rounded-[6px] border-0"
+              style={{ height: embed.height }}
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              allowFullScreen
+              loading="lazy"
+              onLoad={onComplete}
+            />
+            <a href={embed.open} target="_blank" rel="noopener noreferrer" className={`${BODY_14} text-[#32C6CC]`}>
+              Open on {embed.provider} ↗
+            </a>
+          </>
+        ) : lesson?.url ? (
           <a
             href={lesson.url}
             target="_blank"
@@ -299,9 +370,8 @@ function LessonPanel({
             Open ↗
           </a>
         ) : (
-          /* The 49 LearnWorlds links were imported with their titles only —
-             the addresses are visible only inside the old player. A dead
-             button would be worse than this sentence. */
+          /* Every imported link has its address since the 4 Oct capture; this
+             only shows for a link an editor adds without one. */
           <p className={`${BODY_14} text-[#595C5C]`}>This link is being prepared.</p>
         )}
       </div>

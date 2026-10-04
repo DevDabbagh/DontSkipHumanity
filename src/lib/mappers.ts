@@ -7,7 +7,7 @@ import type {
   Film, FilmFestival, FilmScreening, FilmStage, FilmForm, FilmFormat,
   StudioProject, StudioFormat, StudioStatus,
   AcademyProgram, AcademyType, AcademyFormat,
-  AcademyLesson, AcademyLessonType, AcademySection, AcademyInstructor,
+  AcademyLesson, AcademyLessonType, AcademySection, AcademyInstructor, AcademyQuestion,
   Article, ArticleBlock, ArticleAuthor, ArticleStatus, ArticleSource, ArticleResource,
   DSHEvent, EventPartner, EventStatus,
 } from "./types";
@@ -357,6 +357,40 @@ function mapInstructors(row: { academy_program_instructors?: InstructorLinkRow[]
       handles: Array.isArray(i.handles) ? i.handles : [],
       photoUrl: cdnImage(i.photo_url) || "",
     }));
+}
+
+/** A row of `academy_questions_public` (049): the answer key is not in it. */
+export interface QuestionRow {
+  id: string;
+  set_id: string;
+  position: number | null;
+  prompt: unknown;
+  kind: string | null;
+  options: { id?: string; label?: unknown }[] | null;
+}
+
+/**
+ * Hang each survey/quiz lesson's questions on it, in position order.
+ * Mutates and returns the programme so the caller stays one line.
+ */
+export function attachQuestions(program: AcademyProgram, rows: QuestionRow[]): AcademyProgram {
+  const bySet = new Map<string, AcademyQuestion[]>();
+  for (const r of [...rows].sort((a, b) => (a.position ?? 0) - (b.position ?? 0))) {
+    const kind = (["single", "multiple", "text", "scale"] as const).find((k) => k === r.kind) ?? "text";
+    const q: AcademyQuestion = {
+      id: r.id,
+      prompt: str(r.prompt),
+      kind,
+      options: (r.options ?? []).map((o, i) => ({ id: String(o.id ?? i), label: str(o.label) })),
+    };
+    bySet.set(r.set_id, [...(bySet.get(r.set_id) ?? []), q]);
+  }
+  for (const s of program.sections ?? []) {
+    for (const l of s.lessons) {
+      if (l.questionSetId && bySet.has(l.questionSetId)) l.questions = bySet.get(l.questionSetId);
+    }
+  }
+  return program;
 }
 
 export function mapAcademyProgram(row: any): AcademyProgram {

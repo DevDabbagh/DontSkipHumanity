@@ -221,8 +221,18 @@ export interface AcademyLesson {
   /** Page lessons: Articles-editor blocks. */
   body?: ArticleBlock[];
   questionSetId?: string | null;
+  /** Survey/quiz lessons: the questions of `questionSetId`, answer key never included. */
+  questions?: AcademyQuestion[];
   /** Index into `program.sections`. */
   sectionIndex?: number;
+}
+
+/** One survey or quiz question, read from `academy_questions_public` (049). */
+export interface AcademyQuestion {
+  id: string;
+  prompt: string;
+  kind: "single" | "multiple" | "text" | "scale";
+  options: { id: string; label: string }[];
 }
 
 export interface AcademySection {
