@@ -422,6 +422,11 @@ export default function CoursePlayer({
   const total = lessons.length;
   const current = Math.min(Math.max(lessonIndex, 0), Math.max(total - 1, 0));
   const lesson = lessons[current];
+  /* This lesson's own files first, then the ones for the whole course. */
+  const lessonResources = [
+    ...program.resources.filter((r) => lesson && r.lessonId === lesson.id),
+    ...program.resources.filter((r) => !r.lessonId),
+  ];
   /* A locked lesson does not play. The page still shows everything around it —
      the curriculum, the resources, the notes — so a visitor can see what they
      would be joining rather than hitting a wall. */
@@ -766,13 +771,13 @@ export default function CoursePlayer({
 
         <div className="pt-[20px]">
           {tab === "resources" &&
-            (program.resources.length === 0 ? (
+            (lessonResources.length === 0 ? (
               <p className={`${BODY_14} text-[#595C5C]`}>
                 {program.description || "No resources have been attached to this course yet."}
               </p>
             ) : (
               <div className="flex flex-col gap-[10px]">
-                {program.resources.map((file) => (
+                {lessonResources.map((file) => (
                   <ResourceRow key={file.id} file={file} unlockHref={courseHref} />
                 ))}
               </div>

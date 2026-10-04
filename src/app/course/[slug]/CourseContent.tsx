@@ -367,11 +367,11 @@ export default function CourseContent({
             {/* ── Course Resources — Frame 742 (849:867), y=1838 ── */}
             <div className="pt-[60px]">
               <p className={`${EYEBROW} pb-[20px]`}>Course Resources</p>
-              {program.resources.length === 0 ? (
+              {program.resources.filter((r) => !r.lessonId).length === 0 ? (
                 <p className={`${BODY_14} text-[#595C5C]`}>No resources have been attached yet.</p>
               ) : (
                 <div className="flex flex-col gap-[16px]">
-                  {program.resources.map((file) => {
+                  {program.resources.filter((r) => !r.lessonId).map((file) => {
                     const meta = file.sizeLabel
                       ? `${file.type.toUpperCase()} · ${file.sizeLabel}`
                       : file.type.toUpperCase();

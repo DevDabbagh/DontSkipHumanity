@@ -276,6 +276,8 @@ export interface AcademyProgram {
     /** "420 KB", as the editor typed it — these files are not hosted by us. */
     sizeLabel: string;
     locked: boolean;
+    /** Set when the file belongs to one lesson (course builder); null = whole course. */
+    lessonId?: string | null;
   }[];
   /** The curriculum, flat and in order. For 047 rows this is every lesson of
    *  every section; older rows fall back to the JSONB column, then objectives. */

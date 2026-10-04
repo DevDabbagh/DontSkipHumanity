@@ -435,6 +435,7 @@ export function mapAcademyProgram(row: any): AcademyProgram {
             url: r.url || "",
             sizeLabel: r.size_label || "",
             locked: Boolean(r.locked),
+            lessonId: r.lesson_id ?? null,
           }))
       : [],
 
