@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import DshPlayer from "@/components/DshPlayer";
 import InstructorChip from "@/components/InstructorChip";
@@ -494,6 +495,32 @@ export default function CoursePlayer({
      its download — when the lesson changes. */
   /* Theater: the playlist steps aside and the stage takes the full width. */
   const [theater, setTheater] = useState(false);
+  const router = useRouter();
+  /* The lesson the page opened on waits for a click; every lesson reached
+     from inside the player (Next, the playlist, "Up next") starts playing on
+     its own — the learner has already chosen to keep watching. */
+  const [firstLesson] = useState(current);
+  /* "Up next" countdown after a video ends, in seconds; null = hidden. */
+  const [upNext, setUpNext] = useState<number | null>(null);
+  const goNext = () => {
+    setUpNext(null);
+    if (current < total - 1) router.push(href(`/course/${program.slug}/learn?lesson=${current + 1}`), { scroll: false });
+  };
+  useEffect(() => {
+    if (upNext === null) return;
+    const t = setTimeout(() => {
+      if (upNext <= 1) goNext();
+      else setUpNext(upNext - 1);
+    }, 1000);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [upNext]);
+  // A new lesson clears any countdown left from the last one.
+  const [shownLesson, setShownLesson] = useState(current);
+  if (shownLesson !== current) {
+    setShownLesson(current);
+    setUpNext(null);
+  }
   const [answer, setAnswer] = useState("");
   const markDone = (i: number) => {
     if (!doneRef.current.has(i)) void persist(i, true);
@@ -561,8 +588,8 @@ export default function CoursePlayer({
   /* ── Playlist (left) ──────────────────────────────────────────────── */
   const playlist = (
     <aside
-      className="order-2 lg:order-1 w-full lg:w-[30%] lg:min-w-[320px] lg:max-w-[440px] shrink-0 lg:h-full lg:overflow-y-auto hide-scrollbar"
-      style={{ background: "#121212", borderRight: "1px solid #1F1F1F" }}
+      className={`w-full hide-scrollbar ${theater ? "overflow-hidden rounded-[12px]" : "lg:h-full lg:overflow-y-auto"}`}
+      style={{ background: "#121212", ...(theater ? { border: "1px solid #1F1F1F" } : { borderRight: "1px solid #1F1F1F", borderTop: "1px solid #1F1F1F" }) }}
     >
       {/* Course + back */}
       <div className="px-[24px] pt-[28px] pb-[22px]" style={{ borderBottom: "1px solid #1F1F1F" }}>
@@ -653,10 +680,10 @@ export default function CoursePlayer({
                         href={lessonHref(i)}
                         scroll={false}
                         aria-current={isCurrent ? "true" : undefined}
-                        className="flex items-center gap-[12px] pl-[22px] pr-[24px] py-[12px] transition-colors hover:bg-[#161616]"
+                        className="mx-[10px] mb-[2px] flex items-center gap-[12px] rounded-[8px] px-[12px] py-[11px] transition-colors hover:bg-[#1A1A1A]"
                         style={{
-                          background: isCurrent ? "rgba(50,198,204,0.07)" : undefined,
-                          borderLeft: `2px solid ${isCurrent ? "#32C6CC" : "transparent"}`,
+                          background: isCurrent ? "rgba(50,198,204,0.09)" : undefined,
+                          boxShadow: isCurrent ? "inset 2px 0 0 #32C6CC" : undefined,
                         }}
                       >
                         <span
@@ -692,23 +719,17 @@ export default function CoursePlayer({
     </aside>
   );
 
-  /* ── Stage + lesson (right) ───────────────────────────────────────── */
-  const stage = (
-    <section className="order-1 lg:order-2 flex-1 min-w-0 lg:h-full lg:overflow-y-auto hide-scrollbar">
-      <div className={`${theater ? "max-w-[1600px]" : "max-w-[1100px]"} mx-auto px-5 sm:px-8 pt-[24px] pb-[80px]`}>
-        <p className="text-[12px] leading-[18px] text-[#595C5C] pb-[14px]">
-          {sectionTitle ? `${sectionTitle} › ` : ""}Lesson {current + 1} of {total}
-        </p>
-
+  /* ── The video box and the lesson below it ───────────────────────── */
+  const videoBox = (
         <div
-          className="relative flex items-center justify-center overflow-hidden rounded-[10px] w-full"
+          className={`relative flex items-center justify-center overflow-hidden w-full ${theater ? "" : "rounded-[10px]"}`}
           style={{
             /* A video keeps 16:9. A survey or a reading keeps the width and
                lets the height follow its content. */
             aspectRatio: kind === "video" || lockedNow ? "16 / 9" : undefined,
             minHeight: kind === "video" || lockedNow ? undefined : 360,
             background: "#0D0D0D",
-            border: "1px solid rgba(240,240,240,0.08)",
+            border: theater ? "none" : "1px solid rgba(240,240,240,0.08)",
           }}
         >
           {playable ? (
@@ -721,7 +742,11 @@ export default function CoursePlayer({
               title={lesson?.title}
               theater={theater}
               onTheaterChange={setTheater}
-              onEnded={() => markDone(current)}
+              autoPlay={current !== firstLesson}
+              onEnded={() => {
+                markDone(current);
+                if (current < total - 1 && !lessons[current + 1]?.locked) setUpNext(5);
+              }}
             />
           ) : (
             <>
@@ -765,8 +790,31 @@ export default function CoursePlayer({
               )}
             </>
           )}
+          {upNext !== null && current < total - 1 && (
+            <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-[14px] bg-black/75 px-6 text-center backdrop-blur-[2px]">
+              <p className="text-[11px] uppercase tracking-[1.76px] text-[#8B8F8F]">Up next in {upNext}s</p>
+              <p className="max-w-[520px] text-[18px] font-semibold leading-[24px] text-[#F0F0F0]">{lessons[current + 1]?.title}</p>
+              <div className="flex gap-[10px]">
+                <button type="button" onClick={() => setUpNext(null)} className={`px-[16px] py-[10px] rounded-[3px] ${BTN_13} text-[#8B8F8F] hover:text-[#F0F0F0]`} style={{ border: "1px solid #2A2A2A" }}>
+                  Stay here
+                </button>
+                <button type="button" onClick={goNext} className={`px-[16px] py-[10px] rounded-[3px] ${BTN_13} text-[#F0F0F0]`} style={gradientBtn}>
+                  Play now →
+                </button>
+              </div>
+            </div>
+          )}
         </div>
+  );
 
+  const crumb = (
+    <p className="text-[12px] leading-[18px] text-[#595C5C] pb-[14px]">
+      {sectionTitle ? `${sectionTitle} › ` : ""}Lesson {current + 1} of {total}
+    </p>
+  );
+
+  const info = (
+    <div>
         {/* Title, instructor, actions */}
         <div className="flex flex-col gap-[16px] pt-[24px] lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">
@@ -912,21 +960,46 @@ export default function CoursePlayer({
             </div>
           )}
         </div>
-      </div>
-    </section>
+    </div>
   );
 
   return (
     <main className="relative bg-[#0D0D0D] min-h-screen">
       <div className="film-grain" />
       <Navbar />
-      {/* The navbar is fixed. On a laptop the player is an app-like screen:
-          playlist and stage scroll on their own, the page does not. On a
-          phone it is one column — the stage first, the playlist under it. */}
-      <div className="relative flex flex-col lg:flex-row pt-[100px] lg:h-screen">
-        {!theater && playlist}
-        {stage}
-      </div>
+      {theater ? (
+        /* Theater — the picture runs the full width of the window (capped
+           so the whole frame and its controls fit on screen), and the course
+           continues underneath: playlist on the left, the lesson on the right. */
+        <div className="relative pt-[100px]">
+          <div className="w-full bg-black">
+            <div className="mx-auto w-full" style={{ maxWidth: "calc((100vh - 100px) * 16 / 9)" }}>
+              {videoBox}
+            </div>
+          </div>
+          <div className="mx-auto grid max-w-[1600px] gap-[32px] px-5 pb-[80px] pt-[28px] sm:px-8 lg:grid-cols-[360px_minmax(0,1fr)]">
+            <div className="order-2 lg:order-1">{playlist}</div>
+            <div className="order-1 min-w-0 lg:order-2">
+              {crumb}
+              {info}
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* Default — on a laptop an app-like screen: the playlist and the
+           lesson scroll on their own and the page does not. On a phone it is
+           one column — the lesson first, the course content under it. */
+        <div className="relative pt-[100px] lg:grid lg:h-screen lg:grid-cols-[360px_minmax(0,1fr)]">
+          <div className="order-2 lg:order-1 lg:h-full lg:min-h-0">{playlist}</div>
+          <section className="order-1 min-w-0 lg:order-2 lg:h-full lg:overflow-y-auto hide-scrollbar">
+            <div className="mx-auto max-w-[1320px] px-0 pb-[80px] sm:px-8 sm:pt-[24px]">
+              <div className="hidden sm:block">{crumb}</div>
+              {videoBox}
+              <div className="px-5 sm:px-0">{info}</div>
+            </div>
+          </section>
+        </div>
+      )}
     </main>
   );
 }
