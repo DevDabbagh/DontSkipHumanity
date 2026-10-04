@@ -2,117 +2,216 @@
 
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
-import { useReveal } from "@/hooks/useReveal";
-import type { AcademyProgram } from "@/lib/types";
+import { useLocaleHref } from "@/contexts/LocaleContext";
+import type { InstructorProfile as Profile } from "@/lib/api";
 
-const TYPE_LABELS: Record<string, { label: string; color: string }> = {
-  course: { label: "Course", color: "bg-[#9B59B6]/20 text-[#c084fc]" },
-  workshop: { label: "Workshop", color: "bg-[#1ABC9C]/20 text-[#1ABC9C]" },
-  toolkit: { label: "Toolkit", color: "bg-emerald-500/20 text-emerald-300" },
-  resource: { label: "Resource", color: "bg-amber-500/20 text-amber-300" },
-  mentorship: { label: "Mentorship", color: "bg-indigo-500/20 text-indigo-300" },
-};
+/**
+ * A person on DSH: their courses, and everything else they are part of —
+ * articles they wrote (Read), projects they host (Studio), films they directed.
+ * Sections with nothing in them are not shown, so a person with only courses
+ * gets a clean courses page, not three empty headings.
+ */
 
-export default function InstructorProfile({ name, programs }: { name: string; programs: AcademyProgram[] }) {
-  const sectionRef = useReveal();
-  const initials = name
-    .split(" ")
+const EYEBROW = "text-[11px] leading-[24px] tracking-[1.76px] uppercase";
+const BODY_16 = "font-[family-name:var(--font-source-sans)] text-[16px] leading-[26px]";
+const BODY_14 = "font-[family-name:var(--font-source-sans)] text-[14px] leading-[20px]";
+
+/** "@handle" → its Instagram page; a full URL is used as it is. */
+function handleHref(h: string) {
+  const t = h.trim();
+  if (/^https?:\/\//.test(t)) return t;
+  return `https://www.instagram.com/${t.replace(/^@/, "")}/`;
+}
+
+function Card({
+  href,
+  image,
+  eyebrow,
+  title,
+  text,
+}: {
+  href: string;
+  image: string;
+  eyebrow: string;
+  title: string;
+  text?: string;
+}) {
+  return (
+    <Link href={href} className="group flex flex-col gap-[14px]">
+      <div className="relative aspect-[16/10] rounded-[6px] overflow-hidden bg-[#161616]" style={{ border: "1px solid rgba(240,240,240,0.06)" }}>
+        {image && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={image} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+      </div>
+      <div>
+        <p className={`${EYEBROW} text-[#32C6CC]`}>{eyebrow}</p>
+        <h3 className="text-[17px] font-semibold leading-[23px] tracking-[-0.3px] text-[#F0F0F0] group-hover:text-white">{title}</h3>
+        {text && <p className={`${BODY_14} mt-[6px] text-[#595C5C] line-clamp-2`}>{text}</p>}
+      </div>
+    </Link>
+  );
+}
+
+function Section({ title, count, children }: { title: string; count: number; children: React.ReactNode }) {
+  return (
+    <section className="pt-[70px]">
+      <div className="flex items-baseline justify-between pb-[24px]" style={{ borderBottom: "1px solid #1F1F1F" }}>
+        <h2 className="text-[22px] font-semibold tracking-[-0.5px] text-[#F0F0F0]">{title}</h2>
+        <span className={`${EYEBROW} text-[#595C5C]`}>{count}</span>
+      </div>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-[28px] gap-y-[40px] pt-[30px]">{children}</div>
+    </section>
+  );
+}
+
+export default function InstructorProfile({ profile }: { profile: Profile }) {
+  const href = useLocaleHref();
+  const { instructor: p, courses, articles, studio, films } = profile;
+  const initials = p.name
+    .split(/\s+/)
+    .filter(Boolean)
     .map((n) => n[0])
     .join("")
     .toUpperCase()
     .slice(0, 2);
-  const totalEnrolled = programs.reduce((sum, p) => sum + p.enrolledCount, 0);
+
+  const stats = [
+    { n: courses.length, label: courses.length === 1 ? "course" : "courses" },
+    { n: articles.length, label: articles.length === 1 ? "article" : "articles" },
+    { n: studio.length, label: studio.length === 1 ? "Studio project" : "Studio projects" },
+    { n: films.length, label: films.length === 1 ? "film" : "films" },
+  ].filter((s) => s.n > 0);
 
   return (
     <main className="min-h-screen bg-[#0D0D0D] text-white">
       <div className="film-grain" />
       <Navbar />
 
-      {/* Hero */}
-      <div className="max-w-[1400px] mx-auto px-5 sm:px-8" style={{ paddingTop: 120, paddingBottom: 48 }}>
-        <div className="grid sm:grid-cols-[auto_1fr] gap-8 sm:gap-12 items-center">
-          <div className="flex justify-center sm:justify-start">
-            <div
-              className="flex items-center justify-center rounded-full flex-shrink-0"
-              style={{
-                width: 160,
-                height: 160,
-                background: "linear-gradient(135deg, #9B59B6, #1ABC9C)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                boxShadow: "0 12px 30px rgba(0,0,0,0.25)",
-              }}
-            >
-              <span className="text-white font-bold" style={{ fontSize: 48 }}>
-                {initials}
-              </span>
-            </div>
+      <div className="max-w-[1224px] mx-auto px-5 sm:px-8 xl:px-0 pt-[160px]">
+        <Link
+          href={href("/academy")}
+          className="flex w-fit items-center gap-[7px] text-[13px] font-medium text-[#595C5C] hover:text-[#8B8F8F] transition-colors"
+        >
+          <svg width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden>
+            <path d="M11 4H1M1 4L4 1M1 4L4 7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Academy
+        </Link>
+
+        {/* ── Who ── */}
+        <div className="grid md:grid-cols-[220px_1fr] gap-[36px] md:gap-[56px] items-start pt-[50px]">
+          <div
+            className="relative size-[180px] md:size-[220px] rounded-full overflow-hidden shrink-0 flex items-center justify-center"
+            style={{
+              background: "linear-gradient(135deg, rgba(50,198,204,0.35), rgba(178,52,149,0.35))",
+              border: "1px solid rgba(240,240,240,0.1)",
+              boxShadow: "0 16px 40px rgba(0,0,0,0.35)",
+            }}
+          >
+            {p.photoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={p.photoUrl} alt={p.name} className="absolute inset-0 w-full h-full object-cover" />
+            ) : (
+              <span className="text-[56px] font-semibold text-[#F0F0F0]">{initials}</span>
+            )}
           </div>
-          <div>
-            <p
-              className="text-[10px] uppercase mb-3"
-              style={{ color: "rgba(54,54,54,0.8)", letterSpacing: "0.3em", fontWeight: 500 }}
-            >
-              Instructor
-            </p>
-            <h1 style={{ fontSize: 36, fontWeight: 600, color: "#FFFFFF", lineHeight: 1.15, marginBottom: 8 }}>{name}</h1>
-            <p style={{ fontSize: 15, color: "#999999", marginBottom: 20 }}>DSH Academy Instructor</p>
-            <div className="flex flex-wrap gap-6" style={{ fontSize: 14 }}>
-              <span>
-                <span style={{ fontWeight: 600, color: "#F0F0F0" }}>{programs.length}</span>
-                <span style={{ color: "#595C5C" }}> program{programs.length !== 1 ? "s" : ""}</span>
-              </span>
-              <span style={{ color: "#363636" }}>·</span>
-              <span>
-                <span style={{ fontWeight: 600, color: "#F0F0F0" }}>{totalEnrolled}</span>
-                <span style={{ color: "#595C5C" }}> total enrolled</span>
-              </span>
-            </div>
+
+          <div className="min-w-0">
+            <p className={`${EYEBROW} text-[#595C5C]`}>Instructor · DSH Academy</p>
+            <h1 className="text-[36px] md:text-[44px] font-semibold leading-[1.1] tracking-[-1px] text-[#F0F0F0] mt-[6px]">{p.name}</h1>
+            {p.role && (
+              <p className={`${EYEBROW} text-[#32C6CC] mt-[12px] whitespace-pre-line`}>{p.role}</p>
+            )}
+
+            {stats.length > 0 && (
+              <div className="flex flex-wrap items-center gap-x-[22px] gap-y-[6px] mt-[18px] text-[14px]">
+                {stats.map((s) => (
+                  <span key={s.label}>
+                    <span className="font-semibold text-[#F0F0F0]">{s.n}</span>{" "}
+                    <span className="text-[#595C5C]">{s.label}</span>
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {p.handles.length > 0 && (
+              <div className="flex flex-wrap gap-[10px] mt-[20px]">
+                {p.handles.map((h) => (
+                  <a
+                    key={h}
+                    href={handleHref(h)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-[12px] py-[7px] rounded-[3px] text-[12px] font-medium text-[#F0F0F0] transition-colors hover:bg-[rgba(50,198,204,0.15)]"
+                    style={{ border: "1px solid rgba(240,240,240,0.15)" }}
+                  >
+                    {h} ↗
+                  </a>
+                ))}
+              </div>
+            )}
+
+            {p.bio && (
+              <div className={`${BODY_16} text-[#9D9C9C] mt-[26px] max-w-[760px] whitespace-pre-line`}>{p.bio}</div>
+            )}
           </div>
         </div>
+
+        {/* ── Their work on DSH ── */}
+        {courses.length > 0 && (
+          <Section title="Courses on the Academy" count={courses.length}>
+            {courses.map((c) => (
+              <Card
+                key={c.slug}
+                href={href(`/course/${c.slug}`)}
+                image={c.thumbnailUrl}
+                eyebrow={[c.type, c.duration].filter(Boolean).join(" · ")}
+                title={c.title}
+                text={c.description}
+              />
+            ))}
+          </Section>
+        )}
+
+        {articles.length > 0 && (
+          <Section title="Writing on Read" count={articles.length}>
+            {articles.map((a) => (
+              <Card key={a.slug} href={href(`/read/${a.slug}`)} image={a.mainImage} eyebrow="Article" title={a.title} text={a.excerpt} />
+            ))}
+          </Section>
+        )}
+
+        {studio.length > 0 && (
+          <Section title="In the Studio" count={studio.length}>
+            {studio.map((s) => (
+              <Card
+                key={s.slug}
+                href={href(`/studio/${s.slug}`)}
+                image={s.thumbnailUrl || s.coverUrl}
+                eyebrow={s.format}
+                title={s.title}
+                text={s.oneLineDescription || s.synopsisShort}
+              />
+            ))}
+          </Section>
+        )}
+
+        {films.length > 0 && (
+          <Section title="Films" count={films.length}>
+            {films.map((f) => (
+              <Card key={f.slug} href={href(`/film/${f.slug}`)} image={f.thumbnailUrl || f.posterUrl} eyebrow="Film" title={f.title} text={f.logline} />
+            ))}
+          </Section>
+        )}
+
+        <div className="pb-[140px]" />
       </div>
 
-      <div className="max-w-[1400px] mx-auto px-5 sm:px-8">
-        <div style={{ height: 1, background: "#161616" }} />
-      </div>
-
-      {/* Programs */}
-      <div className="max-w-[1400px] mx-auto px-5 sm:px-8 py-16" ref={sectionRef}>
-        <p className="text-[10px] tracking-[0.3em] text-gray-500 uppercase mb-8">
-          {programs.length} program{programs.length !== 1 ? "s" : ""} on the Academy
-        </p>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-7">
-          {programs.map((program, i) => {
-            const typeInfo = TYPE_LABELS[program.type];
-            return (
-              <Link
-                key={program.slug}
-                href={`/course/${program.slug}`}
-                className={`reveal-scale stagger-${Math.min(i + 1, 5)} group`}
-              >
-                <div className="relative aspect-[4/3] rounded-xl overflow-hidden mb-4">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={program.thumbnailUrl}
-                    alt={program.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute top-3 left-3 flex items-center gap-2">
-                    <span className={`text-xs px-2.5 py-1 rounded-full ${typeInfo?.color} backdrop-blur-sm`}>{typeInfo?.label}</span>
-                    {program.isFree && (
-                      <span className="text-xs px-2.5 py-1 rounded-full bg-[#1ABC9C]/20 text-[#1ABC9C] backdrop-blur-sm">Free</span>
-                    )}
-                  </div>
-                </div>
-                <h3 className="text-lg font-semibold text-white group-hover:text-gray-200 transition-colors">{program.title}</h3>
-                <p className="text-sm text-gray-500 mt-1.5 line-clamp-2 leading-relaxed">{program.description}</p>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
-
+      <Newsletter />
       <Footer />
     </main>
   );

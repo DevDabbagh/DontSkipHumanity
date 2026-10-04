@@ -11,9 +11,10 @@
  * Settings are cached for 10 seconds to avoid hammering Supabase.
  */
 
-import type { Film, AcademyProgram, Article, DSHEvent, StudioProject } from "./types";
+import type { Film, AcademyProgram, AcademyInstructor, Article, DSHEvent, StudioProject } from "./types";
+import { slugifyName } from "./slug";
 import { supabase } from "./supabase";
-import { mapFilm, mapStudioProject, mapAcademyProgram, mapArticle, mapEvent, attachQuestions } from "./mappers";
+import { mapFilm, mapStudioProject, mapAcademyProgram, mapArticle, mapEvent, attachQuestions, mapInstructorRow } from "./mappers";
 import type { QuestionRow } from "./mappers";
 import { setMapperLocale } from "./mappers";
 import {
@@ -414,5 +415,75 @@ export async function getDashboardStats() {
     academyParticipants: 8200,
     festivalSelections: 23,
     redistributed: "€2.4M",
+  };
+}
+
+// ─── Instructor profile ──────────────────────────────────────────
+
+export interface InstructorProfile {
+  instructor: AcademyInstructor;
+  courses: AcademyProgram[];
+  articles: Article[];
+  studio: StudioProject[];
+  films: Film[];
+}
+
+/**
+ * Everything one person has on the platform.
+ *
+ * Courses come from the instructor ↔ programme link table (047), which is
+ * exact. Read, Studio and Films have no person id yet — an article stores its
+ * author as a name, Studio lists hosts, a film its director — so those are
+ * matched on the name, folded the same way as the URL slug. That is the
+ * honest limit of today's data: a different spelling will not match, and a
+ * shared people table is the fix if that ever matters.
+ */
+export async function getInstructorProfile(slug: string): Promise<InstructorProfile | null> {
+  await useRequestLocale();
+  const same = (name: string | undefined) => Boolean(name) && slugifyName(name!) === slug;
+
+  let instructor: AcademyInstructor | null = null;
+  let linkedCourseSlugs: string[] = [];
+
+  if (await isModuleLive("academy")) {
+    const { data, error } = await supabase
+      .from("academy_instructors")
+      .select("*, academy_program_instructors(academy_programs(slug, status))")
+      .eq("slug", slug)
+      .maybeSingle();
+    if (error) console.error(`[academy] instructor "${slug}": ${error.message}`);
+    if (data) {
+      instructor = mapInstructorRow(data);
+      linkedCourseSlugs = ((data.academy_program_instructors ?? []) as { academy_programs: { slug: string; status: string } | null }[])
+        .map((l) => l.academy_programs)
+        .filter((p): p is { slug: string; status: string } => Boolean(p && p.status === "published"))
+        .map((p) => p.slug);
+    }
+  }
+
+  const [programs, articles, studio, films] = await Promise.all([
+    getPrograms(),
+    getArticles(),
+    getStudioProjects(),
+    getFilms(),
+  ]);
+
+  const courses = programs.filter((p) => linkedCourseSlugs.includes(p.slug) || same(p.whoLeads));
+
+  // A course from before 047 (or mock data) has a name and nothing else.
+  if (!instructor) {
+    const name = courses[0]?.whoLeads;
+    if (!name) return null;
+    instructor = { slug, name, role: "", bio: "", handles: [], photoUrl: "" };
+  }
+
+  return {
+    instructor,
+    courses,
+    articles: articles.filter((a) => same(a.author?.name)),
+    studio: studio.filter(
+      (s) => (s.credits?.hosts ?? []).some((h) => same(h)) || same(s.credits?.direction)
+    ),
+    films: films.filter((f) => (f.credits?.direction ?? "").split(/,|&| e | and /).some((n) => same(n.trim()))),
   };
 }

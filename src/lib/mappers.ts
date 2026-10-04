@@ -349,14 +349,19 @@ function mapInstructors(row: { academy_program_instructors?: InstructorLinkRow[]
     .sort(byPosition)
     .map((link) => link.academy_instructors)
     .filter((i): i is InstructorRow => Boolean(i))
-    .map((i) => ({
-      slug: i.slug || "",
-      name: i.name || "",
-      role: str(i.role),
-      bio: str(i.bio),
-      handles: Array.isArray(i.handles) ? i.handles : [],
-      photoUrl: cdnImage(i.photo_url) || "",
-    }));
+    .map(mapInstructorRow);
+}
+
+/** One `academy_instructors` row → the public shape. */
+export function mapInstructorRow(i: InstructorRow): AcademyInstructor {
+  return {
+    slug: i.slug || "",
+    name: i.name || "",
+    role: str(i.role),
+    bio: str(i.bio),
+    handles: Array.isArray(i.handles) ? i.handles : [],
+    photoUrl: cdnImage(i.photo_url) || "",
+  };
 }
 
 /** A row of `academy_questions_public` (049): the answer key is not in it. */

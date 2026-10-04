@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
-import LessonVideo from "@/components/LessonVideo";
+import DshPlayer from "@/components/DshPlayer";
+import InstructorChip from "@/components/InstructorChip";
 import { useLocaleHref } from "@/contexts/LocaleContext";
 import { videoThumbnailUrl } from "@/lib/video-url";
 import type { AcademyProgram, AcademyLesson } from "@/lib/types";
@@ -115,18 +116,6 @@ function PublishIcon() {
     <svg width="12.476" height="12.476" viewBox="0 0 13 13" fill="none" aria-hidden>
       <path d="M9.1 1.6l2.3 2.3-6.6 6.6-3 .7.7-3 6.6-6.6z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
     </svg>
-  );
-}
-
-function BigPlayButton() {
-  // 60×60 (849:1178)
-  return (
-    <span className="flex items-center justify-center size-[60px]">
-      <svg width="60" height="60" viewBox="0 0 60 60" fill="none" aria-hidden>
-        <circle cx="30" cy="30" r="29" stroke="#F0F0F0" strokeOpacity="0.9" strokeWidth="1.4" />
-        <path d="M24 19.5l19 10.5-19 10.5V19.5z" fill="#F0F0F0" fillOpacity="0.9" />
-      </svg>
-    </span>
   );
 }
 
@@ -441,11 +430,10 @@ export default function CoursePlayer({
   /* Completion is held here for now. It survives a lesson change but not a
      reload — persisting it needs a per-user record, which does not exist yet. */
   const [done, setDone] = useState<Set<number>>(new Set());
-  /* Which lesson's player is mounted. Tracked by index rather than a boolean
-     so moving to another lesson unmounts the old player — and stops its
-     download — without an effect to reset state. */
-  const [playingIndex, setPlayingIndex] = useState<number | null>(null);
-  const [failedIndex, setFailedIndex] = useState<number | null>(null);
+  /* `key={current}` on the player unmounts the old lesson's player — and stops
+     its download — when the lesson changes. */
+  /* Theater: the playlist steps aside and the stage takes the full width. */
+  const [theater, setTheater] = useState(false);
   const [answer, setAnswer] = useState("");
   const markDone = (i: number) => setDone((d) => new Set(d).add(i));
   const toggleDone = (i: number) =>
@@ -458,7 +446,6 @@ export default function CoursePlayer({
 
   const kind = kindOf(lesson);
   const playable = kind === "video" && Boolean(lesson?.videoUrl) && !lockedNow;
-  const isPlaying = playable && playingIndex === current && failedIndex !== current;
   const poster =
     (lesson?.videoGuid ? videoThumbnailUrl("bunny", lesson.videoGuid) : "") || program.thumbnailUrl;
   const sections = program.sections ?? [];
@@ -525,7 +512,15 @@ export default function CoursePlayer({
         <p className="mt-[16px] text-[17px] font-semibold leading-[23px] tracking-[-0.3px] text-[#F0F0F0]">
           {program.title}
         </p>
-        {program.whoLeads && <p className={`${BODY_14} mt-[4px] text-[#595C5C]`}>{program.whoLeads}</p>}
+        {program.instructors && program.instructors.length > 0 ? (
+          <div className="flex flex-col gap-[10px] mt-[14px]">
+            {program.instructors.map((i) => (
+              <InstructorChip key={i.slug} instructor={i} size={32} />
+            ))}
+          </div>
+        ) : (
+          program.whoLeads && <p className={`${BODY_14} mt-[4px] text-[#595C5C]`}>{program.whoLeads}</p>
+        )}
       </div>
 
       {/* Progress */}
@@ -634,7 +629,7 @@ export default function CoursePlayer({
   /* ── Stage + lesson (right) ───────────────────────────────────────── */
   const stage = (
     <section className="order-1 lg:order-2 flex-1 min-w-0 lg:h-full lg:overflow-y-auto hide-scrollbar">
-      <div className="max-w-[1100px] mx-auto px-5 sm:px-8 pt-[24px] pb-[80px]">
+      <div className={`${theater ? "max-w-[1600px]" : "max-w-[1100px]"} mx-auto px-5 sm:px-8 pt-[24px] pb-[80px]`}>
         <p className="text-[12px] leading-[18px] text-[#595C5C] pb-[14px]">
           {sectionTitle ? `${sectionTitle} › ` : ""}Lesson {current + 1} of {total}
         </p>
@@ -650,14 +645,17 @@ export default function CoursePlayer({
             border: "1px solid rgba(240,240,240,0.08)",
           }}
         >
-          {isPlaying ? (
-            /* Mounted only after the click — see LessonVideo for why. */
-            <LessonVideo
+          {playable ? (
+            /* The Studio player: quality, speed, theater, fullscreen. It loads
+               only the playlist until the first play — see DshPlayer. */
+            <DshPlayer
               key={current}
               src={lesson!.videoUrl}
               poster={poster}
+              title={lesson?.title}
+              theater={theater}
+              onTheaterChange={setTheater}
               onEnded={() => markDone(current)}
-              onFail={() => setFailedIndex(current)}
             />
           ) : (
             <>
@@ -681,22 +679,9 @@ export default function CoursePlayer({
                   <span className={BTN_13}>Unlock this lesson</span>
                 </Link>
               ) : kind === "video" ? (
-                playable && failedIndex !== current ? (
-                  <button
-                    type="button"
-                    className="relative transition-transform hover:scale-[1.04]"
-                    aria-label={`Play — ${lesson?.title ?? ""}`}
-                    onClick={() => setPlayingIndex(current)}
-                  >
-                    <BigPlayButton />
-                  </button>
-                ) : (
-                  <p className={`relative ${BODY_14} text-[#F0F0F0] px-[24px] text-center`}>
-                    {failedIndex === current
-                      ? "This video could not be loaded. Please try again later."
-                      : "This video is being prepared."}
-                  </p>
-                )
+                <p className={`relative ${BODY_14} text-[#F0F0F0] px-[24px] text-center`}>
+                  This video is being prepared.
+                </p>
               ) : (
                 <LessonPanel
                   lesson={lesson}
@@ -872,7 +857,7 @@ export default function CoursePlayer({
           playlist and stage scroll on their own, the page does not. On a
           phone it is one column — the stage first, the playlist under it. */}
       <div className="relative flex flex-col lg:flex-row pt-[100px] lg:h-screen">
-        {playlist}
+        {!theater && playlist}
         {stage}
       </div>
     </main>

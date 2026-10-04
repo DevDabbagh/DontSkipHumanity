@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import InstructorChip from "@/components/InstructorChip";
 import Navbar from "@/components/Navbar";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
@@ -242,7 +243,20 @@ export default function CourseContent({
       <div className="relative max-w-[1224px] mx-auto px-5 sm:px-8 xl:px-0">
         {/* ── Meta row — Frame 708 (847:239): y=654, w 995 ── */}
         <div className="flex flex-wrap gap-x-[80px] gap-y-[24px] pb-[30px] max-w-[995px]">
-          <MetaPair label="Led by" value={program.whoLeads} href={instructorHref} />
+          {program.instructors && program.instructors.length > 0 ? (
+            /* 047 courses know their instructors: photo + name, each a link to
+               the person's page with everything they do on DSH. */
+            <div className="flex flex-col gap-[10px]">
+              <p className={EYEBROW}>Led by</p>
+              <div className="flex flex-wrap gap-x-[24px] gap-y-[12px]">
+                {program.instructors.map((i) => (
+                  <InstructorChip key={i.slug} instructor={i} size={40} />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <MetaPair label="Led by" value={program.whoLeads} href={instructorHref} />
+          )}
           <MetaPair label="Duration" value={program.duration} />
           <MetaPair
             label={program.certification.label || "Certification"}
