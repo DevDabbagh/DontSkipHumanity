@@ -3,8 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
-import Newsletter from "@/components/Newsletter";
-import Footer from "@/components/Footer";
 import LessonVideo from "@/components/LessonVideo";
 import { useLocaleHref } from "@/contexts/LocaleContext";
 import { videoThumbnailUrl } from "@/lib/video-url";
@@ -26,22 +24,17 @@ const kindOf = (l: AcademyLesson | undefined) => l?.type ?? "video";
 /**
  * Academy — lesson details.
  *
- * Built to Figma frame `853:2059` ("DSH – Academy lesson details").
+ * LAYOUT — decided by Ahmed, 4 Oct 2026
  *
- * WHAT CHANGED FROM THE PREVIOUS BUILD
+ * The playlist layout of "Designer/Design Academy Section Pages" (PagePlayer):
+ * a 70/30 split with the lesson list in collapsible modules, progress on top,
+ * and Resources / Notes / Comments as tabs under the stage — but with the
+ * playlist on the LEFT. With 24 real courses of 5–21 lessons each (imported
+ * from LearnWorlds), a list beside the video reads far better than the long
+ * stacked page of Figma frame `853:2059`, which this replaces. Logged in
+ * DSH-Figma-Comments-Report.md so the change from that frame is on record.
  *
- * The old page was a 70/30 split — video on the left, a lesson sidebar on the
- * right — with a breadcrumb above it and Resources/Notes/Comments as three
- * tabs. The frame is none of those things: one centred 1224px column, the
- * video full width at the top, and the lesson list, the resources and the
- * notes as three separate stacked sections down the page. Tabs are only Notes
- * and Comments. So this is a rebuild, not a set of tweaks.
- *
- * MEASUREMENTS
- *
- * Every number below comes from the frame, with the node id next to it. The
- * 1224px column sits at x=348 in a 1920 frame — (1920−1224)/2 = 348 — so it is
- * a centred container, not a fixed offset.
+ * The type ramp and icons below are still the frame's.
  */
 
 /* ── Type ramp, straight from the frame's named styles ────────────────
@@ -63,16 +56,6 @@ const BTN_13 = "text-[13px] font-medium";
    Drawn here rather than linked: Figma's exported asset URLs expire after
    seven days, so a build that referenced them would break silently a week
    later. Sizes match the frame exactly. */
-
-function ClockIcon() {
-  // 18×15 in the frame (853:1728)
-  return (
-    <svg width="18" height="15" viewBox="0 0 18 15" fill="none" aria-hidden>
-      <circle cx="9" cy="7.5" r="6.4" stroke="currentColor" strokeWidth="1.1" />
-      <path d="M9 4.2v3.5l2.3 1.4" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
 
 function PlaySmallIcon() {
   // 20×20 (849:1485)
@@ -465,6 +448,13 @@ export default function CoursePlayer({
   const [failedIndex, setFailedIndex] = useState<number | null>(null);
   const [answer, setAnswer] = useState("");
   const markDone = (i: number) => setDone((d) => new Set(d).add(i));
+  const toggleDone = (i: number) =>
+    setDone((d) => {
+      const next = new Set(d);
+      if (next.has(i)) next.delete(i);
+      else next.add(i);
+      return next;
+    });
 
   const kind = kindOf(lesson);
   const playable = kind === "video" && Boolean(lesson?.videoUrl) && !lockedNow;
@@ -472,73 +462,192 @@ export default function CoursePlayer({
   const poster =
     (lesson?.videoGuid ? videoThumbnailUrl("bunny", lesson.videoGuid) : "") || program.thumbnailUrl;
   const sections = program.sections ?? [];
-  const [tab, setTab] = useState<"notes" | "comments">("notes");
+  const [tab, setTab] = useState<"resources" | "notes" | "comments">("resources");
   const [noteText, setNoteText] = useState("");
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState<{ name: string; text: string }[]>([]);
 
-  /* One number drives the bar and the label. The frame draws a 273px fill on a
-     1224px track (22%) while the label reads 35% — the two disagree in the
-     design itself, so they are computed from the same value here. */
   const percent = total > 0 ? Math.round((done.size / total) * 100) : 0;
-
   const courseHref = href(`/course/${program.slug}`);
+  const lessonHref = (i: number) => href(`/course/${program.slug}/learn?lesson=${i}`);
 
-  return (
-    <main className="relative bg-[#0D0D0D]">
-      <div className="film-grain" />
-      <Navbar />
+  /* The playlist groups lessons by section; a course from before 047 has no
+     sections and becomes one group. Indices stay global so ?lesson=N and the
+     completion set mean the same thing everywhere. */
+  const groups: { title: string; items: number[] }[] =
+    sections.length > 0
+      ? sections.map((s, si) => ({
+          title: s.title,
+          items: lessons.map((l, i) => (l.sectionIndex === si ? i : -1)).filter((i) => i >= 0),
+        }))
+      : [{ title: "Lessons", items: lessons.map((_, i) => i) }];
+  const currentGroup = Math.max(
+    0,
+    groups.findIndex((g) => g.items.includes(current))
+  );
+  /* The current lesson's module starts open; the others can be opened. */
+  const [open, setOpen] = useState<Set<number>>(new Set([currentGroup]));
+  const toggleGroup = (g: number) =>
+    setOpen((o) => {
+      const next = new Set(o);
+      if (next.has(g)) next.delete(g);
+      else next.add(g);
+      return next;
+    });
 
-      {/* The navbar is fixed, so it takes no layout space. The frame gives it
-          128px and starts the content underneath — without this padding every
-          section on the page sat 128px too high. */}
-      <div className="relative max-w-[1224px] mx-auto px-5 sm:px-8 xl:px-0 pt-[128px]">
-        {/* ── Back — Frame 93 (853:2085) ── */}
+  const sectionTitle =
+    lesson?.sectionIndex !== undefined && sections[lesson.sectionIndex]
+      ? sections[lesson.sectionIndex].title
+      : "";
+
+  const gradientBtn = {
+    border: "1px solid rgba(240,240,240,0.2)",
+    backgroundImage: "linear-gradient(93.1087deg, rgb(50,198,204) 0.1096%, rgb(178,52,149) 100.11%)",
+  };
+
+  /* ── Playlist (left) ──────────────────────────────────────────────── */
+  const playlist = (
+    <aside
+      className="order-2 lg:order-1 w-full lg:w-[30%] lg:min-w-[320px] lg:max-w-[440px] shrink-0 lg:h-full lg:overflow-y-auto hide-scrollbar"
+      style={{ background: "#121212", borderRight: "1px solid #1F1F1F" }}
+    >
+      {/* Course + back */}
+      <div className="px-[24px] pt-[28px] pb-[22px]" style={{ borderBottom: "1px solid #1F1F1F" }}>
         <Link
           href={courseHref}
-          className={`flex w-fit items-center gap-[7px] pt-[60px] leading-[16px] ${BTN_13} text-[#595C5C] hover:text-[#8B8F8F] transition-colors`}
+          className={`flex w-fit items-center gap-[7px] ${BTN_13} text-[#595C5C] hover:text-[#8B8F8F] transition-colors`}
         >
           <svg width="12" height="8" viewBox="0 0 12 8" fill="none" aria-hidden>
             <path d="M11 4H1M1 4L4 1M1 4L4 7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          Back
+          Course page
         </Link>
+        <p className="mt-[16px] text-[17px] font-semibold leading-[23px] tracking-[-0.3px] text-[#F0F0F0]">
+          {program.title}
+        </p>
+        {program.whoLeads && <p className={`${BODY_14} mt-[4px] text-[#595C5C]`}>{program.whoLeads}</p>}
+      </div>
 
-        {/* ── Tag · course · instructor — Frame 773 (851:1715) ──
-            pt 80 to land the row at y=284; pb 30 to meet the video at y=339. */}
-        <div className="flex items-center justify-between pt-[80px] pb-[30px]">
-          <div className="flex gap-[14px] items-center flex-wrap">
-            <span
-              className="flex items-center justify-center px-[8px] py-[5px] rounded-[3px] text-[12px] leading-[15px] font-medium text-[#F0F0F0]"
-              style={{ background: "rgba(50,198,204,0.7)" }}
-            >
-              {/* The type is stored lowercase ("course", "mentorship"); the
-                  frame's chip reads "Mentorships" — a label, not a key. */}
-              {program.type.charAt(0).toUpperCase() + program.type.slice(1)}
-            </span>
-            <span className="flex gap-[10px] items-center flex-wrap">
-              <Link href={courseHref} className={`${BODY_14} text-[#32C6CC] hover:underline`}>
-                {program.title}
-              </Link>
-              <span className="text-[12px] leading-[15px] font-medium text-[#F0F0F0]">{program.whoLeads}</span>
-            </span>
-          </div>
+      {/* Progress */}
+      <div className="px-[24px] py-[20px]" style={{ borderBottom: "1px solid #1F1F1F" }}>
+        <p className={`${EYEBROW} text-[#595C5C]`}>Your progress</p>
+        <div className="mt-[10px] w-full h-[6px] rounded-full overflow-hidden" style={{ background: "#1F1F1F" }}>
+          <div
+            className="h-full rounded-full transition-[width] duration-500"
+            style={{ width: `${percent}%`, background: "linear-gradient(to right, #32C6CC, #B23495)" }}
+          />
         </div>
+        <div className="flex items-center justify-between pt-[10px]">
+          <span className="text-[12px] leading-[18px] text-[#8B8F8F]">{percent}% complete</span>
+          <span className="text-[12px] leading-[18px] text-[#595C5C]">
+            {done.size} of {total} lessons
+          </span>
+        </div>
+      </div>
 
-        {/* ── Video — Frame 450 (849:1177): 1224×600, radius 6,
-            border 1.5px rgba(240,240,240,0.1), image at 80%,
-            drop shadow 0 6px 7px rgba(17,17,17,0.8) ── */}
+      {/* Modules */}
+      {groups.map((g, gi) => {
+        const isOpen = open.has(gi);
+        const groupDone = g.items.filter((i) => done.has(i)).length;
+        return (
+          <div key={gi} style={{ borderBottom: "1px solid #1F1F1F" }}>
+            <button
+              type="button"
+              onClick={() => toggleGroup(gi)}
+              aria-expanded={isOpen}
+              className="w-full flex items-center justify-between gap-[12px] px-[24px] py-[16px] text-left transition-colors hover:bg-[#161616]"
+            >
+              <span className="min-w-0">
+                <span className="block text-[11px] leading-[18px] tracking-[1.76px] uppercase text-[#32C6CC]">
+                  Module {String(gi + 1).padStart(2, "0")}
+                </span>
+                <span className="block text-[14px] font-medium leading-[20px] text-[#F0F0F0] truncate">{g.title}</span>
+                <span className="block text-[12px] leading-[18px] text-[#595C5C] mt-[2px]">
+                  {groupDone}/{g.items.length} lessons
+                </span>
+              </span>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 14 14"
+                fill="none"
+                aria-hidden
+                className="shrink-0 text-[#595C5C] transition-transform duration-200"
+                style={{ transform: isOpen ? "rotate(180deg)" : "none" }}
+              >
+                <path d="M3 5l4 4 4-4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+
+            {isOpen && (
+              <ul>
+                {g.items.map((i) => {
+                  const l = lessons[i];
+                  const k = kindOf(l);
+                  const isCurrent = i === current;
+                  const isDone = done.has(i);
+                  return (
+                    <li key={l.id ?? i}>
+                      <Link
+                        href={lessonHref(i)}
+                        scroll={false}
+                        aria-current={isCurrent ? "true" : undefined}
+                        className="flex items-center gap-[12px] pl-[22px] pr-[24px] py-[12px] transition-colors hover:bg-[#161616]"
+                        style={{
+                          background: isCurrent ? "rgba(50,198,204,0.07)" : undefined,
+                          borderLeft: `2px solid ${isCurrent ? "#32C6CC" : "transparent"}`,
+                        }}
+                      >
+                        <span
+                          className="shrink-0 flex items-center justify-center w-[20px]"
+                          style={{ color: l.locked ? "#363636" : isCurrent ? "#32C6CC" : "#595C5C" }}
+                        >
+                          {l.locked ? (
+                            <LockIcon size={16} />
+                          ) : isDone ? (
+                            <CheckCircleIcon filled />
+                          ) : (
+                            <PlaySmallIcon />
+                          )}
+                        </span>
+                        <span
+                          className="flex-1 min-w-0 text-[13px] leading-[18px]"
+                          style={{ color: l.locked ? "#363636" : isCurrent ? "#F0F0F0" : isDone ? "#8B8F8F" : "#C9C9C9" }}
+                        >
+                          {l.title}
+                        </span>
+                        <span className="shrink-0 text-[11px] leading-[16px] text-[#595C5C]">
+                          {k === "video" ? l.duration : KIND_LABEL[k] ?? k}
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        );
+      })}
+    </aside>
+  );
+
+  /* ── Stage + lesson (right) ───────────────────────────────────────── */
+  const stage = (
+    <section className="order-1 lg:order-2 flex-1 min-w-0 lg:h-full lg:overflow-y-auto hide-scrollbar">
+      <div className="max-w-[1100px] mx-auto px-5 sm:px-8 pt-[24px] pb-[80px]">
+        <p className="text-[12px] leading-[18px] text-[#595C5C] pb-[14px]">
+          {sectionTitle ? `${sectionTitle} › ` : ""}Lesson {current + 1} of {total}
+        </p>
+
         <div
-          className="relative flex items-center justify-center overflow-hidden rounded-[6px] w-full"
+          className="relative flex items-center justify-center overflow-hidden rounded-[10px] w-full"
           style={{
-            /* The frame's 1224×600 is a video's shape. A survey or a reading
-               on a phone would be cut off inside it, so non-video lessons
-               keep the width and let the height follow the content. */
-            aspectRatio: kind === "video" || lockedNow ? "1224 / 600" : undefined,
+            /* A video keeps 16:9. A survey or a reading keeps the width and
+               lets the height follow its content. */
+            aspectRatio: kind === "video" || lockedNow ? "16 / 9" : undefined,
             minHeight: kind === "video" || lockedNow ? undefined : 360,
             background: "#0D0D0D",
-            border: "1.5px solid rgba(240,240,240,0.1)",
-            filter: "drop-shadow(0px 6px 7px rgba(17,17,17,0.8))",
+            border: "1px solid rgba(240,240,240,0.08)",
           }}
         >
           {isPlaying ? (
@@ -558,7 +667,7 @@ export default function CoursePlayer({
                 alt=""
                 aria-hidden
                 className="absolute inset-0 w-full h-full object-cover"
-                style={{ opacity: kind === "video" ? 0.8 : 0.18 }}
+                style={{ opacity: kind === "video" ? 0.8 : 0.14 }}
               />
 
               {lockedNow ? (
@@ -582,8 +691,6 @@ export default function CoursePlayer({
                     <BigPlayButton />
                   </button>
                 ) : (
-                  /* No source, or the player reported a fatal error. Say so
-                     instead of offering a play button that does nothing. */
                   <p className={`relative ${BODY_14} text-[#F0F0F0] px-[24px] text-center`}>
                     {failedIndex === current
                       ? "This video could not be loaded. Please try again later."
@@ -597,9 +704,7 @@ export default function CoursePlayer({
                   isDone={done.has(current)}
                   answer={answer}
                   setAnswer={setAnswer}
-                  remaining={lessons.filter(
-                    (l, i) => !done.has(i) && !["link", "certificate"].includes(kindOf(l))
-                  ).length}
+                  remaining={lessons.filter((l, i) => !done.has(i) && !["link", "certificate"].includes(kindOf(l))).length}
                   onComplete={() => {
                     markDone(current);
                     setAnswer("");
@@ -610,271 +715,166 @@ export default function CoursePlayer({
           )}
         </div>
 
-        {/* ── Module — Frame 775 (851:1721): pt 60 / pb 20 eyebrow, pb 80 block ── */}
-        <div className="flex flex-col items-start pb-[80px]">
-          <p className={`${EYEBROW} pt-[60px] pb-[20px]`}>
-            {lesson?.sectionIndex !== undefined && sections[lesson.sectionIndex]
-              ? sections[lesson.sectionIndex].title
-              : "Module"}
-          </p>
-          <div className="flex flex-wrap gap-[15px] items-end pb-[20px] w-full">
-            <p className="text-[26px] font-semibold leading-[26px] tracking-[1px] text-[#32C6CC]">
-              {String(current + 1).padStart(2, "0")}
-            </p>
-            <h1 className="text-[26px] font-semibold leading-[26px] tracking-[-0.75px] text-[#F0F0F0]">
+        {/* Title, instructor, actions */}
+        <div className="flex flex-col gap-[16px] pt-[24px] lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0">
+            <h1 className="text-[24px] font-semibold leading-[30px] tracking-[-0.6px] text-[#F0F0F0]">
               {lesson?.title ?? program.title}
             </h1>
+            {program.whoLeads && <p className={`${BODY_14} mt-[6px] text-[#8B8F8F]`}>{program.whoLeads}</p>}
           </div>
-          <p className={`${BODY_16} text-[#595C5C] max-w-[612px]`}>{program.description}</p>
+          <div className="flex items-center gap-[10px] shrink-0 flex-wrap">
+            {current > 0 && (
+              <Link
+                href={lessonHref(current - 1)}
+                scroll={false}
+                className={`px-[14px] py-[10px] rounded-[3px] ${BTN_13} text-[#8B8F8F] hover:text-[#F0F0F0] transition-colors`}
+                style={{ border: "1px solid #2A2A2A" }}
+              >
+                ← Previous
+              </Link>
+            )}
+            {!lockedNow && (
+              <button
+                type="button"
+                onClick={() => toggleDone(current)}
+                aria-pressed={done.has(current)}
+                className={`flex items-center gap-[8px] px-[14px] py-[10px] rounded-[3px] ${BTN_13} transition-colors`}
+                style={{ border: "1px solid #2A2A2A", color: done.has(current) ? "#F0F0F0" : "#8B8F8F" }}
+              >
+                <CheckCircleIcon filled={done.has(current)} />
+                {done.has(current) ? "Completed" : "Mark complete"}
+              </button>
+            )}
+            {current < total - 1 && (
+              <Link
+                href={lessonHref(current + 1)}
+                scroll={false}
+                onClick={() => !lockedNow && markDone(current)}
+                className={`px-[16px] py-[10px] rounded-[3px] ${BTN_13} text-[#F0F0F0]`}
+                style={gradientBtn}
+              >
+                Next lesson →
+              </Link>
+            )}
+          </div>
         </div>
 
-        {/* ── Your progress — Frame 772 (851:1706): pb 70 ── */}
-        <div className="flex flex-col pb-[70px]">
-          <p className={`${EYEBROW} pb-[20px]`}>Your progress</p>
-          <div className="w-full h-[6px] rounded-full overflow-hidden" style={{ background: "#161616" }}>
-            <div
-              className="h-full rounded-full transition-[width] duration-500"
-              style={{ width: `${percent}%`, background: "linear-gradient(to right, #32C6CC, #B23495)" }}
-            />
-          </div>
-          <div className="flex items-center justify-between pt-[14px]">
-            <span className="text-[12px] leading-[18px] text-[#595C5C]">{percent}% complete</span>
-            <span className="text-[12px] leading-[18px] text-[#595C5C]">
-              {done.size} of {total} lessons
-            </span>
-          </div>
-        </div>
-
-        {/* ── Module content — Frame 734 (849:1206) + rows (853:1921) ── */}
-        <p className={`${EYEBROW} pb-[20px]`}>Module content</p>
-        <div className="h-0 w-full" style={{ boxShadow: "0 -1px 0 0 rgba(240,240,240,0.1)" }} />
-
-        {/* Every rule on this page is drawn as a shadow on a zero-height
-            element, the way the frame draws it — a 1px border or a 1px block
-            would add itself to the stack and push each row 1px further down
-            than the frame, which is exactly what it did on the first pass.
-
-            Row pitch is 60px in the frame: 24px of content, an 18px gap, the
-            rule, then 18px to the next row. The rule is drawn as a border on a
-            zero-height element so it adds nothing to that arithmetic. */}
-        <div className="flex flex-col gap-[18px] pt-[18px]">
-          {lessons.map((l, i) => {
-            const isDone = done.has(i);
-            const locked = l.locked;
-            const k = kindOf(l);
-            /* A section header goes above the first lesson of each section.
-               Pre-047 courses have no sections and render exactly as before. */
-            const si = l.sectionIndex;
-            const startsSection =
-              sections.length > 0 && si !== undefined && (i === 0 || lessons[i - 1].sectionIndex !== si);
+        {/* Tabs */}
+        <div className="flex gap-[28px] mt-[32px]" style={{ borderBottom: "1px solid #1F1F1F" }}>
+          {(["resources", "notes", "comments"] as const).map((t) => {
+            const active = tab === t;
             return (
-              <div key={l.id ?? i} className="flex flex-col gap-[18px]">
-                {startsSection && (
-                  <p
-                    className={`${EYEBROW} px-[24px] ${i === 0 ? "" : "pt-[30px]"}`}
-                    style={{ color: "#595C5C" }}
-                  >
-                    {String(si + 1).padStart(2, "0")} · {sections[si]?.title}
-                  </p>
-                )}
-                <div className="flex items-center justify-between gap-[24px] px-[24px] flex-wrap">
-                  <div className="flex items-end min-w-0">
-                    <span
-                      className="flex items-center h-[23px] pr-[30px] text-[11px] leading-[24px] tracking-[1.76px] uppercase shrink-0"
-                      style={{ color: locked ? "#363636" : "#32C6CC" }}
-                    >
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <p
-                      className={`${BODY_16} max-w-[653px]`}
-                      style={{ color: locked ? "#363636" : "#F0F0F0" }}
-                    >
-                      {l.title}
-                    </p>
-                  </div>
-
-                  {locked ? (
-                    /* Frame 776 (851:1723). A real destination — the course
-                       page is where enrolment lives — rather than a control
-                       that looks live and does nothing. */
-                    <Link
-                      href={courseHref}
-                      className={`flex gap-[10px] items-center ${BTN_13} text-[#595C5C] hover:text-[#8B8F8F] transition-colors`}
-                    >
-                      Unlock this lesson
-                      <LockIcon />
-                    </Link>
-                  ) : (
-                    <div className="flex gap-[40px] items-center flex-wrap">
-                      {/* A running time only appears when the lesson has one;
-                          a lesson that is not a video says what it is instead. */}
-                      {k === "video" ? (
-                        l.duration && (
-                          <span className="flex gap-[10px] items-center text-[#F0F0F0]">
-                            <span className={BODY_14}>{l.duration}</span>
-                            <ClockIcon />
-                          </span>
-                        )
-                      ) : (
-                        <span className={`${BODY_14} text-[#595C5C]`}>{KIND_LABEL[k] ?? k}</span>
-                      )}
-
-                      <Link
-                        href={href(`/course/${program.slug}/learn?lesson=${i}`)}
-                        className={`flex gap-[10px] items-center ${BTN_13} transition-colors hover:text-[#8B8F8F]`}
-                        style={{ color: i === current ? "#F0F0F0" : "#595C5C" }}
-                      >
-                        {k === "video" ? "Play lesson" : "Open"}
-                        <PlaySmallIcon />
-                      </Link>
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setDone((d) => {
-                            const next = new Set(d);
-                            if (next.has(i)) next.delete(i);
-                            else next.add(i);
-                            return next;
-                          })
-                        }
-                        aria-pressed={isDone}
-                        className={`flex gap-[10px] items-center ${BTN_13} transition-colors hover:text-[#8B8F8F]`}
-                        style={{ color: isDone ? "#F0F0F0" : "#595C5C" }}
-                      >
-                        Mark this lesson as complete
-                        <CheckCircleIcon filled={isDone} />
-                      </button>
-                    </div>
-                  )}
-                </div>
-                <div className="h-0 w-full" style={{ boxShadow: "0 -1px 0 0 rgba(240,240,240,0.1)" }} />
-              </div>
+              <button
+                key={t}
+                type="button"
+                onClick={() => setTab(t)}
+                className={`relative pb-[12px] ${BTN_13} transition-colors`}
+                style={{ color: active ? "#F0F0F0" : "#595C5C" }}
+              >
+                {t === "resources" ? "Resources" : t === "notes" ? "Notes" : "Comments"}
+                {active && <span className="absolute left-0 right-0 bottom-[-1px] h-[2px] bg-[#32C6CC]" />}
+              </button>
             );
           })}
         </div>
 
-        {/* ── Module Resources — Frame 796 (853:2012) ── */}
-        <div className="flex flex-col pt-[18px]">
-          <p className={`${EYEBROW} pb-[20px]`}>Module Resources</p>
-          {program.resources.length === 0 ? (
-            <p className={`${BODY_14} text-[#595C5C]`}>
-              No resources have been attached to this module yet.
-            </p>
-          ) : (
-            <div className="flex flex-col gap-[16px]">
-              {program.resources.map((file) => (
-                <ResourceRow key={file.id} file={file} unlockHref={courseHref} />
-              ))}
-            </div>
-          )}
-        </div>
+        <div className="pt-[20px]">
+          {tab === "resources" &&
+            (program.resources.length === 0 ? (
+              <p className={`${BODY_14} text-[#595C5C]`}>
+                {program.description || "No resources have been attached to this course yet."}
+              </p>
+            ) : (
+              <div className="flex flex-col gap-[10px]">
+                {program.resources.map((file) => (
+                  <ResourceRow key={file.id} file={file} unlockHref={courseHref} />
+                ))}
+              </div>
+            ))}
 
-        {/* ── Notes / Comments — Frame 795 (853:2011): pt 100, pb 30, gap 15 ── */}
-        <div className="flex flex-col gap-[15px] pt-[100px] pb-[30px]">
-          <div className="flex gap-[10px] items-center">
-            {(["notes", "comments"] as const).map((t) => {
-              const active = tab === t;
-              return (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => setTab(t)}
-                  className={`flex items-center justify-center px-[14px] py-[12px] rounded-[3px] ${BTN_13} transition-colors`}
-                  style={
-                    active
-                      ? { background: "rgba(50,198,204,0.7)", color: "#F0F0F0", backdropFilter: "blur(3px)" }
-                      : { background: "rgba(27,27,27,0.4)", color: "#595C5C" }
-                  }
-                >
-                  {t === "notes" ? "Notes" : "Comments"}
-                </button>
-              );
-            })}
-          </div>
-          <div className="h-0 w-full" style={{ boxShadow: "0 -1px 0 0 rgba(240,240,240,0.1)" }} />
-        </div>
-
-        {/* ── The box and its button — Frame 797 (853:2029): gap 20, pb 200 ── */}
-        <div className="flex flex-col gap-[20px] items-end pb-[200px]">
-          {tab === "notes" ? (
-            <>
+          {tab === "notes" && (
+            <div className="flex flex-col gap-[14px] items-end">
               <textarea
                 value={noteText}
                 onChange={(e) => setNoteText(e.target.value)}
-                placeholder="Write your notes for this module..."
-                className={`w-full h-[138px] p-[20px] rounded-[6px] resize-none outline-none ${BTN_13} text-[#F0F0F0] placeholder:text-[#363636]`}
-                style={{ background: "rgba(54,54,54,0.1)", border: "1px solid #161616" }}
+                placeholder="Write your notes for this lesson..."
+                className={`w-full h-[160px] p-[16px] rounded-[8px] resize-none outline-none ${BTN_13} text-[#F0F0F0] placeholder:text-[#363636]`}
+                style={{ background: "#141414", border: "1px solid #1F1F1F" }}
               />
               <button
                 type="button"
                 disabled={!noteText.trim()}
                 onClick={() => setNoteText("")}
-                className={`flex gap-[7px] items-center justify-center w-full sm:w-[300px] p-[14px] rounded-[3px] ${BTN_13} text-[#F0F0F0] transition-opacity disabled:opacity-40`}
-                style={{
-                  border: "1px solid rgba(240,240,240,0.2)",
-                  backgroundImage:
-                    "linear-gradient(93.1087deg, rgb(50,198,204) 0.1096%, rgb(178,52,149) 100.11%)",
-                }}
+                className={`flex gap-[7px] items-center justify-center w-full sm:w-[220px] p-[12px] rounded-[3px] ${BTN_13} text-[#F0F0F0] transition-opacity disabled:opacity-40`}
+                style={gradientBtn}
               >
-                Publish
+                Save notes
                 <PublishIcon />
               </button>
-            </>
-          ) : (
-            <>
-              <textarea
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                placeholder="Write a comment for this module..."
-                className={`w-full h-[138px] p-[20px] rounded-[6px] resize-none outline-none ${BTN_13} text-[#F0F0F0] placeholder:text-[#363636]`}
-                style={{ background: "rgba(54,54,54,0.1)", border: "1px solid #161616" }}
-              />
-              <button
-                type="button"
-                disabled={!commentText.trim()}
-                onClick={() => {
-                  const text = commentText.trim();
-                  if (!text) return;
-                  setComments((c) => [{ name: "You", text }, ...c]);
-                  setCommentText("");
-                }}
-                className={`flex gap-[7px] items-center justify-center w-full sm:w-[300px] p-[14px] rounded-[3px] ${BTN_13} text-[#F0F0F0] transition-opacity disabled:opacity-40`}
-                style={{
-                  border: "1px solid rgba(240,240,240,0.2)",
-                  backgroundImage:
-                    "linear-gradient(93.1087deg, rgb(50,198,204) 0.1096%, rgb(178,52,149) 100.11%)",
-                }}
-              >
-                Publish
-                <PublishIcon />
-              </button>
+            </div>
+          )}
 
-              {comments.length > 0 && (
-                <div className="w-full flex flex-col gap-[16px] items-start">
-                  {comments.map((c, i) => (
-                    <div key={i} className="flex gap-[12px] items-start w-full">
-                      <span
-                        className="shrink-0 size-[32px] rounded-full flex items-center justify-center text-[12px] font-semibold"
-                        style={{ background: "rgba(27,27,27,0.4)", color: "#595C5C" }}
-                      >
-                        {c.name[0]}
-                      </span>
-                      <div className="min-w-0">
-                        <p className="text-[13px] font-medium text-[#F0F0F0]">{c.name}</p>
-                        <p className={`${BODY_14} text-[#595C5C] mt-[4px]`}>{c.text}</p>
-                      </div>
-                    </div>
-                  ))}
+          {tab === "comments" && (
+            <div className="flex flex-col gap-[18px]">
+              <div className="flex gap-[12px] items-start">
+                <span className="shrink-0 size-[32px] rounded-full" style={{ background: "#1F1F1F" }} />
+                <div className="flex-1 flex flex-col gap-[10px] items-end">
+                  <textarea
+                    value={commentText}
+                    onChange={(e) => setCommentText(e.target.value)}
+                    placeholder="Add a comment..."
+                    className={`w-full h-[90px] p-[14px] rounded-[8px] resize-none outline-none ${BTN_13} text-[#F0F0F0] placeholder:text-[#363636]`}
+                    style={{ background: "#141414", border: "1px solid #1F1F1F" }}
+                  />
+                  <button
+                    type="button"
+                    disabled={!commentText.trim()}
+                    onClick={() => {
+                      const text = commentText.trim();
+                      if (!text) return;
+                      setComments((c) => [{ name: "You", text }, ...c]);
+                      setCommentText("");
+                    }}
+                    className={`px-[16px] py-[10px] rounded-[3px] ${BTN_13} text-[#F0F0F0] transition-opacity disabled:opacity-40`}
+                    style={gradientBtn}
+                  >
+                    Post
+                  </button>
                 </div>
-              )}
-            </>
+              </div>
+              {comments.map((c, i) => (
+                <div key={i} className="flex gap-[12px] items-start">
+                  <span
+                    className="shrink-0 size-[32px] rounded-full flex items-center justify-center text-[12px] font-semibold"
+                    style={{ background: "#1F1F1F", color: "#8B8F8F" }}
+                  >
+                    {c.name[0]}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-[13px] font-medium text-[#F0F0F0]">{c.name}</p>
+                    <p className={`${BODY_14} text-[#8B8F8F] mt-[4px]`}>{c.text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </div>
+    </section>
+  );
 
-      <Newsletter />
-      <Footer />
+  return (
+    <main className="relative bg-[#0D0D0D] min-h-screen">
+      <div className="film-grain" />
+      <Navbar />
+      {/* The navbar is fixed. On a laptop the player is an app-like screen:
+          playlist and stage scroll on their own, the page does not. On a
+          phone it is one column — the stage first, the playlist under it. */}
+      <div className="relative flex flex-col lg:flex-row pt-[100px] lg:h-screen">
+        {playlist}
+        {stage}
+      </div>
     </main>
   );
 }
