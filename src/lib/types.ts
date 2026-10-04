@@ -290,6 +290,8 @@ export interface AcademyProgram {
   studyTime?: string;
   videoTime?: string;
   certificateEnabled?: boolean;
+  /** Migration 051 — the design and where the learner's name goes. */
+  certificateTemplate?: import("./certificate").CertTemplate;
   testimonials: { quote: string; author: string }[];
   partnerships: { label: string; title: string; body: string }[];
   /** The "Certification / Available after completion" pair in the meta row. */

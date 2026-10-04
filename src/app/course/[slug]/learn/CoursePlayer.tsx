@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import DshPlayer from "@/components/DshPlayer";
 import InstructorChip from "@/components/InstructorChip";
 import { useLocaleHref } from "@/contexts/LocaleContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
+import CertificateClaim from "@/components/CertificateClaim";
 import { videoThumbnailUrl } from "@/lib/video-url";
 import type { AcademyProgram, AcademyLesson } from "@/lib/types";
 
@@ -227,7 +230,9 @@ function LessonPanel({
   setAnswer,
   remaining,
   onComplete,
+  program,
 }: {
+  program: AcademyProgram;
   lesson: AcademyLesson | undefined;
   kind: string;
   isDone: boolean;
@@ -396,11 +401,9 @@ function LessonPanel({
       <div className={wrap}>
         <p className={EYEBROW}>{KIND_LABEL.certificate}</p>
         {title}
-        <p className={`${BODY_14} text-[#9D9C9C]`}>
-          {remaining > 0
-            ? `${remaining} lesson${remaining === 1 ? "" : "s"} left before your certificate.`
-            : "You have completed every lesson. Certificates are issued to signed-in learners."}
-        </p>
+        <div className="w-full text-left">
+          <CertificateClaim program={program} remaining={remaining} />
+        </div>
       </div>
     );
   }
@@ -417,7 +420,7 @@ export default function CoursePlayer({
 }) {
   const href = useLocaleHref();
 
-  const lessons: AcademyLesson[] = program.lessons.length > 0 ? program.lessons : [];
+  const lessons: AcademyLesson[] = program.lessons;
 
   const total = lessons.length;
   const current = Math.min(Math.max(lessonIndex, 0), Math.max(total - 1, 0));
@@ -432,22 +435,80 @@ export default function CoursePlayer({
      would be joining rather than hitting a wall. */
   const lockedNow = Boolean(lesson?.locked);
 
-  /* Completion is held here for now. It survives a lesson change but not a
-     reload — persisting it needs a per-user record, which does not exist yet. */
+  /* Completion. For a signed-in learner every change is saved to their
+     account (academy_lesson_progress) and read back on the next visit; for a
+     visitor it lives in this tab only. The server decides certificates from
+     the saved rows, never from this set. */
   const [done, setDone] = useState<Set<number>>(new Set());
+  const { user } = useAuth();
+  const enrolled = useRef(false);
+  const doneRef = useRef(done);
+  useEffect(() => {
+    doneRef.current = done;
+  });
+
+  const persist = useCallback(
+    async (i: number, completed: boolean) => {
+      const l = lessons[i];
+      if (!user || !l?.id || !program.id) return;
+      if (!enrolled.current) {
+        // Free courses: join on first progress. Paid courses are joined at
+        // checkout, so "not free" here is expected and harmless.
+        await supabase.rpc("academy_enroll_learner", { p_program_id: program.id });
+        enrolled.current = true;
+      }
+      const { error } = await supabase.from("academy_lesson_progress").upsert(
+        { user_id: user.id, lesson_id: l.id, program_id: program.id, completed_at: completed ? new Date().toISOString() : null, updated_at: new Date().toISOString() },
+        { onConflict: "user_id,lesson_id" }
+      );
+      if (error) console.warn("[academy] progress not saved:", error.message);
+    },
+    [user, lessons, program.id]
+  );
+
+  // Signed in: load saved progress, and save anything done before signing in.
+  useEffect(() => {
+    if (!user || !program.id) return;
+    let live = true;
+    supabase
+      .from("academy_lesson_progress")
+      .select("lesson_id, completed_at")
+      .eq("program_id", program.id)
+      .then(({ data }) => {
+        if (!live || !data) return;
+        const savedIds = new Set(data.filter((r) => r.completed_at).map((r) => r.lesson_id as string));
+        const fromServer = new Set<number>();
+        lessons.forEach((l, i) => l.id && savedIds.has(l.id) && fromServer.add(i));
+        const local = doneRef.current;
+        local.forEach((i) => {
+          if (!fromServer.has(i)) void persist(i, true);
+        });
+        setDone(new Set([...fromServer, ...local]));
+      });
+    return () => {
+      live = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, program.id]);
   /* `key={current}` on the player unmounts the old lesson's player — and stops
      its download — when the lesson changes. */
   /* Theater: the playlist steps aside and the stage takes the full width. */
   const [theater, setTheater] = useState(false);
   const [answer, setAnswer] = useState("");
-  const markDone = (i: number) => setDone((d) => new Set(d).add(i));
-  const toggleDone = (i: number) =>
+  const markDone = (i: number) => {
+    if (!doneRef.current.has(i)) void persist(i, true);
+    setDone((d) => new Set(d).add(i));
+  };
+  const toggleDone = (i: number) => {
+    const was = doneRef.current.has(i);
+    void persist(i, !was);
     setDone((d) => {
       const next = new Set(d);
-      if (next.has(i)) next.delete(i);
+      if (was) next.delete(i);
       else next.add(i);
       return next;
     });
+  };
 
   const kind = kindOf(lesson);
   const playable = kind === "video" && Boolean(lesson?.videoUrl) && !lockedNow;
@@ -689,6 +750,7 @@ export default function CoursePlayer({
                 </p>
               ) : (
                 <LessonPanel
+                  program={program}
                   lesson={lesson}
                   kind={kind}
                   isDone={done.has(current)}

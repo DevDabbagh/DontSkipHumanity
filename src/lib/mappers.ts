@@ -1,3 +1,4 @@
+import { normaliseCertTemplate } from "./certificate";
 /**
  * Map Supabase snake_case rows → landing page camelCase types.
  * Read-only — no toSnake functions needed for the public site.
@@ -425,6 +426,7 @@ export function mapAcademyProgram(row: any): AcademyProgram {
     studyTime: row.study_time || "",
     videoTime: row.video_time || "",
     certificateEnabled: Boolean(row.certificate_enabled),
+    certificateTemplate: normaliseCertTemplate(row.certificate_template),
     resources: Array.isArray(row.academy_resources)
       ? [...row.academy_resources]
           .sort((a: any, b: any) => (a.position ?? 0) - (b.position ?? 0))

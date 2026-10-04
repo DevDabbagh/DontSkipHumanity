@@ -47,6 +47,13 @@ const SOCIAL_KEY_TO_LABEL: Record<string, string> = {
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  // Anywhere on the site can ask for the sign-in dialog (e.g. "Sign in to
+  // get your certificate") without owning its state.
+  useEffect(() => {
+    const open = () => setIsLoginModalOpen(true);
+    window.addEventListener("dsh:open-login", open);
+    return () => window.removeEventListener("dsh:open-login", open);
+  }, []);
   const { locale, locales, defaultCode } = useLocale();
   /* Live, prefix-stripped path — the server-supplied one goes stale as soon as
      the visitor navigates without a reload. */
