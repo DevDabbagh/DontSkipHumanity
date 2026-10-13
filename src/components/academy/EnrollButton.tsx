@@ -65,7 +65,7 @@ export default function EnrollButton({
         </svg>
       </button>
       {error && <p className="mt-[8px] text-[12px] text-[#E0607E]">{error}</p>}
-      {!owned && access.ready && (
+      {!owned && access.ready && program.lessons.some((l) => (l.access ?? (l.locked ? "members" : "public")) === "public") && (
         <a href={learnHref} className="mt-[12px] block text-center text-[12px] text-[#595C5C] underline-offset-4 hover:text-[#8B8F8F] hover:underline">
           Preview the free lessons
         </a>

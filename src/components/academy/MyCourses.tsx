@@ -52,13 +52,14 @@ export default function MyCourses({ userId }: { userId: string }) {
         return;
       }
       const [{ data: lessons }, { data: progress }, { data: certs }] = await Promise.all([
-        supabase.from("academy_lessons").select("id, program_id, type").in("program_id", ids),
+        supabase.from("academy_lessons").select("id, program_id, type, question_set_id").in("program_id", ids),
         supabase.from("academy_lesson_progress").select("lesson_id, program_id").in("program_id", ids).not("completed_at", "is", null),
         supabase.from("academy_certificates").select("program_id, code").in("program_id", ids),
       ]);
       const counted = new Map<string, Set<string>>();
       (lessons ?? []).forEach((l) => {
         if (!COUNTED.includes(l.type as string)) return;
+        if ((l.type === "survey" || l.type === "quiz") && !l.question_set_id) return;
         const set = counted.get(l.program_id as string) ?? new Set<string>();
         set.add(l.id as string);
         counted.set(l.program_id as string, set);

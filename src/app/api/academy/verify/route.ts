@@ -32,6 +32,9 @@ export async function POST(req: Request) {
     if (!res.ok) return NextResponse.json({ error: res.error }, { status: 500 });
     return NextResponse.json({ ok: true, paid: session.payment_status === "paid" });
   } catch (err) {
+    if ((err as { code?: string })?.code === "resource_missing") {
+      return NextResponse.json({ error: "Unknown purchase." }, { status: 404 });
+    }
     console.error("[academy/verify]", err);
     return NextResponse.json({ error: "Could not confirm the purchase." }, { status: 500 });
   }

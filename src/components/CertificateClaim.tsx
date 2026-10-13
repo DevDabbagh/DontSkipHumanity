@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
@@ -23,7 +23,21 @@ interface CertRow {
   issued_at: string;
 }
 
-export default function CertificateClaim({ program, remaining }: { program: AcademyProgram; remaining: number }) {
+export default function CertificateClaim({
+  program,
+  remaining,
+  onIssued,
+}: {
+  program: AcademyProgram;
+  remaining: number;
+  /** The learner holds a certificate (just issued or from before) — the
+   *  certificate lesson itself then counts as done. */
+  onIssued?: () => void;
+}) {
+  const onIssuedRef = useRef(onIssued);
+  useEffect(() => {
+    onIssuedRef.current = onIssued;
+  });
   const { user, profile } = useAuth();
   const href = useLocaleHref();
   const [cert, setCert] = useState<CertRow | null>(null);
@@ -47,6 +61,7 @@ export default function CertificateClaim({ program, remaining }: { program: Acad
         if (!live) return;
         setCert((data as CertRow | null) ?? null);
         setChecked(true);
+        if (data) onIssuedRef.current?.();
       });
     return () => {
       live = false;
@@ -73,6 +88,7 @@ export default function CertificateClaim({ program, remaining }: { program: Acad
       return;
     }
     setCert(data as CertRow);
+    onIssuedRef.current?.();
   };
 
   const box = "flex flex-col gap-[16px]";

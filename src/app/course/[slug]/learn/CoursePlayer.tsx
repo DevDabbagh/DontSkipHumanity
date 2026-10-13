@@ -30,6 +30,17 @@ const KIND_LABEL: Record<string, string> = {
 /** Lessons from before migration 047 carry no type; they were always videos. */
 const kindOf = (l: AcademyLesson | undefined) => l?.type ?? "video";
 
+/** A survey or quiz is completed only by answering it (and, for a quiz,
+ *  passing) — never by a button. One with no questions attached cannot be
+ *  completed and does not count, the same rule as the certificate (053). */
+const answeredOnly = (l: AcademyLesson | undefined) => ["survey", "quiz", "certificate"].includes(kindOf(l));
+const counts = (l: AcademyLesson) => {
+  const k = kindOf(l);
+  if (k === "link" || k === "certificate") return false;
+  if (k === "survey" || k === "quiz") return Boolean(l.questionSetId);
+  return true;
+};
+
 /**
  * Academy — lesson details.
  *
@@ -353,7 +364,7 @@ function LessonPanel({
         <p className={EYEBROW}>{KIND_LABEL.certificate}</p>
         {title}
         <div className="w-full text-left">
-          <CertificateClaim program={program} remaining={remaining} />
+          <CertificateClaim program={program} remaining={remaining} onIssued={isDone ? undefined : onComplete} />
         </div>
       </div>
     );
@@ -855,7 +866,7 @@ export default function CoursePlayer({
                   kind={kind}
                   isDone={done.has(current)}
                   signedIn={Boolean(user)}
-                  remaining={lessons.filter((l, i) => !done.has(i) && !["link", "certificate"].includes(kindOf(l))).length}
+                  remaining={lessons.filter((l, i) => !done.has(i) && counts(l)).length}
                   onComplete={() => markDone(current)}
                 />
               )}
@@ -905,7 +916,7 @@ export default function CoursePlayer({
                 ← Previous
               </Link>
             )}
-            {!lockedNow && (
+            {!lockedNow && !answeredOnly(lesson) && (
               <button
                 type="button"
                 onClick={() => toggleDone(current)}
@@ -921,7 +932,7 @@ export default function CoursePlayer({
               <Link
                 href={lessonHref(current + 1)}
                 scroll={false}
-                onClick={() => !lockedNow && markDone(current)}
+                onClick={() => !lockedNow && !answeredOnly(lesson) && markDone(current)}
                 className={`px-[16px] py-[10px] rounded-[3px] ${BTN_13} text-[#F0F0F0]`}
                 style={gradientBtn}
               >
