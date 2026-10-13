@@ -293,10 +293,12 @@ export default function AcademyListing({
       {featured && (
         <section className="max-w-[1224px] mx-auto px-5 sm:px-8 xl:px-0 pt-[358px]">
           <p className={`${EYEBROW} mb-[38px]`}>{t("academy.featured")}</p>
-          <div className="flex flex-col xl:flex-row gap-[40px] xl:gap-[70px] items-start">
+          <div className="group relative flex flex-col xl:flex-row gap-[40px] xl:gap-[70px] items-start cursor-pointer">
+            {/* The whole featured block opens the course (stretched link). */}
+            <Link href={`/course/${featured.slug}`} aria-label={featured.title} className="absolute inset-0 z-0" />
             {/* Still — 612×448, same chrome as every image card */}
             <div
-              className={`relative overflow-hidden shrink-0 w-full xl:w-[612px] h-[280px] sm:h-[380px] xl:h-[448px] ${CARD_BORDER}`}
+              className={`pointer-events-none relative overflow-hidden shrink-0 w-full xl:w-[612px] h-[280px] sm:h-[380px] xl:h-[448px] ${CARD_BORDER}`}
               style={{ boxShadow: CARD_SHADOW, backgroundColor: "#0D0D0D" }}
             >
               {featured.thumbnailUrl && (
@@ -305,13 +307,13 @@ export default function AcademyListing({
                   data-colorize
                   src={featured.thumbnailUrl}
                   alt=""
-                  className="absolute inset-0 w-full h-full object-cover"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                 />
               )}
             </div>
 
             {/* Text column — 541 wide, gap 50 to the buttons */}
-            <div className="flex flex-col gap-[50px] items-start xl:w-[541px]">
+            <div className="pointer-events-none flex flex-col gap-[50px] items-start xl:w-[541px]">
               <div className="flex flex-col gap-[20px] items-start w-full">
                 <div className="flex flex-col gap-[40px] items-start w-full">
                   <div className="flex flex-col gap-[20px] items-start w-full">
@@ -351,7 +353,7 @@ export default function AcademyListing({
                 <ProgramMeta program={featured} solidChip />
               </div>
 
-              <div className="flex gap-[24px] items-center">
+              <div className="pointer-events-auto relative z-10 flex gap-[24px] items-center">
                 <Link href={`/course/${featured.slug}`} className={GLASS_BTN}>
                   {t("academy.enroll")}
                   <Caret />
@@ -602,10 +604,18 @@ function ProgramCard({
   t: (key: string) => string;
 }) {
   return (
-    <article className="flex flex-col gap-[30px] items-start">
+    <article className="group relative flex flex-col gap-[30px] items-start cursor-pointer">
+      {/* The whole card opens the course. A link stretched over the card
+          (rather than wrapping it) keeps the buttons below their own links —
+          an <a> inside an <a> is invalid HTML. */}
+      <Link
+        href={`/course/${program.slug}`}
+        aria-label={program.title}
+        className="absolute inset-0 z-0 rounded-[6px]"
+      />
       {/* Still — 392×250, 1.5px border, 6px radius, spread-2 shadow */}
       <div
-        className={`relative overflow-hidden w-full h-[250px] ${CARD_BORDER}`}
+        className={`pointer-events-none relative overflow-hidden w-full h-[250px] ${CARD_BORDER}`}
         style={{ boxShadow: CARD_SHADOW, backgroundColor: "#0D0D0D" }}
       >
         {program.thumbnailUrl && (
@@ -614,18 +624,18 @@ function ProgramCard({
             data-colorize
             src={program.thumbnailUrl}
             alt=""
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           />
         )}
       </div>
 
-      <div className="flex flex-col gap-[40px] items-start w-full">
+      <div className="pointer-events-none flex flex-col gap-[40px] items-start w-full">
         <div className="flex flex-col gap-[20px] items-start w-full">
           <div className="flex flex-col gap-[20px] items-start w-full">
             <ProgramMeta program={program} />
             <div className="flex flex-col gap-[10px] w-full">
               {/* 20/28 semibold — Mobile/H2_Mobile_DSH in the frame */}
-              <h3 className="font-semibold text-[20px] leading-[28px] text-[#F0F0F0]">
+              <h3 className="font-semibold text-[20px] leading-[28px] text-[#F0F0F0] transition-colors group-hover:text-white">
                 {program.title}
               </h3>
               <p className="font-[family-name:var(--font-source-sans)] text-[14px] leading-[20px] text-[#595C5C]">
@@ -649,7 +659,7 @@ function ProgramCard({
           </div>
         </div>
 
-        <div className="flex gap-[24px] h-[40px] items-center">
+        <div className="pointer-events-auto relative z-10 flex gap-[24px] h-[40px] items-center">
           <Link href={`/course/${program.slug}`} className={GLASS_BTN}>
             {t("academy.enroll")}
             <Caret />
