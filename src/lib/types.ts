@@ -207,6 +207,8 @@ export interface AcademyLesson {
   duration: string;
   /** True when only a paying participant may open it. */
   locked: boolean;
+  /** Migration 050: who may open it — everyone, enrolled members, or buyers. */
+  access?: "public" | "members" | "paid";
   /** Ready-to-play address (Bunny HLS playlist for 047 rows). */
   videoUrl: string;
   /* The fields below exist only on 047 rows. A row from the old `lessons`

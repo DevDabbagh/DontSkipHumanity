@@ -279,6 +279,7 @@ interface LessonRow {
   title?: unknown;
   duration_seconds?: number | null;
   is_free?: boolean;
+  access?: string;
   video_guid?: string;
   video_url?: string;
   url?: string;
@@ -331,6 +332,10 @@ function mapSections(row: { academy_sections?: SectionRow[] }): AcademySection[]
           title: str(l.title),
           duration: clock(l.duration_seconds),
           locked: l.is_free === false,
+          access:
+            l.access === "members" || l.access === "paid" || l.access === "public"
+              ? l.access
+              : l.is_free === false ? "members" : "public",
           // A Bunny guid becomes the HLS playlist here, at read time, so a
           // change of CDN hostname never leaves dead URLs in the database.
           videoUrl: guid ? videoPlaybackUrl("bunny", guid) : (l.video_url || ""),

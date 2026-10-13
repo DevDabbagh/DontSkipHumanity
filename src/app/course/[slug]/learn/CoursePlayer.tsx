@@ -10,6 +10,10 @@ import { useLocaleHref } from "@/contexts/LocaleContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import CertificateClaim from "@/components/CertificateClaim";
+import QuestionForm from "@/components/academy/QuestionForm";
+import LessonNotes from "@/components/academy/LessonNotes";
+import LessonComments from "@/components/academy/LessonComments";
+import { authHeader, buyCourse, openLogin, useCourseAccess, type LockReason } from "@/lib/course-access";
 import { videoThumbnailUrl } from "@/lib/video-url";
 import type { AcademyProgram, AcademyLesson } from "@/lib/types";
 
@@ -110,15 +114,6 @@ function DownloadIcon({ size = 14 }: { size?: number }) {
     <svg width={size} height={size} viewBox="0 0 14 14" fill="none" aria-hidden>
       <path d="M7 1.5v8m0 0L4 6.6M7 9.5l3-2.9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M1.8 10.4v1a1.6 1.6 0 001.6 1.6h7.2a1.6 1.6 0 001.6-1.6v-1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function PublishIcon() {
-  // 12.476×12.476 (853:2026)
-  return (
-    <svg width="12.476" height="12.476" viewBox="0 0 13 13" fill="none" aria-hidden>
-      <path d="M9.1 1.6l2.3 2.3-6.6 6.6-3 .7.7-3 6.6-6.6z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -227,20 +222,18 @@ function LessonPanel({
   lesson,
   kind,
   isDone,
-  answer,
-  setAnswer,
   remaining,
   onComplete,
   program,
+  signedIn,
 }: {
   program: AcademyProgram;
   lesson: AcademyLesson | undefined;
   kind: string;
   isDone: boolean;
-  answer: string;
-  setAnswer: (v: string) => void;
   remaining: number;
   onComplete: () => void;
+  signedIn: boolean;
 }) {
   const wrap =
     "relative flex flex-col items-center gap-[18px] text-center w-full max-w-[640px] px-[24px] py-[40px]";
@@ -256,58 +249,15 @@ function LessonPanel({
     backgroundImage: "linear-gradient(93.1087deg, rgb(50,198,204) 0.1096%, rgb(178,52,149) 100.11%)",
   };
 
-  if (kind === "survey" || kind === "quiz") {
+  if ((kind === "survey" || kind === "quiz") && lesson) {
     return (
-      <div className={wrap}>
-        <p className={EYEBROW}>{KIND_LABEL[kind]}</p>
-        {title}
-        {isDone ? (
-          /* Worded so it promises nothing: answers are not stored yet. The
-             academy_answers table exists (047); saving into it needs a
-             signed-in, enrolled learner, which is the next piece of work. */
-          <p className={`${BODY_14} text-[#32C6CC]`}>Thank you for your answer.</p>
-        ) : (
-          <>
-            {/* The options captured from LearnWorlds (049): SIM/NÃO, or the
-                1–4 scale. One choice per survey, kept in `answer` like the
-                free-text fallback below so Submit behaves the same. */}
-            {lesson?.questions?.[0]?.options.length ? (
-              <div role="radiogroup" aria-label={lesson.questions[0].prompt} className="flex flex-wrap justify-center gap-[10px] w-full">
-                {lesson.questions[0].options.map((o) => {
-                  const on = answer === o.id;
-                  return (
-                    <button
-                      key={o.id}
-                      type="button"
-                      role="radio"
-                      aria-checked={on}
-                      onClick={() => setAnswer(o.id)}
-                      className={`px-[18px] py-[12px] rounded-[3px] ${BTN_13} transition-colors`}
-                      style={{
-                        background: on ? "rgba(50,198,204,0.14)" : "rgba(13,13,13,0.7)",
-                        border: `1px solid ${on ? "#32C6CC" : "#363636"}`,
-                        color: on ? "#F0F0F0" : "#9D9C9C",
-                      }}
-                    >
-                      {o.label}
-                    </button>
-                  );
-                })}
-              </div>
-            ) : (
-              <textarea
-                value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
-                placeholder="Your answer…"
-                className={`w-full h-[110px] p-[16px] rounded-[6px] resize-none outline-none ${BTN_13} text-[#F0F0F0] placeholder:text-[#363636] text-left`}
-                style={{ background: "rgba(13,13,13,0.7)", border: "1px solid #363636" }}
-              />
-            )}
-            <button type="button" disabled={!answer.trim()} onClick={onComplete} className={primary} style={primaryStyle}>
-              Submit
-            </button>
-          </>
+      <div className={`${wrap} items-stretch`}>
+        <p className={`${EYEBROW} text-center`}>{KIND_LABEL[kind]}</p>
+        <div className="text-center">{title}</div>
+        {isDone && kind === "survey" && (
+          <p className={`${BODY_14} text-center text-[#32C6CC]`}>Completed</p>
         )}
+        <QuestionForm key={lesson.id} lesson={lesson} kind={kind} signedIn={signedIn} onCompleted={onComplete} />
       </div>
     );
   }
@@ -412,6 +362,97 @@ function LessonPanel({
   return null;
 }
 
+/* The course-level call to action in the playlist, for anyone not yet in. */
+function EnrollStrip({
+  program,
+  signedIn,
+  onEnroll,
+}: {
+  program: AcademyProgram;
+  signedIn: boolean;
+  onEnroll: () => Promise<string | null>;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const price =
+    program.price != null ? `${program.currency === "EUR" ? "€" : `${program.currency} `}${program.price}` : "";
+  const go = async () => {
+    if (!signedIn) return openLogin();
+    setBusy(true);
+    setError("");
+    const err = program.isFree ? await onEnroll() : await buyCourse(program.id);
+    setBusy(false);
+    if (err) setError(err);
+  };
+  return (
+    <>
+      <button
+        type="button"
+        onClick={go}
+        disabled={busy}
+        className={`w-full rounded-[3px] px-[14px] py-[11px] ${BTN_13} text-[#F0F0F0] transition-opacity disabled:opacity-50`}
+        style={{ border: "1px solid rgba(240,240,240,0.2)", backgroundImage: "linear-gradient(93.1087deg, rgb(50,198,204) 0.1096%, rgb(178,52,149) 100.11%)" }}
+      >
+        {busy ? "One moment…" : !signedIn ? "Sign in to enroll" : program.isFree ? "Enroll for free" : `Buy course${price ? ` · ${price}` : ""}`}
+      </button>
+      {error && <p className="mt-[6px] text-[12px] text-[#E0607E]">{error}</p>}
+    </>
+  );
+}
+
+/* ── What a closed lesson offers instead ──────────────────────────────
+   sign_in → only a signed-in learner can enroll or buy
+   enroll  → a free course: one click joins it
+   buy     → a paid course or a "paid" lesson: Stripe Checkout */
+function LockCta({
+  reason,
+  program,
+  onEnroll,
+}: {
+  reason: LockReason;
+  program: AcademyProgram;
+  onEnroll: () => Promise<string | null>;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const price =
+    program.price != null ? `${program.currency === "EUR" ? "€" : `${program.currency} `}${program.price}` : "";
+  const label =
+    reason === "sign_in" ? "Sign in to unlock" : reason === "enroll" ? "Enroll for free" : `Buy course${price ? ` · ${price}` : ""}`;
+  const note =
+    reason === "sign_in"
+      ? "This lesson is for enrolled learners."
+      : reason === "enroll"
+        ? "Join this free course to open every lesson and save your progress."
+        : "This lesson is part of the paid course.";
+  const go = async () => {
+    if (reason === "sign_in") return openLogin();
+    setBusy(true);
+    setError("");
+    const err = reason === "enroll" ? await onEnroll() : await buyCourse(program.id);
+    setBusy(false);
+    if (err) setError(err);
+  };
+  return (
+    <div className="relative flex flex-col items-center gap-[14px] px-[24px] text-center text-[#F0F0F0]">
+      <span className="opacity-90">
+        <LockIcon size={60} />
+      </span>
+      <p className={`${BODY_14} max-w-[360px] text-[#C9C9C9]`}>{note}</p>
+      <button
+        type="button"
+        onClick={go}
+        disabled={busy}
+        className={`rounded-[3px] px-[20px] py-[12px] ${BTN_13} text-[#F0F0F0] transition-opacity disabled:opacity-50`}
+        style={{ border: "1px solid rgba(240,240,240,0.2)", backgroundImage: "linear-gradient(93.1087deg, rgb(50,198,204) 0.1096%, rgb(178,52,149) 100.11%)" }}
+      >
+        {busy ? "One moment…" : label}
+      </button>
+      {error && <p className="text-[12px] text-[#E0607E]">{error}</p>}
+    </div>
+  );
+}
+
 export default function CoursePlayer({
   program,
   lessonIndex,
@@ -434,7 +475,12 @@ export default function CoursePlayer({
   /* A locked lesson does not play. The page still shows everything around it —
      the curriculum, the resources, the notes — so a visitor can see what they
      would be joining rather than hitting a wall. */
-  const lockedNow = Boolean(lesson?.locked);
+  const access = useCourseAccess(program);
+  /* Until the learner's enrolment is known a members/paid lesson stays shut,
+     so the video never flashes open and then locks. */
+  const lockReason: LockReason = access.ready ? access.lockOf(lesson) : lesson?.access && lesson.access !== "public" ? "sign_in" : null;
+  const lockedNow = Boolean(lockReason);
+  const isLocked = (l: AcademyLesson | undefined) => (access.ready ? Boolean(access.lockOf(l)) : Boolean(l?.access && l.access !== "public"));
 
   /* Completion. For a signed-in learner every change is saved to their
      account (academy_lesson_progress) and read back on the next visit; for a
@@ -443,6 +489,32 @@ export default function CoursePlayer({
   const [done, setDone] = useState<Set<number>>(new Set());
   const { user } = useAuth();
   const enrolled = useRef(false);
+  const enrollmentRef = useRef(access.enrolled);
+  useEffect(() => {
+    enrollmentRef.current = access.enrolled;
+    if (access.enrolled) enrolled.current = true;
+  });
+
+  /* Back from Stripe: confirm the purchase so the course opens now rather
+     than whenever the webhook lands, then tidy the address bar. */
+  useEffect(() => {
+    if (!user) return;
+    const params = new URLSearchParams(window.location.search);
+    const sid = params.get("purchase");
+    if (!sid || !sid.startsWith("cs_")) return;
+    void (async () => {
+      await fetch("/api/academy/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...(await authHeader()) },
+        body: JSON.stringify({ sessionId: sid }),
+      }).catch(() => null);
+      await access.refresh();
+      params.delete("purchase");
+      const q = params.toString();
+      window.history.replaceState(null, "", window.location.pathname + (q ? `?${q}` : ""));
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
   const doneRef = useRef(done);
   useEffect(() => {
     doneRef.current = done;
@@ -452,11 +524,14 @@ export default function CoursePlayer({
     async (i: number, completed: boolean) => {
       const l = lessons[i];
       if (!user || !l?.id || !program.id) return;
-      if (!enrolled.current) {
-        // Free courses: join on first progress. Paid courses are joined at
-        // checkout, so "not free" here is expected and harmless.
-        await supabase.rpc("academy_enroll_learner", { p_program_id: program.id });
+      if (!enrolled.current && !enrollmentRef.current) {
+        // A free course: a signed-in learner joins on first progress. A paid
+        // course is joined only at checkout, so there is nothing to save.
+        if (!program.isFree) return;
+        const { error: e } = await supabase.rpc("academy_enroll_learner", { p_program_id: program.id });
+        if (e) return;
         enrolled.current = true;
+        void access.refresh();
       }
       const { error } = await supabase.from("academy_lesson_progress").upsert(
         { user_id: user.id, lesson_id: l.id, program_id: program.id, completed_at: completed ? new Date().toISOString() : null, updated_at: new Date().toISOString() },
@@ -464,7 +539,8 @@ export default function CoursePlayer({
       );
       if (error) console.warn("[academy] progress not saved:", error.message);
     },
-    [user, lessons, program.id]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [user, lessons, program.id, program.isFree]
   );
 
   // Signed in: load saved progress, and save anything done before signing in.
@@ -521,7 +597,6 @@ export default function CoursePlayer({
     setShownLesson(current);
     setUpNext(null);
   }
-  const [answer, setAnswer] = useState("");
   const markDone = (i: number) => {
     if (!doneRef.current.has(i)) void persist(i, true);
     setDone((d) => new Set(d).add(i));
@@ -543,9 +618,6 @@ export default function CoursePlayer({
     (lesson?.videoGuid ? videoThumbnailUrl("bunny", lesson.videoGuid) : "") || program.thumbnailUrl;
   const sections = program.sections ?? [];
   const [tab, setTab] = useState<"resources" | "notes" | "comments">("resources");
-  const [noteText, setNoteText] = useState("");
-  const [commentText, setCommentText] = useState("");
-  const [comments, setComments] = useState<{ name: string; text: string }[]>([]);
 
   const percent = total > 0 ? Math.round((done.size / total) * 100) : 0;
   const courseHref = href(`/course/${program.slug}`);
@@ -631,6 +703,11 @@ export default function CoursePlayer({
             {done.size} of {total} lessons
           </span>
         </div>
+        {access.ready && !access.paid && !(program.isFree && access.enrolled) && (
+          <div className="mt-[16px]">
+            <EnrollStrip program={program} signedIn={Boolean(user)} onEnroll={access.enrollFree} />
+          </div>
+        )}
       </div>
 
       {/* Modules */}
@@ -688,9 +765,9 @@ export default function CoursePlayer({
                       >
                         <span
                           className="shrink-0 flex items-center justify-center w-[20px]"
-                          style={{ color: l.locked ? "#363636" : isCurrent ? "#32C6CC" : "#595C5C" }}
+                          style={{ color: isLocked(l) ? "#363636" : isCurrent ? "#32C6CC" : "#595C5C" }}
                         >
-                          {l.locked ? (
+                          {isLocked(l) ? (
                             <LockIcon size={16} />
                           ) : isDone ? (
                             <CheckCircleIcon filled />
@@ -700,7 +777,7 @@ export default function CoursePlayer({
                         </span>
                         <span
                           className="flex-1 min-w-0 text-[13px] leading-[18px]"
-                          style={{ color: l.locked ? "#363636" : isCurrent ? "#F0F0F0" : isDone ? "#8B8F8F" : "#C9C9C9" }}
+                          style={{ color: isLocked(l) ? "#363636" : isCurrent ? "#F0F0F0" : isDone ? "#8B8F8F" : "#C9C9C9" }}
                         >
                           {l.title}
                         </span>
@@ -745,7 +822,7 @@ export default function CoursePlayer({
               autoPlay={current !== firstLesson}
               onEnded={() => {
                 markDone(current);
-                if (current < total - 1 && !lessons[current + 1]?.locked) setUpNext(5);
+                if (current < total - 1 && !isLocked(lessons[current + 1])) setUpNext(5);
               }}
             />
           ) : (
@@ -760,15 +837,13 @@ export default function CoursePlayer({
               />
 
               {lockedNow ? (
-                <Link
-                  href={courseHref}
-                  className="relative flex flex-col items-center gap-[14px] text-[#F0F0F0] transition-opacity hover:opacity-80"
-                >
-                  <span className="opacity-90">
-                    <LockIcon size={60} />
-                  </span>
-                  <span className={BTN_13}>Unlock this lesson</span>
-                </Link>
+                <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+                  {access.ready ? (
+                    <LockCta reason={lockReason} program={program} onEnroll={access.enrollFree} />
+                  ) : (
+                    <span className="relative text-[#F0F0F0] opacity-60"><LockIcon size={60} /></span>
+                  )}
+                </div>
               ) : kind === "video" ? (
                 <p className={`relative ${BODY_14} text-[#F0F0F0] px-[24px] text-center`}>
                   This video is being prepared.
@@ -779,13 +854,9 @@ export default function CoursePlayer({
                   lesson={lesson}
                   kind={kind}
                   isDone={done.has(current)}
-                  answer={answer}
-                  setAnswer={setAnswer}
+                  signedIn={Boolean(user)}
                   remaining={lessons.filter((l, i) => !done.has(i) && !["link", "certificate"].includes(kindOf(l))).length}
-                  onComplete={() => {
-                    markDone(current);
-                    setAnswer("");
-                  }}
+                  onComplete={() => markDone(current)}
                 />
               )}
             </>
@@ -893,71 +964,10 @@ export default function CoursePlayer({
               </div>
             ))}
 
-          {tab === "notes" && (
-            <div className="flex flex-col gap-[14px] items-end">
-              <textarea
-                value={noteText}
-                onChange={(e) => setNoteText(e.target.value)}
-                placeholder="Write your notes for this lesson..."
-                className={`w-full h-[160px] p-[16px] rounded-[8px] resize-none outline-none ${BTN_13} text-[#F0F0F0] placeholder:text-[#363636]`}
-                style={{ background: "#141414", border: "1px solid #1F1F1F" }}
-              />
-              <button
-                type="button"
-                disabled={!noteText.trim()}
-                onClick={() => setNoteText("")}
-                className={`flex gap-[7px] items-center justify-center w-full sm:w-[220px] p-[12px] rounded-[3px] ${BTN_13} text-[#F0F0F0] transition-opacity disabled:opacity-40`}
-                style={gradientBtn}
-              >
-                Save notes
-                <PublishIcon />
-              </button>
-            </div>
-          )}
+          {tab === "notes" && <LessonNotes userId={user?.id ?? null} lessonId={lesson?.id} programId={program.id} />}
 
           {tab === "comments" && (
-            <div className="flex flex-col gap-[18px]">
-              <div className="flex gap-[12px] items-start">
-                <span className="shrink-0 size-[32px] rounded-full" style={{ background: "#1F1F1F" }} />
-                <div className="flex-1 flex flex-col gap-[10px] items-end">
-                  <textarea
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                    placeholder="Add a comment..."
-                    className={`w-full h-[90px] p-[14px] rounded-[8px] resize-none outline-none ${BTN_13} text-[#F0F0F0] placeholder:text-[#363636]`}
-                    style={{ background: "#141414", border: "1px solid #1F1F1F" }}
-                  />
-                  <button
-                    type="button"
-                    disabled={!commentText.trim()}
-                    onClick={() => {
-                      const text = commentText.trim();
-                      if (!text) return;
-                      setComments((c) => [{ name: "You", text }, ...c]);
-                      setCommentText("");
-                    }}
-                    className={`px-[16px] py-[10px] rounded-[3px] ${BTN_13} text-[#F0F0F0] transition-opacity disabled:opacity-40`}
-                    style={gradientBtn}
-                  >
-                    Post
-                  </button>
-                </div>
-              </div>
-              {comments.map((c, i) => (
-                <div key={i} className="flex gap-[12px] items-start">
-                  <span
-                    className="shrink-0 size-[32px] rounded-full flex items-center justify-center text-[12px] font-semibold"
-                    style={{ background: "#1F1F1F", color: "#8B8F8F" }}
-                  >
-                    {c.name[0]}
-                  </span>
-                  <div className="min-w-0">
-                    <p className="text-[13px] font-medium text-[#F0F0F0]">{c.name}</p>
-                    <p className={`${BODY_14} text-[#8B8F8F] mt-[4px]`}>{c.text}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <LessonComments userId={user?.id ?? null} lessonId={lesson?.id} programId={program.id} canPost={!lockedNow && access.enrolled} />
           )}
         </div>
     </div>
@@ -973,7 +983,7 @@ export default function CoursePlayer({
            continues underneath: playlist on the left, the lesson on the right. */
         <div className="relative pt-[100px]">
           <div className="w-full bg-black">
-            <div className="mx-auto w-full" style={{ maxWidth: "calc((100vh - 100px) * 16 / 9)" }}>
+            <div className="mx-auto w-full" style={{ maxWidth: "calc((100vh - 150px) * 16 / 9)" }}>
               {videoBox}
             </div>
           </div>
@@ -989,7 +999,7 @@ export default function CoursePlayer({
         /* Default — on a laptop an app-like screen: the playlist and the
            lesson scroll on their own and the page does not. On a phone it is
            one column — the lesson first, the course content under it. */
-        <div className="relative pt-[100px] lg:grid lg:h-screen lg:grid-cols-[360px_minmax(0,1fr)]">
+        <div className="relative flex flex-col pt-[100px] lg:grid lg:h-screen lg:grid-cols-[360px_minmax(0,1fr)]">
           <div className="order-2 lg:order-1 lg:h-full lg:min-h-0">{playlist}</div>
           <section className="order-1 min-w-0 lg:order-2 lg:h-full lg:overflow-y-auto hide-scrollbar">
             <div className="mx-auto max-w-[1320px] px-0 pb-[80px] sm:px-8 sm:pt-[24px]">

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getStripe, getStripeMode, webhookSecretFor } from "@/lib/stripe";
 import { recordDonation } from "@/lib/donations";
+import { isCourseSession, recordCoursePurchase } from "@/lib/course-purchase";
 import {
   recordSubscription,
   extendSubscription,
@@ -50,6 +51,12 @@ export async function POST(req: Request) {
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object;
+      /* A course purchase is an enrolment, not a donation — kept out of the
+         donation totals entirely. */
+      if (isCourseSession(session)) {
+        await recordCoursePurchase(session);
+        break;
+      }
       /* Source of truth for recording — fires even if the donor closes the
          tab before being redirected back. Idempotent via stripe_session_id. */
       await recordDonation(session);

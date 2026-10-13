@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
 import SupportCTA from "@/components/SupportCTA";
+import EnrollButton from "@/components/academy/EnrollButton";
 import { useLocaleHref } from "@/contexts/LocaleContext";
 import { slugifyName } from "@/lib/slug";
 import { useState } from "react";
@@ -538,18 +539,16 @@ export default function CourseContent({
                         )}
                       </div>
 
-                      <Link
-                        href={learnHref}
+                      <EnrollButton
+                        program={program}
+                        learnHref={learnHref}
                         className={`flex gap-[7px] h-[44px] items-center justify-center p-[14px] rounded-[3px] w-full ${BTN_13} text-[#F0F0F0] transition-opacity hover:opacity-90`}
                         style={{
                           border: "1px solid rgba(240,240,240,0.2)",
                           backgroundImage:
                             "linear-gradient(93.3672deg, rgb(50,198,204) 0.1096%, rgb(178,52,149) 100.11%)",
                         }}
-                      >
-                        {program.isFree ? "Enroll Now" : "Enroll Now"}
-                        <ArrowRight />
-                      </Link>
+                      />
                     </div>
                   </div>
 
