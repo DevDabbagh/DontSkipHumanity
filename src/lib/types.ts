@@ -317,11 +317,13 @@ export type ArticleStatus = "draft" | "published" | "scheduled" | "archived";
 
 export interface ArticleBlock {
   id: string;
-  type: "text" | "image" | "quote" | "heading" | "divider" | "html";
+  type: "text" | "image" | "quote" | "heading" | "divider" | "html" | "cta";
   content: string;
   caption?: string;
   credit?: string;
   level?: 2 | 3;
+  /** cta blocks: where the button goes. */
+  url?: string;
 }
 
 export interface ArticleAuthor {

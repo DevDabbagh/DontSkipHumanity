@@ -513,6 +513,13 @@ export default function StudioProjectContent({
                   label="Directed by"
                   value={project.credits.direction || project.credits.hosts.join(", ")}
                 />
+                {/* A show with both a director and hosts used to lose the
+                    hosts — they only stood in when no director was set
+                    (live QA, 16 Oct 2026). Shown only when both exist, so
+                    the credits block keeps its shape otherwise. */}
+                {project.credits.direction && project.credits.hosts.length > 0 && (
+                  <CreditRow label="Hosted by" value={project.credits.hosts.join(", ")} />
+                )}
                 <CreditRow label={t("studio.producedBy")} value={project.credits.production} />
                 <CreditRow
                   label="Co-Production"

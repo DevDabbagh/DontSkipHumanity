@@ -159,7 +159,35 @@ function RenderBlock({ block }: { block: ArticleBlock }) {
           >
             {block.content}
           </p>
+          {/* The dashboard's "— Attribution" field (stored as credit). */}
+          {block.credit && (
+            <cite className="block not-italic pl-[32px] pt-[14px] text-[12px] leading-[15px] font-medium text-[#595C5C]">
+              — {block.credit.replace(/^[—–-]\s*/, "")}
+            </cite>
+          )}
         </blockquote>
+      );
+
+    case "cta":
+      /* The dashboard's "Button" block: label in content, link in url.
+         Offered by the article editor but never rendered here (QA 16 Oct). */
+      if (!block.content || !block.url) return null;
+      return (
+        <div className="pt-[20px] pb-[60px]">
+          <a
+            href={block.url}
+            {...(/^https?:\/\//.test(block.url) && !block.url.includes("dontskiphumanity") && !block.url.includes("dont-skip-humanity")
+              ? { target: "_blank", rel: "noopener noreferrer" }
+              : {})}
+            className="inline-flex items-center gap-[7px] px-[18px] py-[12px] rounded-[3px] text-[13px] font-medium text-[#F0F0F0] transition-opacity hover:opacity-90"
+            style={{
+              border: "1px solid rgba(240,240,240,0.2)",
+              backgroundImage: "linear-gradient(93.37deg, rgb(50,198,204) 0.11%, rgb(178,52,149) 100.11%)",
+            }}
+          >
+            {block.content} →
+          </a>
+        </div>
       );
 
     case "divider":
@@ -510,6 +538,11 @@ export default function ArticleContent({
                 <span style={{ color: sectionColour(article.section) }}>{article.section}</span>
               )}
               {article.date && <span className="text-[#595C5C]">{formatDate(article.date)}</span>}
+              {/* Set in the dashboard ("Reading time"); 0 means not measured
+                  and shows nothing. It was saved but never displayed (QA 16 Oct). */}
+              {article.readMinutes > 0 && (
+                <span className="text-[#595C5C]">{article.readMinutes} min read</span>
+              )}
             </span>
           </div>
         )}
